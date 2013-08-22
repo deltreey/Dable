@@ -31,8 +31,8 @@ Creating your Dable is as simple as using the id of a div from your page and cal
 ```javascript
 dable.BuildAll(divId);
 ```
-Everything in Dable is designed to be modifiable by you.
------
+__Everything in Dable is designed to be modifiable by you.__
+
 The Search is an array of callbacks, so you can add your own with a simple command.
 
 ```javascript
