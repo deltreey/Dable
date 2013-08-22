@@ -238,7 +238,10 @@
 						return false;
 					}
 				}
-				body.innerHTML = '';
+				var tempBody = body.cloneNode(false);
+				while (tempBody.firstChild) {
+				    tempBody.removeChild(tempBody.firstChild);
+				}
 				var displayedRows = [];
 				var row = document.createElement('tr');
 				var cell = document.createElement('td');
@@ -253,7 +256,8 @@
 				if (pageDisplay + $export.pageSize >= $export.visibleRows.length) { //if this is too big, only show remaining rows
 					length = $export.visibleRows.length;
 				}
-				//loop through the visible rows and display this page
+			    //loop through the visible rows and display this page
+				var rows = [];
 				for (var i = pageDisplay; i < length; ++i) {
 					var tempRow = row.cloneNode(false);
 					if (i % 2 == 0) {
@@ -272,8 +276,13 @@
 						tempCell.innerHTML = text;
 						tempRow.appendChild(tempCell);
 					}
-					body.appendChild(tempRow);
+					tempBody.appendChild(tempRow);
 				}
+				
+				if (body.parentElement) {
+				    body.parentElement.replaceChild(tempBody, body);
+				}
+				body = tempBody;
 
 				var footer = document.getElementById($export.id + '_footer');
 				$export.UpdateFooter(footer);
