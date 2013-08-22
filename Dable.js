@@ -662,7 +662,7 @@
 				return false;
 			}
 			
-			return $exports;
+			return $export;
 		};
 	});
 }(typeof define === 'function' && define.amd ? define : function (deps, factory) {
