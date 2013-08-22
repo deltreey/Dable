@@ -21,11 +21,7 @@
 			};	
 				
 			$export.searchFunc = function (event) {
-				if (!event) {
-					return false;
-				}
-				
-				var searchBox = event.srcElement;
+				var searchBox = this;
 				if (searchBox.id != $export.id + '_search') {
 					return false;
 				}
@@ -57,9 +53,6 @@
 			};
 			
 			$export.sortFunc = function (event) {
-				if (!event) {
-					return false;
-				}
 				var columnCell = this;  //use this here, as the event.srcElement is probably a <span>
 				var sortSpan = columnCell.querySelector('.table-sort');
 				var columnTag = columnCell.getAttribute('data-tag');
