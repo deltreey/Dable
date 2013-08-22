@@ -22,8 +22,9 @@ dable.SetColumnNames(columns);	// Because the data is raw, we need to name our c
 If you want to style your Dable, you can use custom styling with easy to remember classes and IDs.
 Or you can just select JQueryUI or Bootstrap for preconfigured styles.
 
+```javascript
 dable.style = "JqueryUI";	// Don't worry about uppercase/lowercase
-
+```
 Dable is pure javascript, so you don't have to add a CSS file to your project.  However, if you use a custom style, make sure you include the relevant stylesheet.
 
 Creating your Dable is as simple as using the id of a div from your page and calling
