@@ -3,7 +3,7 @@ Dable
 
 Dable (pronounced 'dabble') is a simple javascript table control with filtering, sorting, paging, styles, and more!
 
-Dable is simple and elegant.  It has _zero_ dependencies and works in IE8+.
+Dable is simple and elegant.  It has __zero__ dependencies and works in IE8+.
 
 Initialize a new Dable with
 
@@ -72,3 +72,5 @@ dable.UpdateStyle();				// Reapply our styles
 ```
 
 Every function inside of Dable is accessible, down to the initial rendering functions!
+
+For more examples, check out the site! http://deltreey.github.io/Dable/
