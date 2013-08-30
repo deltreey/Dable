@@ -1,0 +1,134 @@
+<!doctype html>
+<!-- The Time Machine GitHub pages theme was designed and developed by Jon Rohan, on Feb 7, 2012. -->
+<!-- Follow him for fun. http://twitter.com/jonrohan. Tail his code on http://github.com/jonrohan -->
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <link rel="stylesheet" href="stylesheets/stylesheet.css" media="screen"/>
+  <link rel="stylesheet" href="stylesheets/pygment_trac.css"/>
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+  <script type="text/javascript" src="javascripts/script.js"></script>
+
+  <title>Dable</title>
+  <meta name="description" content="Dable (pronounced 'dabble') is a simple javascript table control with filtering, sorting, paging, styles, and more!">
+
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+</head>
+
+<body>
+
+  <div class="wrapper">
+    <header>
+      <h1 class="title">Dable</h1>
+    </header>
+    <div id="container">
+      <p class="tagline">Dable (pronounced 'dabble') is a simple javascript table control with filtering, sorting, paging, styles, and more!</p>
+      <div id="main" role="main">
+        <div class="download-bar">
+        <div class="inner">
+          <a href="https://github.com/deltreey/Dable/tarball/master" class="download-button tar"><span>Download</span></a>
+          <a href="https://github.com/deltreey/Dable/zipball/master" class="download-button zip"><span>Download</span></a>
+          <a href="https://github.com/deltreey/Dable" class="code">View Dable on GitHub</a>
+        </div>
+        <span class="blc"></span><span class="trc"></span>
+        </div>
+        <article class="markdown-body">
+          <h1>
+<a name="dable" class="anchor" href="#dable"><span class="octicon octicon-link"></span></a>Dable</h1>
+
+<p>Dable (pronounced 'dabble') is a simple javascript table control with filtering, sorting, paging, styles, and more!</p>
+
+<p>Dable is simple and elegant.  It has <em>zero</em> dependencies and works in IE8+.</p>
+
+<p>Initialize a new Dable with</p>
+
+<div class="highlight"><pre><span class="kd">var</span> <span class="nx">dable</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Dable</span><span class="p">();</span>
+</pre></div>
+
+<p>Build your Dable by giving it data and column names.</p>
+
+<div class="highlight"><pre><span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span> <span class="p">],</span> <span class="p">[</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span> <span class="p">]</span> <span class="p">];</span>
+<span class="kd">var</span> <span class="nx">columns</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">'Odd'</span><span class="p">,</span> <span class="s1">'Even'</span> <span class="p">];</span>
+
+<span class="nx">dable</span><span class="p">.</span><span class="nx">SetDataAsRows</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>      <span class="c1">// We can import data as rows or columns for flexibility</span>
+<span class="nx">dable</span><span class="p">.</span><span class="nx">SetColumnNames</span><span class="p">(</span><span class="nx">columns</span><span class="p">);</span>  <span class="c1">// Because the data is raw, we need to name our columns</span>
+</pre></div>
+
+<p>If you want to style your Dable, you can use custom styling with easy to remember classes and IDs.
+Or you can just select JQueryUI or Bootstrap for preconfigured styles.</p>
+
+<div class="highlight"><pre><span class="nx">dable</span><span class="p">.</span><span class="nx">style</span> <span class="o">=</span> <span class="s2">"JqueryUI"</span><span class="p">;</span>   <span class="c1">// Don't worry about uppercase/lowercase</span>
+</pre></div>
+
+<p>Dable is pure javascript, so you don't have to add a CSS file to your project.  However, if you use a custom style, make sure you include the relevant stylesheet.</p>
+
+<p>Creating your Dable is as simple as using the id of a div from your page and calling</p>
+
+<div class="highlight"><pre><span class="nx">dable</span><span class="p">.</span><span class="nx">BuildAll</span><span class="p">(</span><span class="nx">divId</span><span class="p">);</span>
+</pre></div>
+
+<p><strong>Everything in Dable is designed to be modifiable by you.</strong></p>
+
+<p>The Search is an array of callbacks, so you can add your own with a simple command.</p>
+
+<div class="highlight"><pre><span class="nx">dable</span><span class="p">.</span><span class="nx">filters</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">searchText</span><span class="p">,</span> <span class="nx">cellValue</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">//this is a custom filter</span>
+<span class="p">});</span>
+</pre></div>
+
+<p>Because it's a simple array, you can wipe out the existing filters altogether if you don't like them.
+Your columns are a simple object array.  Each object has a Tag, a FriendlyName, and can be provided with CustomRendering and CustomSortFunc callbacks</p>
+
+<div class="highlight"><pre><span class="p">{</span> <span class="nx">Tag</span><span class="p">,</span> <span class="nx">FriendlyName</span><span class="p">,</span> <span class="nx">CustomSortFunc</span><span class="p">,</span> <span class="nx">CustomRendering</span> <span class="p">}</span>
+</pre></div>
+
+<p>These callbacks are simple to use too.  When you want to render something uniquely, just return the text to render and it'll be stuck in the cell.</p>
+
+<div class="highlight"><pre><span class="nx">dable</span><span class="p">.</span><span class="nx">columnData</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">CustomSortFunc</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">cellValue</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="s1">'&lt;a target="_blank" href="/?cell='</span> <span class="o">+</span> <span class="nx">cellValue</span> <span class="o">+</span> <span class="s1">'"&gt;'</span> <span class="o">+</span> <span class="nx">cellValue</span> <span class="o">+</span> <span class="s1">'&lt;/a&gt;'</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>When you want to sort something uniquely, just return an array of the rows to present in whatever order you want.</p>
+
+<div class="highlight"><pre><span class="nx">dable</span><span class="p">.</span><span class="nx">columnData</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="nx">CustomSortFunc</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">columnIndex</span><span class="p">,</span> <span class="nx">ascending</span><span class="p">,</span> <span class="nx">currentRows</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">currentRows</span><span class="p">.</span><span class="nx">reverse</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>What about printing?  If your table is paged, you need to be able to output all the rows to print!
+Here's a sample of how to do this extremely complex Dable procedure.</p>
+
+<div class="highlight"><pre><span class="nx">dable</span><span class="p">.</span><span class="nx">pageNumber</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>               <span class="c1">// Go back to the first page</span>
+<span class="nx">dable</span><span class="p">.</span><span class="nx">pageSize</span> <span class="o">=</span> <span class="nx">dable</span><span class="p">.</span><span class="nx">rows</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="c1">// Change the page size to the whole table size</span>
+<span class="nx">dable</span><span class="p">.</span><span class="nx">UpdateDisplayedRows</span><span class="p">();</span>        <span class="c1">// Update the table</span>
+<span class="nx">dable</span><span class="p">.</span><span class="nx">UpdateStyle</span><span class="p">();</span>                <span class="c1">// Reapply our styles</span>
+</pre></div>
+
+<p>Every function inside of Dable is accessible, down to the initial rendering functions!</p>
+        </article>
+      </div>
+    </div>
+    <footer>
+      <div class="owner">
+      <p><a href="https://github.com/deltreey" class="avatar"><img src="https://1.gravatar.com/avatar/0cee84351ff4c40bacdb5db506942290?d=https%3A%2F%2Fidenticons.github.com%2F97b8447a2e66e128746b7b33ea6b2050.png&amp;s=30" width="48" height="48"/></a> <a href="https://github.com/deltreey">deltreey</a> maintains <a href="https://github.com/deltreey/Dable">Dable</a></p>
+
+
+      </div>
+      <div class="creds">
+        <small>This page generated using <a href="https://pages.github.com/">GitHub Pages</a><br/>theme by <a href="https://twitter.com/jonrohan/">Jon Rohan</a></small>
+      </div>
+    </footer>
+  </div>
+  <div class="current-section">
+    <a href="#top">Scroll to top</a>
+    <a href="https://github.com/deltreey/Dable/tarball/master" class="tar">tar</a><a href="https://github.com/deltreey/Dable/zipball/master" class="zip">zip</a><a href="" class="code">source code</a>
+    <p class="name"></p>
+  </div>
+
+  
+</body>
+</html>
