@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="../Dable.js"></script>
+<!--Include the Bootstrap CDN-->
+<link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div id="BootstrapDable"></div>
+<script type="text/javascript">
+	var dable = new Dable();
+	var data = [ [ 1, 2 ], [ 3, 4 ] ];
+	var columns = [ 'Odd', 'Even' ];
+	dable.SetDataAsRows(data);
+	dable.SetColumnNames(columns);
+	dable.style = 'bootstrap';	//set the style
+	dable.BuildAll("BootstrapDable");
+</script>
+</body>
+</html>
