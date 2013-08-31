@@ -468,6 +468,18 @@
 				pageRight.setAttribute('class', pageClass);
 			};
 			
+			$export.CheckForTable = function () {//Check for existing table
+				var tableDiv = document.getElementById($export.id);
+				if (tableDiv) {
+					var table = tableDiv.querySelector("table");
+					if (table) {
+							var newTable = $export.GenerateTableFromHtml(table);	//Make it a Dable!
+							$export.BuildAll(newTable);
+							return true;
+					}
+				}
+				return false;
+			}
 			$export.GenerateTableFromHtml = function (tableNode) {
 				if (!tableNode) {
 					return false;
@@ -492,13 +504,18 @@
 				
 				var parentDiv = tableNode.parentElement;
 				parentDiv.innerHTML = '';
-				$export.BuildAll(parentDiv.id);
+				
+				return parentDiv.id;
 			};
+			
 			$export.BuildAll = function (tableId) {
 				if (!tableId) {
 					tableId = $export.id;
 				}
 				$export.id = tableId;
+				if ($export.CheckForTable()) {
+					return true;
+				}
 				var tableDiv = document.getElementById(tableId);
 				if (!tableDiv
 					|| tableDiv.nodeName.toLowerCase() != 'div') {
@@ -679,15 +696,7 @@
 				return false;
 			}
 			
-			//Check for existing table
-			var tableDiv = document.getElementById(tableId);
-			if (tableDiv) {
-				var table = tableDiv.querySelector("table");
-				if (table) {
-						$export.GenerateTableFromHtml(table);	//Make it a Dable!
-				}
-			}
-			
+			$export.CheckForTable();
 			return $export;
 		};
 	});
