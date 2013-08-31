@@ -420,6 +420,7 @@
 				header.setAttribute('class', 'panel-heading');
 				footer.setAttribute('class', 'panel-footer');
 				tableDiv.setAttribute('class', 'panel panel-info');
+				tableDiv.setAttribute('style', 'margin-bottom: 0;');
 
 				tableDiv.innerHTML = '';
 				var tableBox = div.cloneNode(false);

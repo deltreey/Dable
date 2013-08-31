@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="../Dable.js"></script>
+<!--Include the JQueryUI CDN-->
+<link href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" rel="stylesheet">
+</head>
+<body>
+<div id="JQueryUIDable"></div>
+<script type="text/javascript">
+	var dable = new Dable();
+	var data = [ [ 1, 2 ], [ 3, 4 ] ];
+	var columns = [ 'Odd', 'Even' ];
+	dable.SetDataAsRows(data);
+	dable.SetColumnNames(columns);
+	dable.style = 'jqueryui';	//set the style
+	dable.BuildAll("JQueryUIDable");
+</script>
+</body>
+</html>
