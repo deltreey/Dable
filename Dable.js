@@ -1,8 +1,6 @@
 !(function (define) {
 	define([], function () {
 		return function (tableId) {
-			
-		
 			var $export = {
 				id: tableId,
 				columns: [],
@@ -51,7 +49,6 @@
 				$export.UpdateDisplayedRows(body);
 				$export.UpdateStyle(document.getElementById($export.id));
 			};
-			
 			$export.sortFunc = function (event) {
 				var columnCell = this;  //use this here, as the event.srcElement is probably a <span>
 				var sortSpan = columnCell.querySelector('.table-sort');
@@ -127,7 +124,6 @@
 
 				return newRows;
 			};
-			
 			$export.filters = [
 				//PHRASES FILTER
 				function (searchText, value) {
@@ -192,7 +188,6 @@
 					}
 				}
 			};
-			
 			$export.SetDataAsColumns = function (columns) {
 				if (!columns) {
 					return false;
@@ -211,7 +206,6 @@
 				$export.columns = columns;
 				$export.rows = tableRows;
 			};
-			
 			$export.SetDataAsRows = function (rows) {
 				if (!rows) {
 					return false;
@@ -288,7 +282,6 @@
 				$export.UpdateFooter(footer);
 				return body;
 			};
-			
 			$export.UpdateFooter = function (footer) {
 				if (!footer) {
 					return false;
@@ -324,7 +317,6 @@
 
 				return footer;
 			};
-			
 			$export.UpdateStyle = function (tableDiv, style) {
 				if (!tableDiv) {
 					tableDiv = document.getElementById($export.id);
@@ -414,7 +406,6 @@
 				}
 				pageRight.setAttribute('class', pageRightClass);
 			};
-			
 			$export.ApplyBootstrapStyles = function (tableDiv) {
 				if (!tableDiv) {
 					return false;
@@ -475,7 +466,33 @@
 				pageRight.appendChild(pageRightSpan);
 				pageRight.setAttribute('class', pageClass);
 			};
-
+			
+			$export.GenerateTableFromHtml = function (tableNode) {
+				if (!tableNode) {
+					return false;
+				}
+				var headers = tableNode.querySelectorAll("thead tr th");
+				var colNames = [];
+				for (var i = 0; i < headers.length; ++i) {	//add our column names
+					colNames.push(headers[i].innerHTML);
+				}
+				$export.SetColumnNames(colNames);
+				
+				var rowsHtml = tableNode.querySelectorAll("tbody tr");
+				var allRows = [];
+				for (var i = 0; i < rowsHtml.length; ++i) {
+					allRows.push([]);
+					var rowCells = rowsHtml[i].children;
+					for (var j = 0; j < rowCells.length; ++j) {
+						allRows[i].push(rowCells[j].innerHTML);
+					}
+				}
+				$export.SetDataAsRows(allRows);
+				
+				var parentDiv = tableNode.parentElement;
+				parentDiv.innerHTML = '';
+				$export.BuildAll(parentDiv.id);
+			};
 			$export.BuildAll = function (tableId) {
 				if (!tableId) {
 					tableId = $export.id;
@@ -497,7 +514,6 @@
 
 				$export.UpdateStyle(tableDiv);
 			};
-			
 			$export.BuildHeader = function (tableDiv) {
 				if (!tableDiv) {
 					return false;
@@ -550,7 +566,6 @@
 
 				return head;
 			};
-			
 			$export.BuildTable = function (tableDiv) {
 				if (!tableDiv) {
 					return false;
@@ -601,7 +616,6 @@
 
 				return table;
 			};
-			
 			$export.BuildFooter = function (tableDiv) {
 				if (!tableDiv) {
 					return false;
@@ -662,6 +676,15 @@
 					}
 				}
 				return false;
+			}
+			
+			//Check for existing table
+			var tableDiv = document.getElementById(tableId);
+			if (tableDiv) {
+				var table = tableDiv.querySelector("table");
+				if (table) {
+						$export.GenerateTableFromHtml(table);	//Make it a Dable!
+				}
 			}
 			
 			return $export;
