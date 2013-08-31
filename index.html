@@ -7,7 +7,8 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta name="description" content="Dable (pronounced 'dabble') is a simple javascript table control with filtering, sorting, paging, styles, and more!">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
+  <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">\
+  <link href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" rel="stylesheet">
   <link rel="stylesheet" href="stylesheets/stylesheet.css" media="screen"/>
   <link rel="stylesheet" href="stylesheets/pygment_trac.css"/>
   <style type="text/css">
@@ -57,12 +58,12 @@ Here are some examples of how you can use it.</p>
 <div id="defaultExample" class="bordered">
 	<div id="DefaultDable"></div>
 	<script type="text/javascript">
-		var dable = new Dable();
+		var dable1 = new Dable();
 		var data = [ [ 1, 2 ], [ 3, 4 ] ];
 		var columns = [ 'Odd', 'Even' ];
-		dable.SetDataAsRows(data);
-		dable.SetColumnNames(columns);
-		dable.BuildAll("DefaultDable");
+		dable1.SetDataAsRows(data);
+		dable1.SetColumnNames(columns);
+		dable1.BuildAll("DefaultDable");
 	</script>
 </div>
 <a href="Examples/Default.html">See it Alone</a>
@@ -109,7 +110,7 @@ Here are some examples of how you can use it.</p>
 		</table>
 	</div>
 	<script type="text/javascript">
-		var dable = new Dable("TableDable");
+		var dable2 = new Dable("TableDable");
 	</script>
 </div>
 <a href="Examples/FromTable.html">See it Alone</a>
@@ -151,13 +152,13 @@ Here are some examples of how you can use it.</p>
 <div id="defaultExample" class="bordered">
 	<div id="BootstrapDable"></div>
 	<script type="text/javascript">
-		var dable = new Dable();
+		var dable3 = new Dable();
 		var data = [ [ 1, 2 ], [ 3, 4 ] ];
 		var columns = [ 'Odd', 'Even' ];
-		dable.SetDataAsRows(data);
-		dable.SetColumnNames(columns);
-		dable.style = 'bootstrap';	//set the style
-		dable.BuildAll("BootstrapDable");
+		dable3.SetDataAsRows(data);
+		dable3.SetColumnNames(columns);
+		dable3.style = 'bootstrap';	//set the style
+		dable3.BuildAll("BootstrapDable");
 	</script>
 </div>
 <a href="Examples/BootstrapStyle.html">See it Alone</a>
@@ -166,6 +167,7 @@ Here are some examples of how you can use it.</p>
 &lt;<span class="ow">html</span>&gt;
 &lt;<span class="ow">head</span>&gt;
 &lt;<span class="ow">script</span> src=<span class="s1">&quot;Dable.js&quot;</span>&gt;&lt;/<span class="ow">script</span>&gt;
+<span class="c">&lt;!--Include the Bootstrap CDN--&gt;</span>
 &lt;<span class="ow">link</span> href=<span class="s1">&quot;//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css&quot;</span> rel=<span class="s1">&quot;stylesheet&quot;</span>&gt;
 &lt;/<span class="ow">head</span>&gt;
 &lt;<span class="ow">body</span>&gt;
@@ -178,6 +180,43 @@ Here are some examples of how you can use it.</p>
 	<span class="vi">dable</span>.SetColumnNames(<span class="vi">columns</span>);
 	<span class="vi">dable</span>.style = <span class="s1">'bootstrap'</span>;	<span class="c">//set the style</span>
 	<span class="vi">dable</span>.BuildAll(<span class="s1">&quot;BootstrapDable&quot;</span>);
+&lt;/<span class="ow">script</span>&gt;
+&lt;/<span class="ow">body</span>&gt;
+&lt;/<span class="ow">html</span>&gt;</pre>
+</div>
+
+<h3>Dable with JQueryUI styling:</h3>
+<div id="defaultExample" class="bordered">
+	<div id="JQueryUIDable"></div>
+	<script type="text/javascript">
+		var dable4 = new Dable();
+		var data = [ [ 1, 2 ], [ 3, 4 ] ];
+		var columns = [ 'Odd', 'Even' ];
+		dable4.SetDataAsRows(data);
+		dable4.SetColumnNames(columns);
+		dable4.style = 'jqueryui';	//set the style
+		dable4.BuildAll("JQueryUIDable");
+	</script>
+</div>
+<a href="Examples/JQueryUIStyle.html">See it Alone</a>
+<div class="highlight">
+	<pre>&lt;<span class="kd">!DOCTYPE</span> <span class="ow">html</span>&gt;
+&lt;<span class="ow">html</span>&gt;
+&lt;<span class="ow">head</span>&gt;
+&lt;<span class="ow">script</span> src=<span class="s1">&quot;Dable.js&quot;</span>&gt;&lt;/<span class="ow">script</span>&gt;
+<span class="c">&lt;!--Include the JQueryUI CDN--&gt;</span>
+&lt;<span class="ow">link</span> href=<span class="s1">&quot;http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css&quot;</span> rel=<span class="s1">&quot;stylesheet&quot;</span>&gt;
+&lt;/<span class="ow">head</span>&gt;
+&lt;<span class="ow">body</span>&gt;
+&lt;<span class="ow">div</span> id=<span class="s1">&quot;JQueryUIDable&quot;</span>&gt;&lt;/<span class="ow">div</span>&gt;
+&lt;<span class="ow">script</span> type=<span class="s1">&quot;text/javascript</span>&quot;&gt;
+	<span class="kd">var</span> <span class="vi">dable</span> = <span class="ow">new</span> <span class="nc">Dable</span>();
+	<span class="kd">var</span> <span class="vi">data</span> = [ [ <span class="m">1</span>, <span class="m">2</span> ], [ <span class="m">3</span>, <span class="m">4</span> ] ];
+	<span class="kd">var</span> <span class="vi">columns</span> = [ <span class="s1">'Odd'</span>, <span class="s1">'Even'</span> ];
+	<span class="vi">dable</span>.SetDataAsRows(<span class="vi">data</span>);
+	<span class="vi">dable</span>.SetColumnNames(<span class="vi">columns</span>);
+	<span class="vi">dable</span>.style = <span class="s1">'jquerui'</span>;	<span class="c">//set the style</span>
+	<span class="vi">dable</span>.BuildAll(<span class="s1">&quot;JQueryUIDable&quot;</span>);
 &lt;/<span class="ow">script</span>&gt;
 &lt;/<span class="ow">body</span>&gt;
 &lt;/<span class="ow">html</span>&gt;</pre>
