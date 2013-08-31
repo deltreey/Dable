@@ -415,14 +415,15 @@
 				var header = tableDiv.querySelector('#' + $export.id + '_header');
 				var footer = tableDiv.querySelector('#' + $export.id + '_footer');
 				var table = tableDiv.querySelector('table');
-				table.setAttribute('class', 'table-striped');
+				table.setAttribute('class', 'table table-bordered table-striped');
+				table.setAttribute('style', 'margin-bottom: 0;');
 				header.setAttribute('class', 'panel-heading');
 				footer.setAttribute('class', 'panel-footer');
 				tableDiv.setAttribute('class', 'panel panel-info');
+				tableDiv.setAttribute('style', 'margin-bottom: 0;');
 
 				tableDiv.innerHTML = '';
 				var tableBox = div.cloneNode(false);
-				tableBox.setAttribute('class', 'panel-body');
 				tableBox.appendChild(table);
 				tableDiv.appendChild(header);
 				tableDiv.appendChild(tableBox);
@@ -435,7 +436,7 @@
 
 				var headCells = table.querySelectorAll('th');
 				for (var i = 0; i < headCells.length; ++i) {
-					headCells[i].setAttribute('style', 'border: 1px solid black; padding: 5px;');
+					headCells[i].setAttribute('style', 'padding: 5px;');
 					var sort = headCells[i].querySelector('.table-sort');
 					if (sort.innerHTML == 'v') {
 						sort.setAttribute('class', 'table-sort glyphicon glyphicon-chevron-up');
