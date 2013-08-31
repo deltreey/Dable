@@ -84,45 +84,66 @@ Here are some examples of how you can use it.</p>
 &lt;/<span class="ow">html</span>&gt;</pre>
 </div>
 
-<p><strong>Everything in Dable is designed to be modifiable by you.</strong></p>
-
-<p>The Search is an array of callbacks, so you can add your own with a simple command.</p>
-
-<div class="highlight"><pre><span class="nx">dable</span><span class="p">.</span><span class="nx">filters</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">searchText</span><span class="p">,</span> <span class="nx">cellValue</span><span class="p">)</span> <span class="p">{</span>
-    <span class="c1">//this is a custom filter</span>
-<span class="p">});</span>
-</pre></div>
-
-<p>Because it's a simple array, you can wipe out the existing filters altogether if you don't like them.
-Your columns are a simple object array.  Each object has a Tag, a FriendlyName, and can be provided with CustomRendering and CustomSortFunc callbacks</p>
-
-<div class="highlight"><pre><span class="p">{</span> <span class="nx">Tag</span><span class="p">,</span> <span class="nx">FriendlyName</span><span class="p">,</span> <span class="nx">CustomSortFunc</span><span class="p">,</span> <span class="nx">CustomRendering</span> <span class="p">}</span>
-</pre></div>
-
-<p>These callbacks are simple to use too.  When you want to render something uniquely, just return the text to render and it'll be stuck in the cell.</p>
-
-<div class="highlight"><pre><span class="nx">dable</span><span class="p">.</span><span class="nx">columnData</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">CustomSortFunc</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">cellValue</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="s1">'&lt;a target="_blank" href="/?cell='</span> <span class="o">+</span> <span class="nx">cellValue</span> <span class="o">+</span> <span class="s1">'"&gt;'</span> <span class="o">+</span> <span class="nx">cellValue</span> <span class="o">+</span> <span class="s1">'&lt;/a&gt;'</span><span class="p">;</span>
-<span class="p">}</span>
-</pre></div>
-
-<p>When you want to sort something uniquely, just return an array of the rows to present in whatever order you want.</p>
-
-<div class="highlight"><pre><span class="nx">dable</span><span class="p">.</span><span class="nx">columnData</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="nx">CustomSortFunc</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">columnIndex</span><span class="p">,</span> <span class="nx">ascending</span><span class="p">,</span> <span class="nx">currentRows</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">currentRows</span><span class="p">.</span><span class="nx">reverse</span><span class="p">();</span>
-<span class="p">}</span>
-</pre></div>
-
-<p>What about printing?  If your table is paged, you need to be able to output all the rows to print!
-Here's a sample of how to do this extremely complex Dable procedure.</p>
-
-<div class="highlight"><pre><span class="nx">dable</span><span class="p">.</span><span class="nx">pageNumber</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>               <span class="c1">// Go back to the first page</span>
-<span class="nx">dable</span><span class="p">.</span><span class="nx">pageSize</span> <span class="o">=</span> <span class="nx">dable</span><span class="p">.</span><span class="nx">rows</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="c1">// Change the page size to the whole table size</span>
-<span class="nx">dable</span><span class="p">.</span><span class="nx">UpdateDisplayedRows</span><span class="p">();</span>        <span class="c1">// Update the table</span>
-<span class="nx">dable</span><span class="p">.</span><span class="nx">UpdateStyle</span><span class="p">();</span>                <span class="c1">// Reapply our styles</span>
-</pre></div>
-
-<p>Every function inside of Dable is accessible, down to the initial rendering functions!</p>
+<h3>A Dable built from an existing HTML table:</h3>
+<div id="defaultExample" class="bordered">
+	<div id="TableDable">
+		<table>
+			<thead>
+				<tr>
+					<th>Odd</th>
+					<th>Even</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>1</td>
+					<td>2</td>
+				</tr>
+				<tr>
+					<td>3</td>
+					<td>4</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<script type="text/javascript">
+		var dable = new Dable("TableDable");
+	</script>
+</div>
+<a href="Examples/FromTable.html">See it Alone</a>
+<div class="highlight">
+	<pre>&lt;<span class="kd">!DOCTYPE</span> <span class="ow">html</span>&gt;
+&lt;<span class="ow">html</span>&gt;
+&lt;<span class="ow">head</span>&gt;
+&lt;<span class="ow">script</span> src=<span class="s1">&quot;../Dable.js&quot;</span>&gt;&lt;/<span class="ow">script</span>&gt;
+&lt;/<span class="ow">head</span>&gt;
+&lt;<span class="ow">body</span>&gt;
+&lt;<span class="ow">div</span> id=<span class="s1">&quot;TableDable&quot;</span>&gt;
+  &lt;<span class="ow">table</span>&gt;
+    &lt;<span class="ow">thead</span>&gt;
+      &lt;<span class="ow">tr</span>&gt;
+        &lt;<span class="ow">th</span>&gt;Odd&lt;/<span class="ow">th</span>&gt;
+        &lt;<span class="ow">th</span>&gt;Even&lt;/<span class="ow">th</span>&gt;
+      &lt;/<span class="ow">tr</span>&gt;
+    &lt;/<span class="ow">thead</span>&gt;
+    &lt;<span class="ow">tbody</span>&gt;
+      &lt;<span class="ow">tr</span>&gt;
+        &lt;<span class="ow">td</span>&gt;1&lt;/<span class="ow">td</span>&gt;
+        &lt;<span class="ow">td</span>&gt;2&lt;/<span class="ow">td</span>&gt;
+      &lt;/<span class="ow">tr</span>&gt;
+      &lt;<span class="ow">tr</span>&gt;
+        &lt;<span class="ow">td</span>&gt;3&lt;/<span class="ow">td</span>&gt;
+        &lt;<span class="ow">td</span>&gt;4&lt;/<span class="ow">td</span>&gt;
+      &lt;/<span class="ow">tr</span>&gt;
+    &lt;/<span class="ow">tbody</span>&gt;
+  &lt;/<span class="ow">table</span>&gt;
+&lt;/<span class="ow">div</span>&gt;
+&lt;<span class="ow">script</span> type=<span class="s1">&quot;text/javascript</span>&quot;&gt;
+	<span class="kd">var</span> <span class="vi">dable</span> = <span class="ow">new</span> <span class="nc">Dable</span>(<span class="s1">&quot;TableDable&quot;</span>);
+&lt;/<span class="ow">script</span>&gt;
+&lt;/<span class="ow">body</span>&gt;
+&lt;/<span class="ow">html</span>&gt;</pre>
+</div>
         </article>
       </div>
     </div>
