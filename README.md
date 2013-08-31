@@ -32,6 +32,33 @@ Creating your Dable is as simple as using the id of a div from your page and cal
 ```javascript
 dable.BuildAll(divId);
 ```
+Or, if you prefer HTML to Javascript, build your table in HTML, and then create your Dable in one step.
+
+```html
+<div id="TableDable">
+	<table>
+		<thead>
+			<tr>
+				<th>Odd</th>
+				<th>Even</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>1</td>
+				<td>2</td>
+			</tr>
+			<tr>
+				<td>3</td>
+				<td>4</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+<script type="text/javascript">
+	var dable = new Dable("TableDable");
+</script>
+```
 __Everything in Dable is designed to be modifiable by you.__
 
 The Search is an array of callbacks, so you can add your own with a simple command.
