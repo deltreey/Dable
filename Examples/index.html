@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="../Dable.js"></script>
+</head>
+<body>
+<div id="DefaultDable"></div>
+<script type="text/javascript">
+	var dable = new Dable();
+	var data = [ [ 1, 2 ], [ 3, 4 ] ];
+	var columns = [ 'Odd', 'Even' ];
+	dable.SetDataAsRows(data);
+	dable.SetColumnNames(columns);
+	dable.BuildAll("DefaultDable");
+</script>
+</body>
+</html>
