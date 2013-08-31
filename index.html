@@ -221,6 +221,96 @@ Here are some examples of how you can use it.</p>
 &lt;/<span class="ow">body</span>&gt;
 &lt;/<span class="ow">html</span>&gt;</pre>
 </div>
+
+<h3>A Dable with alternating styles:</h3>
+<p>Dable builds cleanly each time, so we can rebuild the table with new styles anytime we want</p>
+<div id="defaultExample" class="bordered">
+	<div id="AlternatingDable">
+		<table>
+			<thead>
+				<tr>
+					<th>Odd</th>
+					<th>Even</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>1</td>
+					<td>2</td>
+				</tr>
+				<tr>
+					<td>3</td>
+					<td>4</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<script type="text/javascript">
+		var dable5 = new Dable("AlternatingDable");
+		setInterval(function() {
+			if (dable5.style == "jqueryui") {
+				dable5.style = "bootstrap";
+			}
+			else if (!dable5.style) {
+				dable5.style = "jqueryui";
+			}
+			else {
+				dable5.style = "";
+			}
+			dable5.BuildAll("AlternatingDable");
+		}, 3000);
+	</script>
+</div>
+<a href="Examples/Alternating.html">See it Alone</a>
+<div class="highlight">
+	<pre>&lt;<span class="kd">!DOCTYPE</span> <span class="ow">html</span>&gt;
+&lt;<span class="ow">html</span>&gt;
+&lt;<span class="ow">head</span>&gt;
+&lt;<span class="ow">script</span> src=<span class="s1">&quot;Dable.js&quot;</span>&gt;&lt;/<span class="ow">script</span>&gt;
+<span class="c">&lt;!--Include the JQueryUI CDN--&gt;</span>
+&lt;<span class="ow">link</span> href=<span class="s1">&quot;http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css&quot;</span> rel=<span class="s1">&quot;stylesheet&quot;</span>&gt;
+<span class="c">&lt;!--Include the Bootstrap CDN--&gt;</span>
+&lt;<span class="ow">link</span> href=<span class="s1">&quot;//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css&quot;</span> rel=<span class="s1">&quot;stylesheet&quot;</span>&gt;
+&lt;/<span class="ow">head</span>&gt;
+&lt;<span class="ow">body</span>&gt;
+&lt;<span class="ow">div</span> id=<span class="s1">&quot;AlternatingDable&quot;</span>&gt;
+  &lt;<span class="ow">table</span>&gt;
+    &lt;<span class="ow">thead</span>&gt;
+      &lt;<span class="ow">tr</span>&gt;
+        &lt;<span class="ow">th</span>&gt;Odd&lt;/<span class="ow">th</span>&gt;
+        &lt;<span class="ow">th</span>&gt;Even&lt;/<span class="ow">th</span>&gt;
+      &lt;/<span class="ow">tr</span>&gt;
+    &lt;/<span class="ow">thead</span>&gt;
+    &lt;<span class="ow">tbody</span>&gt;
+      &lt;<span class="ow">tr</span>&gt;
+        &lt;<span class="ow">td</span>&gt;1&lt;/<span class="ow">td</span>&gt;
+        &lt;<span class="ow">td</span>&gt;2&lt;/<span class="ow">td</span>&gt;
+      &lt;/<span class="ow">tr</span>&gt;
+      &lt;<span class="ow">tr</span>&gt;
+        &lt;<span class="ow">td</span>&gt;3&lt;/<span class="ow">td</span>&gt;
+        &lt;<span class="ow">td</span>&gt;4&lt;/<span class="ow">td</span>&gt;
+      &lt;/<span class="ow">tr</span>&gt;
+    &lt;/<span class="ow">tbody</span>&gt;
+  &lt;/<span class="ow">table</span>&gt;
+&lt;/<span class="ow">div</span>&gt;
+&lt;<span class="ow">script</span> type=<span class="s1">&quot;text/javascript</span>&quot;&gt;
+	<span class="kd">var</span> <span class="vi">dable</span> = <span class="ow">new</span> <span class="nc">Dable</span>(<span class="s1">&quot;AlternatingDable&quot;</span>);
+	setInterval(<span class="kd">function</span> () {
+		<span class="kd">if</span> (<span class="vi">dable</span>.style == <span class="s1">&quot;jqueryui&quot;</span>) {
+			<span class="vi">dable</span>.style = <span class="s1">&quot;bootstrap&quot;</span>;
+		}
+		<span class="kd">else if</span> (!<span class="vi">dable</span>.style) {
+			<span class="vi">dable</span>.style = <span class="s1">&quot;jqueryui&quot;</span>;
+		}
+		<span class="kd">else</span> {
+			<span class="vi">dable</span>.style = <span class="s1">&quot;&quot;</span>;
+		}
+		<span class="vi">dable</span>.BuildAll(<span class="s1">&quot;AlternatingDable&quot;</span>);
+	}, <span class="m">3000</span>);
+&lt;/<span class="ow">script</span>&gt;
+&lt;/<span class="ow">body</span>&gt;
+&lt;/<span class="ow">html</span>&gt;</pre>
+</div>
         </article>
       </div>
     </div>

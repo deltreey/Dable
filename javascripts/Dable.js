@@ -329,22 +329,14 @@
 				}
 				$export.style = style;
 
-				var oddRows = tableDiv.querySelectorAll('.table-row-odd');
-				for (var i = 0; i < oddRows.length; ++i) {
-					oddRows[i].setAttribute('style', 'background-color: ' + $export.oddRowColor);
-				}
-				var evenRows = tableDiv.querySelectorAll('.table-row-even');
-				for (var i = 0; i < evenRows.length; ++i) {
-					evenRows[i].setAttribute('style', 'background-color: ' + $export.evenRowColor);
-				}
-				var cells = tableDiv.querySelectorAll('td');
-				for (var i = 0; i < cells.length; ++i) {
-					cells[i].setAttribute('style', 'padding: 5px;');
-				}
+				//initial style cleanup
+				$export.RemoveStyles(tableDiv);
+				//base styles for 'none', the other styles sometimes build on these, so we apply them beforehand
+				$export.ApplyBaseStyles(tableDiv);
+				
 				if (style.toLowerCase() == 'none') {
-					return false;
+					return true;
 				}
-
 				else {
 					if (style.toLowerCase() == 'jqueryui') {
 						$export.ApplyJqueryUIStyles(tableDiv);
@@ -354,7 +346,57 @@
 					}
 				}
 			};
-
+			
+			$export.RemoveStyles = function (tableDiv) {
+				tableDiv.removeAttribute('class');
+				var children = tableDiv.children;
+				for (var i = 0; i < children.length; ++i) {
+					children[i].removeAttribute('class');
+				}
+				var headerChildren = children[0].children;
+				for (var i = 0; i < headerChildren.length; ++i) {
+					headerChildren[i].removeAttribute('class');
+				}
+				
+				var table = children[1];
+				var thead = table.children[0];
+				thead.removeAttribute('class');
+				thead.children[0].removeAttribute('class');
+				var theadCells = thead.children[0].children;
+				for (var i = 0; i < theadCells.length; ++i) {
+					theadCells[i].removeAttribute('class');
+				}
+				var tbody = table.children[1];
+				tbody.removeAttribute('class');
+				
+				var footerChildren = children[2].children;
+				var leftChildren = footerChildren[0].children;
+				for (var i = 0; i < leftChildren.length; ++i) {
+					leftChildren[i].removeAttribute('class');
+				}
+				var rightChildren = footerChildren[1].children;
+				for (var i = 0; i < rightChildren.length; ++i) {
+					rightChildren[i].removeAttribute('class');
+				}
+			}
+			$export.ApplyBaseStyles = function (tableDiv) {
+				var oddRows = tableDiv.querySelectorAll('.table-row-odd');
+				for (var i = 0; i < oddRows.length; ++i) {
+					oddRows[i].setAttribute('style', 'background-color: ' + $export.oddRowColor);
+				}
+				var evenRows = tableDiv.querySelectorAll('.table-row-even');
+				for (var i = 0; i < evenRows.length; ++i) {
+					evenRows[i].setAttribute('style', 'background-color: ' + $export.evenRowColor);
+				}
+				var cells = tableDiv.querySelectorAll('td, th');
+				for (var i = 0; i < cells.length; ++i) {
+					cells[i].setAttribute('style', 'padding: 5px;');
+				}
+				var header = tableDiv.querySelector('#' + $export.id + '_header');
+				header.setAttribute('style', 'padding: 5px;');
+				var footer = tableDiv.querySelector('#' + $export.id + '_footer');
+				footer.setAttribute('style', 'padding: 5px;');
+			}
 			$export.ApplyJqueryUIStyles = function (tableDiv) {
 				if (!tableDiv) {
 					return false;
@@ -364,12 +406,10 @@
 				var span = document.createElement('span');
 
 				header.setAttribute('class', 'fg-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix');
-				header.setAttribute('style', 'padding: 5px;');
 
 				var headCells = tableDiv.querySelectorAll('th');
 				for (var i = 0; i < headCells.length; ++i) {
 					headCells[i].setAttribute('class', 'ui-state-default');
-					headCells[i].setAttribute('style', 'padding: 5px;');
 					var sort = headCells[i].querySelector('.table-sort');
 					if (sort.innerHTML == 'v') {
 						sort.setAttribute('class', 'table-sort ui-icon ui-icon-triangle-1-s');
@@ -381,7 +421,6 @@
 				}
 
 				footer.setAttribute('class', 'fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix');
-				footer.setAttribute('style', 'padding: 5px;');
 				var pageClass = 'fg-button ui-button ui-state-default ui-corner-left';
 
 				var pageLeft = footer.querySelector('#' + $export.id + '_page_prev');
@@ -423,10 +462,8 @@
 				tableDiv.setAttribute('style', 'margin-bottom: 0;');
 
 				tableDiv.innerHTML = '';
-				var tableBox = div.cloneNode(false);
-				tableBox.appendChild(table);
 				tableDiv.appendChild(header);
-				tableDiv.appendChild(tableBox);
+				tableDiv.appendChild(table);
 				tableDiv.appendChild(footer);
 
 				var tableRows = table.querySelectorAll('.tbody tr');
@@ -436,13 +473,12 @@
 
 				var headCells = table.querySelectorAll('th');
 				for (var i = 0; i < headCells.length; ++i) {
-					headCells[i].setAttribute('style', 'padding: 5px;');
 					var sort = headCells[i].querySelector('.table-sort');
 					if (sort.innerHTML == 'v') {
-						sort.setAttribute('class', 'table-sort glyphicon glyphicon-chevron-up');
+						sort.setAttribute('class', 'table-sort glyphicon glyphicon-chevron-down');
 					}
 					else {
-						sort.setAttribute('class', 'table-sort glyphicon glyphicon-chevron-down');
+						sort.setAttribute('class', 'table-sort glyphicon glyphicon-chevron-up');
 					}
 					sort.innerHTML = '';
 				}
@@ -468,6 +504,18 @@
 				pageRight.setAttribute('class', pageClass);
 			};
 			
+			$export.CheckForTable = function () {//Check for existing table
+				var tableDiv = document.getElementById($export.id);
+				if (tableDiv) {
+					var table = tableDiv.querySelector("table");
+					if (table) {
+							var newTable = $export.GenerateTableFromHtml(table);	//Make it a Dable!
+							$export.BuildAll(newTable);
+							return true;
+					}
+				}
+				return false;
+			}
 			$export.GenerateTableFromHtml = function (tableNode) {
 				if (!tableNode) {
 					return false;
@@ -492,13 +540,18 @@
 				
 				var parentDiv = tableNode.parentElement;
 				parentDiv.innerHTML = '';
-				$export.BuildAll(parentDiv.id);
+				
+				return parentDiv.id;
 			};
+			
 			$export.BuildAll = function (tableId) {
 				if (!tableId) {
 					tableId = $export.id;
 				}
 				$export.id = tableId;
+				if ($export.CheckForTable()) {
+					return true;
+				}
 				var tableDiv = document.getElementById(tableId);
 				if (!tableDiv
 					|| tableDiv.nodeName.toLowerCase() != 'div') {
@@ -679,15 +732,7 @@
 				return false;
 			}
 			
-			//Check for existing table
-			var tableDiv = document.getElementById(tableId);
-			if (tableDiv) {
-				var table = tableDiv.querySelector("table");
-				if (table) {
-						$export.GenerateTableFromHtml(table);	//Make it a Dable!
-				}
-			}
-			
+			$export.CheckForTable();
 			return $export;
 		};
 	});

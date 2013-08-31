@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="../javascripts/Dable.js"></script>
+<!--Include the Bootstrap CDN-->
+<link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
+<!--Include the JQueryUI CDN-->
+<link href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" rel="stylesheet">
+</head>
+<body>
+<div id="AlternatingDable">
+	<table>
+		<thead>
+			<tr>
+				<th>Odd</th>
+				<th>Even</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>1</td>
+				<td>2</td>
+			</tr>
+			<tr>
+				<td>3</td>
+				<td>4</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+<script type="text/javascript">
+	var dable = new Dable("AlternatingDable");
+	setInterval(function() {
+		if (dable.style == "jqueryui") {
+			dable.style = "bootstrap";
+		}
+		else if (!dable.style) {
+			dable.style = "jqueryui";
+		}
+		else {
+			dable.style = "";
+		}
+		dable.BuildAll("AlternatingDable");
+	}, 3000);
+</script>
+</body>
+</html>
