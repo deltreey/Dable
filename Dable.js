@@ -461,11 +461,6 @@
 				tableDiv.setAttribute('class', 'panel panel-info');
 				tableDiv.setAttribute('style', 'margin-bottom: 0;');
 
-				tableDiv.innerHTML = '';
-				tableDiv.appendChild(header);
-				tableDiv.appendChild(table);
-				tableDiv.appendChild(footer);
-
 				var tableRows = table.querySelectorAll('.tbody tr');
 				for (var i = 0; i < tableRows.length; ++i) {    //remove manual striping
 					tableRows[i].removeAttribute('style');
@@ -495,7 +490,6 @@
 				pageLeftSpan.setAttribute('class', 'glyphicon glyphicon-arrow-left');
 				pageLeft.appendChild(pageLeftSpan);
 				pageLeft.setAttribute('class', pageClass);
-
 				
 				pageRight.innerHTML = '';
 				var pageRightSpan = span.cloneNode(false);
