@@ -518,6 +518,10 @@ footer .owner p a {
   @include box-sizing(border-box);
 }
 
+#LargeDataDable table {
+	margin: 0;
+}
+
 .highlight .hll { background-color: #404040 }
 .highlight  { color: #d0d0d0;  font-weight: bold; }
 .highlight .c { color: #999999; font-style: italic } /* Comment */

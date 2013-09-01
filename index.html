@@ -11,6 +11,7 @@
   <link href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" rel="stylesheet">
   <link rel="stylesheet" href="stylesheets/stylesheet.css" media="screen"/>
   <link rel="stylesheet" href="stylesheets/pygment_trac.css"/>
+  <link rel="stylesheet" href="stylesheets/toastr.min.css"/>
   <style type="text/css">
 	.bordered {
 		border: 1px solid black;
@@ -28,6 +29,7 @@
 	}
   </style>
   <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+  <script type="text/javascript" src="javascripts/toastr.js"></script>
   <script type="text/javascript" src="javascripts/script.js"></script>
   <script src="javascripts/Dable.js"></script>
   <title>Dable</title>
@@ -88,7 +90,7 @@ Here are some examples of how you can use it.</p>
 </div>
 
 <h3>A Dable built from an existing HTML table:</h3>
-<div id="defaultExample" class="bordered">
+<div id="htmlTableExample" class="bordered">
 	<div id="TableDable">
 		<table>
 			<thead>
@@ -149,7 +151,7 @@ Here are some examples of how you can use it.</p>
 </div>
 
 <h3>Dable with Bootstrap styling:</h3>
-<div id="defaultExample" class="bordered">
+<div id="bootstrapExample" class="bordered">
 	<div id="BootstrapDable"></div>
 	<script type="text/javascript">
 		var dable3 = new Dable();
@@ -186,7 +188,7 @@ Here are some examples of how you can use it.</p>
 </div>
 
 <h3>Dable with JQueryUI styling:</h3>
-<div id="defaultExample" class="bordered">
+<div id="jqueryuiExample" class="bordered">
 	<div id="JQueryUIDable"></div>
 	<script type="text/javascript">
 		var dable4 = new Dable();
@@ -224,7 +226,7 @@ Here are some examples of how you can use it.</p>
 
 <h3>A Dable with alternating styles:</h3>
 <p>Dable builds cleanly each time, so we can rebuild the table with new styles anytime we want</p>
-<div id="defaultExample" class="bordered">
+<div id="alternatingExample" class="bordered">
 	<div id="AlternatingDable">
 		<table>
 			<thead>
@@ -257,7 +259,7 @@ Here are some examples of how you can use it.</p>
 			else {
 				dable5.style = "";
 			}
-			dable5.BuildAll("AlternatingDable");
+			dable5.UpdateStyle(document.getElementById("AlternatingDable"));
 		}, 3000);
 	</script>
 </div>
@@ -305,20 +307,29 @@ Here are some examples of how you can use it.</p>
 		<span class="kd">else</span> {
 			<span class="vi">dable</span>.style = <span class="s1">&quot;&quot;</span>;
 		}
-		<span class="vi">dable</span>.BuildAll(<span class="s1">&quot;AlternatingDable&quot;</span>);
+		<span class="vi">dable</span>.UpdateStyle(<span class="vg">document</span>.getElementById(<span class="s1">&quot;AlternatingDable&quot;</span>));
 	}, <span class="m">3000</span>);
 &lt;/<span class="ow">script</span>&gt;
 &lt;/<span class="ow">body</span>&gt;
 &lt;/<span class="ow">html</span>&gt;</pre>
 </div>
+
+<h3 style='display: inline;'>Dable with Large Data sets:</h3> <button id="btn-showLargeData" class='btn btn-default' style='display: inline;'>Show That Again</button>
+<br /><br />
+<div id="largeDataExample">
+	<div id="LargeDataDable"></div>
+	<script type="text/javascript">
+		ShowLargeData();
+	</script>
+</div>
+<a href="Examples/LargeData.html">See it Alone</a>
+
         </article>
       </div>
     </div>
     <footer>
       <div class="owner">
       <p><a href="https://github.com/deltreey" class="avatar"><img src="https://1.gravatar.com/avatar/0cee84351ff4c40bacdb5db506942290?d=https%3A%2F%2Fidenticons.github.com%2F97b8447a2e66e128746b7b33ea6b2050.png&amp;s=30" width="48" height="48"/></a> <a href="https://github.com/deltreey">deltreey</a> maintains <a href="https://github.com/deltreey/Dable">Dable</a></p>
-
-
       </div>
       <div class="creds">
         <small>This page generated using <a href="https://pages.github.com/">GitHub Pages</a><br/>theme by <a href="https://twitter.com/jonrohan/">Jon Rohan</a></small>
