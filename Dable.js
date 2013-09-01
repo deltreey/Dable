@@ -64,7 +64,8 @@
 				if (columnIndex == -1) {
 					return false;
 				}
-
+				
+				$export.sortColumn = columnIndex;
 				var ascend = false;
 				if ($export.sortOrder.length > 3 && $export.sortOrder.substr(0, 4).toLowerCase() == 'desc') {
 					ascend = true;
@@ -380,6 +381,19 @@
 				}
 			}
 			$export.ApplyBaseStyles = function (tableDiv) {
+				var table = tableDiv.querySelector('table');
+				table.setAttribute('style', 'width: 100%;');
+				
+				var sorts = tableDiv.querySelectorAll('.table-sort');
+				for (var i = 0; i < sorts.length; ++i) {
+					sorts[i].setAttribute('class', 'table-sort');
+					sorts[i].innerHTML = '^';
+					if (i == $export.sortColumn) {
+						if ($export.sortOrder.toLowerCase().substr(0, 4) == 'desc') {
+							sorts[i].innerHTML = 'v';
+						}
+					}
+				}
 				var oddRows = tableDiv.querySelectorAll('.table-row-odd');
 				for (var i = 0; i < oddRows.length; ++i) {
 					oddRows[i].setAttribute('style', 'background-color: ' + $export.oddRowColor);
@@ -543,14 +557,23 @@
 					tableId = $export.id;
 				}
 				$export.id = tableId;
-				if ($export.CheckForTable()) {
-					return true;
-				}
 				var tableDiv = document.getElementById(tableId);
-				if (!tableDiv
-					|| tableDiv.nodeName.toLowerCase() != 'div') {
-					return false;   //get the right element type
+				
+				if (!tableDiv) {
+					if (!$export.rows || $export.rows.length < 1) {
+						if ($export.CheckForTable()) {
+							return true;	//build table off of existing data
+						}
+					}
+					else {
+						return false;   //get the right element type
+					}
 				}
+				else if (tableDiv.nodeName.toLowerCase() != 'div') {
+					return false;
+				}
+				
+				tableDiv.innerHTML = '';
 
 				var header = $export.BuildHeader(tableDiv);
 				var table = $export.BuildTable(tableDiv);
