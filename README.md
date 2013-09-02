@@ -77,7 +77,7 @@ Your columns are a simple object array.  Each object has a Tag, a FriendlyName, 
 These callbacks are simple to use too.  When you want to render something uniquely, just return the text to render and it'll be stuck in the cell.
 
 ```javascript
-dable.columnData[0].CustomSortFunc = function (cellValue) {
+dable.columnData[0].CustomRendering = function (cellValue) {
 	return '<a target="_blank" href="/?cell=' + cellValue + '">' + cellValue + '</a>';
 }
 ```
