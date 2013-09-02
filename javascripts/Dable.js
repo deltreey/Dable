@@ -469,7 +469,7 @@
 				var footer = tableDiv.querySelector('#' + $export.id + '_footer');
 				var table = tableDiv.querySelector('table');
 				table.setAttribute('class', 'table table-bordered table-striped');
-				table.setAttribute('style', 'margin-bottom: 0;');
+				table.setAttribute('style', 'width: 100%; margin-bottom: 0;');
 				header.setAttribute('class', 'panel-heading');
 				footer.setAttribute('class', 'panel-footer');
 				tableDiv.setAttribute('class', 'panel panel-info');
