@@ -132,6 +132,7 @@
 					value = value.toString().toLowerCase();
 					var phrases = [];
 					var regex = /\s*".*?"\s*/g;
+					var match;
 					while(match = regex.exec(searchText)) {
 						var phrase = match[0].replace(/"/g, '').trim();
 						phrases.push(phrase);
@@ -150,6 +151,7 @@
 					searchText = searchText.toString().toLowerCase();
 					value = value.toString().toLowerCase();
 					var regex = /\s*".*?"\s*/g;
+					var match;
 					while (match = regex.exec(searchText)) {
 						searchText = searchText.replace(match[0], ' ');
 					} //remove phrases
