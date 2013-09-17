@@ -442,7 +442,7 @@
 				var pageLeft = footer.querySelector('#' + $export.id + '_page_prev');
 				pageLeft.innerHTML = '';
 				var pageLeftSpan = span.cloneNode(false);
-				pageLeftSpan.setAttribute('class', 'ui-icon ui-icon-circle-arrow-w');
+				pageLeftSpan.setAttribute('class', 'ui-icon ui-icon-circle-arrow-e');
 				pageLeft.appendChild(pageLeftSpan);
 				if (pageLeft.getAttribute('disabled')) {
 					pageLeft.setAttribute('class', pageClass + ' ui-state-disabled');
@@ -450,7 +450,7 @@
 				var pageRight = footer.querySelector('#' + $export.id + '_page_next');
 				pageRight.innerHTML = '';
 				var pageRightSpan = span.cloneNode(false);
-				pageRightSpan.setAttribute('class', 'ui-icon ui-icon-circle-arrow-e');
+				pageRightSpan.setAttribute('class', 'ui-icon ui-icon-circle-arrow-w');
 				pageRight.appendChild(pageRightSpan);
 				if (pageRight.getAttribute('disabled')) {
 					pageRight.setAttribute('class', pageClass + ' ui-state-disabled');
