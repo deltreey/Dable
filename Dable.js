@@ -461,11 +461,11 @@
 				    var pageLast = footer.querySelector('#' + $export.id + '_page_last');
 				    pageFirst.innerHTML = '';
 				    var pageFirstSpan = span.cloneNode(false);
-				    pageFirstSpan.setAttribute('class', 'ui-icon ui-icon-arrowthickstop-1-e');
+				    pageFirstSpan.setAttribute('class', 'ui-icon ui-icon-arrowthickstop-1-w');
 				    pageFirst.appendChild(pageFirstSpan);
 				    pageLast.innerHTML = '';
 				    var pageLastSpan = span.cloneNode(false);
-				    pageLastSpan.setAttribute('class', 'ui-icon ui-icon-arrowthickstop-1-w');
+				    pageLastSpan.setAttribute('class', 'ui-icon ui-icon-arrowthickstop-1-e');
 				    pageLast.appendChild(pageLastSpan);
 				}
 			};
