@@ -12,11 +12,17 @@
 				columnData: [],
 				pageNumber: 0,
 				pageSize: 10,
-				pageSizes: [10,25,50,100],
+				pageSizes: [10, 25, 50, 100],
+				pagerSize: 0,
+                pagerIncludeFirstAndLast: false,
 				style: 'none',
 				evenRowColor: '#E2E4FF',
 				oddRowColor: 'white'
-			};	
+			};
+
+			$export.NumberOfPages = function () {
+			    return $export.visibleRows.length / $export.pageSize;
+			};
 				
 			$export.searchFunc = function (event) {
 				var searchBox = this;
@@ -302,21 +308,8 @@
 						showing.innerHTML += " (filtered from " + ($export.rows.length) + " total entries)";
 					}
 				}
-
-				var pageLeft = footer.querySelector('#' + $export.id + '_page_prev');
-				var pageRight = footer.querySelector('#' + $export.id + '_page_next');
-				if (start == 1) {
-					pageLeft.setAttribute('disabled', 'disabled');
-				}
-				else {
-					pageLeft.removeAttribute('disabled');
-				}
-				if (end >= $export.visibleRows.length) {
-					pageRight.setAttribute('disabled', 'disabled');
-				}
-				else {
-					pageRight.removeAttribute('disabled');
-				}
+				var right = footer.querySelector('#' + $export.id + '_page_prev').parentElement;
+				footer.replaceChild($export.BuildPager(), right);
 
 				return footer;
 			};
@@ -412,6 +405,8 @@
 				header.setAttribute('style', 'padding: 5px;');
 				var footer = tableDiv.querySelector('#' + $export.id + '_footer');
 				footer.setAttribute('style', 'padding: 5px;');
+				var right = footer.querySelector('#' + $export.id + '_page_prev').parentElement;
+				footer.replaceChild($export.BuildPager(), right);
 			}
 			$export.ApplyJqueryUIStyles = function (tableDiv) {
 				if (!tableDiv) {
@@ -437,29 +432,42 @@
 				}
 
 				footer.setAttribute('class', 'fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix');
-				var pageClass = 'fg-button ui-button ui-state-default ui-corner-left';
+				var pageClass = 'fg-button ui-button ui-state-default ui-corner-left table-page';
+
+				var pageButtons = footer.querySelectorAll('.table-page');
+				for (var i = 0; i < pageButtons.length; ++i) {
+				    pageButtons[i].setAttribute('class', pageClass);
+				}
 
 				var pageLeft = footer.querySelector('#' + $export.id + '_page_prev');
 				pageLeft.innerHTML = '';
 				var pageLeftSpan = span.cloneNode(false);
 				pageLeftSpan.setAttribute('class', 'ui-icon ui-icon-circle-arrow-w');
 				pageLeft.appendChild(pageLeftSpan);
-				var pageLeftClass = pageClass;
 				if (pageLeft.getAttribute('disabled')) {
-					pageLeftClass += ' ui-state-disabled';
+					pageLeft.setAttribute('class', pageClass + ' ui-state-disabled');
 				}
-				pageLeft.setAttribute('class', pageLeftClass);
-
 				var pageRight = footer.querySelector('#' + $export.id + '_page_next');
 				pageRight.innerHTML = '';
 				var pageRightSpan = span.cloneNode(false);
 				pageRightSpan.setAttribute('class', 'ui-icon ui-icon-circle-arrow-e');
 				pageRight.appendChild(pageRightSpan);
-				var pageRightClass = pageClass;
 				if (pageRight.getAttribute('disabled')) {
-					pageRightClass += ' ui-state-disabled';
+					pageRight.setAttribute('class', pageClass + ' ui-state-disabled');
 				}
-				pageRight.setAttribute('class', pageRightClass);
+
+				if ($export.pagerIncludeFirstAndLast) {
+				    var pageFirst = footer.querySelector('#' + $export.id + '_page_first');
+				    var pageLast = footer.querySelector('#' + $export.id + '_page_last');
+				    pageFirst.innerHTML = '';
+				    var pageFirstSpan = span.cloneNode(false);
+				    pageFirstSpan.setAttribute('class', 'ui-icon ui-icon-arrowthickstop-1-e');
+				    pageFirst.appendChild(pageFirstSpan);
+				    pageLast.innerHTML = '';
+				    var pageLastSpan = span.cloneNode(false);
+				    pageLastSpan.setAttribute('class', 'ui-icon ui-icon-arrowthickstop-1-w');
+				    pageLast.appendChild(pageLastSpan);
+				}
 			};
 			$export.ApplyBootstrapStyles = function (tableDiv) {
 				if (!tableDiv) {
@@ -494,7 +502,7 @@
 					sort.innerHTML = '';
 				}
 
-				var pageClass = 'btn btn-default';
+				var pageClass = 'btn btn-default table-page';
 				var pageLeft = footer.querySelector('#' + $export.id + '_page_prev');
 				var pageRight = footer.querySelector('#' + $export.id + '_page_next');
 				var pageParent = pageLeft.parentElement;
@@ -505,13 +513,29 @@
 				var pageLeftSpan = span.cloneNode(false);
 				pageLeftSpan.setAttribute('class', 'glyphicon glyphicon-arrow-left');
 				pageLeft.appendChild(pageLeftSpan);
-				pageLeft.setAttribute('class', pageClass);
 				
 				pageRight.innerHTML = '';
 				var pageRightSpan = span.cloneNode(false);
 				pageRightSpan.setAttribute('class', 'glyphicon glyphicon-arrow-right');
 				pageRight.appendChild(pageRightSpan);
-				pageRight.setAttribute('class', pageClass);
+
+				if ($export.pagerIncludeFirstAndLast) {
+				    var pageFirst = footer.querySelector('#' + $export.id + '_page_first');
+				    var pageLast = footer.querySelector('#' + $export.id + '_page_last');
+				    pageFirst.innerHTML = '';
+				    var pageFirstSpan = span.cloneNode(false);
+				    pageFirstSpan.setAttribute('class', 'glyphicon glyphicon-fast-backward');
+				    pageFirst.appendChild(pageFirstSpan);
+				    pageLast.innerHTML = '';
+				    var pageLastSpan = span.cloneNode(false);
+				    pageLastSpan.setAttribute('class', 'glyphicon glyphicon-fast-forward');
+				    pageLast.appendChild(pageLastSpan);
+				}
+
+				var pageButtons = footer.querySelectorAll('.table-page');
+				for (var i = 0; i < pageButtons.length; ++i) {
+				    pageButtons[i].setAttribute('class', pageClass);
+				}
 			};
 			
 			$export.CheckForTable = function () {//Check for existing table
@@ -703,31 +727,7 @@
 				left.appendChild(showing);
 				left.setAttribute('style', 'float: left;');
 
-				var right = div.cloneNode(false);
-				var pageLeft = button.cloneNode(false);
-				pageLeft.innerHTML = 'Prev';
-				pageLeft.setAttribute('type', 'button');
-				pageLeft.setAttribute('class', 'table-page');
-				pageLeft.id = $export.id + '_page_prev';
-				pageLeft.onclick = function () {
-					$export.pageNumber -= 1;
-					$export.UpdateDisplayedRows(document.getElementById($export.id + '_body'));
-					$export.UpdateStyle(tableDiv);
-				};
-				
-				right.appendChild(pageLeft);
-				var pageRight = button.cloneNode(false);
-				pageRight.innerHTML = 'Next';
-				pageRight.setAttribute('type', 'button');
-				pageLeft.setAttribute('class', 'table-page');
-				pageRight.id = $export.id + '_page_next';
-				pageRight.onclick = function () {
-					$export.pageNumber += 1;
-					$export.UpdateDisplayedRows(document.getElementById($export.id + '_body'));
-					$export.UpdateStyle();
-				};
-				right.appendChild(pageRight);
-				right.setAttribute('style', 'float: right;');
+				var right = $export.BuildPager(footer);
 
 				var clear = div.cloneNode(false);
 				clear.setAttribute('style', 'clear: both;');
@@ -739,6 +739,117 @@
 				footer.appendChild(right);
 				footer.appendChild(clear);
 				return $export.UpdateFooter(footer);
+			};
+			$export.BuildPager = function () {
+			    var div = document.createElement('div');
+			    var button = document.createElement('button');
+			    var right = div.cloneNode(false);
+
+			    if ($export.pagerIncludeFirstAndLast) {
+			        var pageFirst = button.cloneNode(false);
+			        pageFirst.innerHTML = 'First';
+			        pageFirst.setAttribute('type', 'button');
+			        pageFirst.setAttribute('class', 'table-page');
+			        pageFirst.id = $export.id + '_page_first';
+			        pageFirst.onclick = function () {
+			            $export.pageNumber = 0;
+			            $export.UpdateDisplayedRows(document.getElementById($export.id + '_body'));
+			            $export.UpdateStyle();
+			        };
+					if ($export.pageNumber <= 0) {
+						pageFirst.setAttribute('disabled', 'disabled');
+					}
+			        right.appendChild(pageFirst);
+			    }
+
+			    var pageLeft = button.cloneNode(false);
+			    pageLeft.innerHTML = 'Prev';
+			    pageLeft.setAttribute('type', 'button');
+			    pageLeft.setAttribute('class', 'table-page');
+			    pageLeft.id = $export.id + '_page_prev';
+			    pageLeft.onclick = function () {
+			        $export.pageNumber -= 1;
+			        $export.UpdateDisplayedRows(document.getElementById($export.id + '_body'));
+			        $export.UpdateStyle();
+			    };
+			    if ($export.pageNumber <= 0) {
+			        pageLeft.setAttribute('disabled', 'disabled');
+			    }
+
+			    right.appendChild(pageLeft);
+
+			    if ($export.pagerSize > 0) {
+			        var start = $export.pageNumber - parseInt($export.pagerSize / 2);
+			        var length = start + $export.pagerSize;
+			        if ($export.pageNumber <= ($export.pagerSize / 2)) {
+			            // display from beginning
+			            length = $export.pagerSize;
+			            start = 0;
+			            if (length > $export.NumberOfPages()) {
+			                length = $export.NumberOfPages();
+			            }   //very small tables
+			        }
+			        else if (($export.NumberOfPages() - $export.pageNumber) <= ($export.pagerSize / 2)) {
+                        //display the last five pages
+			            length = $export.NumberOfPages();
+			            start = $export.NumberOfPages() - $export.pagerSize;
+			        }
+
+			        for (var i = start; i < length; ++i) {
+			            var btn = button.cloneNode(false);
+			            btn.innerHTML = (i + 1).toString();
+						var page = i;
+			            btn.onclick = function (j) {
+			                return function() {
+								$export.pageNumber = j;
+								$export.UpdateDisplayedRows(document.getElementById($export.id + '_body'));
+								$export.UpdateStyle();
+							}
+			            }(i);
+			            btn.setAttribute('type', 'button');
+			            btn.setAttribute('class', 'table-page');
+			            if (i == $export.pageNumber) {
+			                btn.setAttribute('disabled', 'disabled');
+			            }
+			            right.appendChild(btn);
+			        }
+			    }
+
+			    var pageRight = button.cloneNode(false);
+			    pageRight.innerHTML = 'Next';
+			    pageRight.setAttribute('type', 'button');
+			    pageRight.setAttribute('class', 'table-page');
+			    pageRight.id = $export.id + '_page_next';
+			    pageRight.onclick = function () {
+			        $export.pageNumber += 1;
+			        $export.UpdateDisplayedRows(document.getElementById($export.id + '_body'));
+			        $export.UpdateStyle();
+			    };
+			    if ($export.NumberOfPages() - 1 == $export.pageNumber) {
+			        pageRight.setAttribute('disabled', 'disabled');
+			    }
+
+			    right.appendChild(pageRight);
+			    right.setAttribute('style', 'float: right;');
+
+			    if ($export.pagerIncludeFirstAndLast) {
+			        var pageLast = button.cloneNode(false);
+			        pageLast.innerHTML = 'Last';
+			        pageLast.setAttribute('type', 'button');
+			        pageLast.setAttribute('class', 'table-page');
+			        pageLast.id = $export.id + '_page_last';
+			        pageLast.onclick = function () {
+			            $export.pageNumber = $export.NumberOfPages() - 1;
+			            $export.UpdateDisplayedRows(document.getElementById($export.id + '_body'));
+			            $export.UpdateStyle();
+			        };
+					if ($export.NumberOfPages() - 1 == $export.pageNumber) {
+						pageLast.setAttribute('disabled', 'disabled');
+					}
+			        right.appendChild(pageLast);
+			    }
+
+			    return right;
 			};
 
 			//Utility function
