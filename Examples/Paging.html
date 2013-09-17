@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="../Dable.js"></script>
+<!--Include the Bootstrap CDN-->
+<link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div id="PagingDable"></div>
+<script type="text/javascript">
+	var dable = new Dable();
+	var data = [
+		[ 1, 2 ], [ 3, 4 ], [5, 6], [7, 8], [9, 10],
+		[11, 12], [13, 14], [15, 16], [17, 18], [19, 20],
+		[ 1, 2 ], [ 3, 4 ], [5, 6], [7, 8], [9, 10],
+		[11, 12], [13, 14], [15, 16], [17, 18], [19, 20]
+	];
+	var columns = [ 'Odd', 'Even' ];
+	dable.SetDataAsRows(data);
+	dable.SetColumnNames(columns);
+	dable.pageSizes = [1, 2, 5];			// replace the possible page sizes with our own
+	dable.pageSize = 1;						// select a tiny page size for the example
+	dable.pagerSize = 5;					// The pager is our previous/next buttons, we're adding a 5 page display to it
+	dable.pagerIncludeFirstAndLast = true;	//we're going to include first and last buttons
+	dable.BuildAll("PagingDable");
+	
+	setInterval(function() {	//lets alternate the styles so we can see the pager works on all styles
+		if (dable.style == "jqueryui") {
+			dable.style = "bootstrap";
+		}
+		else if (!dable.style) {
+			dable.style = "jqueryui";
+		}
+		else {
+			dable.style = "";
+		}
+		dable.UpdateStyle(document.getElementById("AlternatingDable"));
+	}, 3000);
+</script>
+</body>
+</html>
