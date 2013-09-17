@@ -442,7 +442,7 @@
 				var pageLeft = footer.querySelector('#' + $export.id + '_page_prev');
 				pageLeft.innerHTML = '';
 				var pageLeftSpan = span.cloneNode(false);
-				pageLeftSpan.setAttribute('class', 'ui-icon ui-icon-circle-arrow-e');
+				pageLeftSpan.setAttribute('class', 'ui-icon ui-icon-circle-arrow-w');
 				pageLeft.appendChild(pageLeftSpan);
 				if (pageLeft.getAttribute('disabled')) {
 					pageLeft.setAttribute('class', pageClass + ' ui-state-disabled');
@@ -450,7 +450,7 @@
 				var pageRight = footer.querySelector('#' + $export.id + '_page_next');
 				pageRight.innerHTML = '';
 				var pageRightSpan = span.cloneNode(false);
-				pageRightSpan.setAttribute('class', 'ui-icon ui-icon-circle-arrow-w');
+				pageRightSpan.setAttribute('class', 'ui-icon ui-icon-circle-arrow-e');
 				pageRight.appendChild(pageRightSpan);
 				if (pageRight.getAttribute('disabled')) {
 					pageRight.setAttribute('class', pageClass + ' ui-state-disabled');
@@ -461,11 +461,11 @@
 				    var pageLast = footer.querySelector('#' + $export.id + '_page_last');
 				    pageFirst.innerHTML = '';
 				    var pageFirstSpan = span.cloneNode(false);
-				    pageFirstSpan.setAttribute('class', 'ui-icon ui-icon-arrowthickstop-1-e');
+				    pageFirstSpan.setAttribute('class', 'ui-icon ui-icon-arrowthickstop-1-w');
 				    pageFirst.appendChild(pageFirstSpan);
 				    pageLast.innerHTML = '';
 				    var pageLastSpan = span.cloneNode(false);
-				    pageLastSpan.setAttribute('class', 'ui-icon ui-icon-arrowthickstop-1-w');
+				    pageLastSpan.setAttribute('class', 'ui-icon ui-icon-arrowthickstop-1-e');
 				    pageLast.appendChild(pageLastSpan);
 				}
 			};
