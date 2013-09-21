@@ -9,6 +9,7 @@
 				hiddenColumns: [],
 				sortColumn: null,
 				sortOrder: 'descending',
+				minimumSearchLength: 1,
 				columnData: [],
 				pageNumber: 0,
 				pageSize: 10,
@@ -28,6 +29,9 @@
 				var searchBox = this;
 				if (searchBox.id != $export.id + '_search') {
 					return false;
+				}
+				if (searchBox.value && searchBox.value.length < $export.minimumSearchLength) {
+					return true;
 				}
 				var searchText = searchBox.value;
 				var includedRows = [];
