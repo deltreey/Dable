@@ -22,7 +22,8 @@
 			};
 
 			$export.NumberOfPages = function () {
-			    return $export.visibleRows.length / $export.pageSize;
+			    var n = $export.visibleRows.length / $export.pageSize;
+			    return Math.round(n);
 			};
 				
 			$export.searchFunc = function (event) {
