@@ -331,19 +331,22 @@
 
 				//initial style cleanup
 				$export.RemoveStyles(tableDiv);
-				//base styles for 'none', the other styles sometimes build on these, so we apply them beforehand
-				$export.ApplyBaseStyles(tableDiv);
-				
-				if (style.toLowerCase() == 'none') {
-					return true;
-				}
-				else {
-					if (style.toLowerCase() == 'jqueryui') {
-						$export.ApplyJqueryUIStyles(tableDiv);
-					}
-					else if (style.toLowerCase() == 'bootstrap') {
-						$export.ApplyBootstrapStyles(tableDiv);
-					}
+                //clear is a style option to completely avoid any styling so you can roll your own
+				if (style.toLowerCase() != 'clear') {
+				    //base styles for 'none', the other styles sometimes build on these, so we apply them beforehand
+				    $export.ApplyBaseStyles(tableDiv);
+
+				    if (style.toLowerCase() == 'none') {
+				        return true;
+				    }
+				    else {
+				        if (style.toLowerCase() == 'jqueryui') {
+				            $export.ApplyJqueryUIStyles(tableDiv);
+				        }
+				        else if (style.toLowerCase() == 'bootstrap') {
+				            $export.ApplyBootstrapStyles(tableDiv);
+				        }
+				    }
 				}
 			};
 			
@@ -353,7 +356,8 @@
 				for (var i = 0; i < children.length; ++i) {
 					children[i].removeAttribute('class');
 				}
-				var headerChildren = children[0].children;
+				var header = children[0];
+				var headerChildren = header.children;
 				for (var i = 0; i < headerChildren.length; ++i) {
 					headerChildren[i].removeAttribute('class');
 				}
@@ -369,7 +373,8 @@
 				var tbody = table.children[1];
 				tbody.removeAttribute('class');
 				
-				var footerChildren = children[2].children;
+				var footer = children[2];
+				var footerChildren = footer.children;
 				var leftChildren = footerChildren[0].children;
 				for (var i = 0; i < leftChildren.length; ++i) {
 					leftChildren[i].removeAttribute('class');
@@ -378,6 +383,8 @@
 				for (var i = 0; i < rightChildren.length; ++i) {
 					rightChildren[i].removeAttribute('class');
 				}
+
+				RemoveStyle(tableDiv);  //recursive function to remove style attributes
 			}
 			$export.ApplyBaseStyles = function (tableDiv) {
 				var table = tableDiv.querySelector('table');
@@ -401,16 +408,49 @@
 				for (var i = 0; i < evenRows.length; ++i) {
 					evenRows[i].setAttribute('style', 'background-color: ' + $export.evenRowColor);
 				}
-				var cells = tableDiv.querySelectorAll('td, th');
+				var cells = tableDiv.querySelectorAll('td');
 				for (var i = 0; i < cells.length; ++i) {
 					cells[i].setAttribute('style', 'padding: 5px;');
 				}
+
+				var headCells = tableDiv.querySelectorAll('th');
+				for (var i = 0; i < headCells.length; ++i) {
+				    headCells[i].setAttribute('style', 'padding: 5px;');
+				    var headCellLeft = headCells[i].children[0];
+				    headCellLeft.setAttribute('style', 'float: left');
+				    var headCellRight = headCells[i].children[1];
+				    headCellRight.setAttribute('style', 'float: right');
+				    var headCellClear = headCells[i].children[2];
+				    headCellClear.setAttribute('style', 'clear: both;');
+				}
+				var headRow = headCells[0].parentElement;
+				headRow.onmouseover = function () {
+				    this.setAttribute('style', 'cursor: pointer');
+				};
+				headRow.onmouseout = function () {
+				    this.setAttribute('style', 'cursor: default');
+				};
+
 				var header = tableDiv.querySelector('#' + $export.id + '_header');
 				header.setAttribute('style', 'padding: 5px;');
+				var headLeft = header.children[0];
+				headLeft.setAttribute('style', 'float: left;');
+				var headRight = header.children[1];
+				headRight.setAttribute('style', 'float: right;');
+				var headClear = header.children[2];
+				headClear.setAttribute('style', 'clear: both;');
+
 				var footer = tableDiv.querySelector('#' + $export.id + '_footer');
 				footer.setAttribute('style', 'padding: 5px;');
+				var footLeft = footer.children[0];
+				footLeft.setAttribute('style', 'float: left;');
+				var footClear = footer.children[2];
+				footClear.setAttribute('style', 'clear: both;');
+
 				var right = footer.querySelector('#' + $export.id + '_page_prev').parentElement;
 				footer.replaceChild($export.BuildPager(), right);
+				var footRight = footer.children[1];
+				footRight.setAttribute('style', 'float: right;');
 			}
 			$export.ApplyJqueryUIStyles = function (tableDiv) {
 				if (!tableDiv) {
@@ -644,7 +684,6 @@
 					$export.UpdateStyle(tableDiv);
 				};
 				left.appendChild(entryCount);
-				left.setAttribute('style', 'float: left;');
 
 				var right = div.cloneNode(false);
 				var search = span.cloneNode(false);
@@ -654,10 +693,8 @@
 				inputSearch.setAttribute('id', $export.id + '_search');
 				inputSearch.onkeyup = $export.searchFunc;
 				right.appendChild(inputSearch);
-				right.setAttribute('style', 'float: right;');
 
 				var clear = div.cloneNode(false);
-				clear.setAttribute('style', 'clear: both;');
 
 				var head = div.cloneNode(false);
 				head.id = $export.id + '_header';
@@ -680,28 +717,20 @@
 				var span = document.createElement('span');
 				//The thead section contains the column names
 				var headRow = row.cloneNode(false);
-				headRow.onmouseover = function () {
-					this.setAttribute('style', 'cursor: pointer');
-				};
-				headRow.onmouseout = function () {
-					this.setAttribute('style', 'cursor: default');
-				};
 				for (var i = 0; i < $export.columnData.length; ++i) {
 					var tempCell = headCell.cloneNode(false);
 					var nameSpan = span.cloneNode(false);
 					nameSpan.innerHTML = $export.columnData[i].FriendlyName + ' ';
-					nameSpan.setAttribute('style', 'float: left');
 					tempCell.appendChild(nameSpan);
 
 					var sortSpan = span.cloneNode(false);
 					sortSpan.setAttribute('class', 'table-sort');
 					sortSpan.innerHTML = 'v';
-					sortSpan.setAttribute('style', 'float: right');
 					tempCell.appendChild(sortSpan);
 
 					var clear = span.cloneNode(false);
-					clear.setAttribute('style', 'clear: both;');
 					tempCell.appendChild(clear);
+
 					tempCell.setAttribute('data-tag', $export.columnData[i].Tag);
 					tempCell.onclick = $export.sortFunc;
 					headRow.appendChild(tempCell);
@@ -713,7 +742,6 @@
 				body = $export.UpdateDisplayedRows(body);
 				body.id = $export.id + '_body';
 				table.appendChild(body);
-				table.setAttribute('style', 'width: 100%');
 
 				return table;
 			};
@@ -729,12 +757,10 @@
 				var showing = span.cloneNode(false);
 				showing.id = $export.id + '_showing';
 				left.appendChild(showing);
-				left.setAttribute('style', 'float: left;');
 
 				var right = $export.BuildPager(footer);
 
 				var clear = div.cloneNode(false);
-				clear.setAttribute('style', 'clear: both;');
 
 				var footer = div.cloneNode(false);
 				footer.id = $export.id + '_footer';
@@ -834,7 +860,6 @@
 			    }
 
 			    right.appendChild(pageRight);
-			    right.setAttribute('style', 'float: right;');
 
 			    if ($export.pagerIncludeFirstAndLast) {
 			        var pageLast = button.cloneNode(false);
@@ -856,7 +881,7 @@
 			    return right;
 			};
 
-			//Utility function
+			//Utility functions
 			function ArrayContains(array, object) {
 				for (var i = 0; i < array.length; ++i) {
 					if (array[i] === object) {
@@ -864,6 +889,15 @@
 					}
 				}
 				return false;
+			}
+			function RemoveStyle(node) {
+			    node.removeAttribute('style');
+			    var childNodes = node.children;
+			    if (childNodes && childNodes.length > 0) {
+			        for (var i = 0; i < childNodes.length; ++i) {
+			            RemoveStyle(childNodes[i]);
+			        }
+			    }
 			}
 			
 			$export.CheckForTable();
