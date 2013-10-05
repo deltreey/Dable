@@ -63,7 +63,7 @@
 			$export.sortFunc = function (event) {
 				var tag = event.srcElement.tagName;
 				//prevent sorting from some form elements
-				if(tag != 'INPUT' && tag != 'BUTTON' && tag != 'SELECT' && tag != 'TEXTAREA'){
+				if(tag != 'INPUT' && tag != 'BUTTON' && tag != 'SELECT' && tag != 'TEXTAREA') {
 					var columnCell = this;  //use this here, as the event.srcElement is probably a <span>
 					var sortSpan = columnCell.querySelector('.table-sort');
 					var columnTag = columnCell.getAttribute('data-tag');
@@ -422,19 +422,25 @@
 				for (var i = 0; i < headCells.length; ++i) {
 				    headCells[i].setAttribute('style', 'padding: 5px;');
 				    var headCellLeft = headCells[i].children[0];
-				    headCellLeft.setAttribute('style', 'float: left');
-				    var headCellRight = headCells[i].children[1];
-				    headCellRight.setAttribute('style', 'float: right');
-				    var headCellClear = headCells[i].children[2];
-				    headCellClear.setAttribute('style', 'clear: both;');
+					headCellLeft.setAttribute('style', 'float: left');
+					if ($export.columnData[i].CustomSortFunc !== false) {
+						var headCellRight = headCells[i].children[1];
+						headCellRight.setAttribute('style', 'float: right');
+						var headCellClear = headCells[i].children[2];
+						headCellClear.setAttribute('style', 'clear: both;');
+						
+						headCells[i].onmouseover = function () {
+							this.setAttribute('style', 'padding: 5px; cursor: pointer');
+						};
+						headCells[i].onmouseout = function () {
+							this.setAttribute('style', 'padding: 5px; cursor: default');
+						};
+					}
+					else {
+						var headCellClear = headCells[i].children[1];
+						headCellClear.setAttribute('style', 'clear: both;');
+					}
 				}
-				var headRow = headCells[0].parentElement;
-				headRow.onmouseover = function () {
-				    this.setAttribute('style', 'cursor: pointer');
-				};
-				headRow.onmouseout = function () {
-				    this.setAttribute('style', 'cursor: default');
-				};
 
 				var header = tableDiv.querySelector('#' + $export.id + '_header');
 				header.setAttribute('style', 'padding: 5px;');
@@ -471,13 +477,15 @@
 				for (var i = 0; i < headCells.length; ++i) {
 					headCells[i].setAttribute('class', 'ui-state-default');
 					var sort = headCells[i].querySelector('.table-sort');
-					if (sort.innerHTML == 'v') {
-						sort.setAttribute('class', 'table-sort ui-icon ui-icon-triangle-1-s');
+					if (sort) {
+						if (sort.innerHTML == 'v') {
+							sort.setAttribute('class', 'table-sort ui-icon ui-icon-triangle-1-s');
+						}
+						else {
+							sort.setAttribute('class', 'table-sort ui-icon ui-icon-triangle-1-n');
+						}
+						sort.innerHTML = '';
 					}
-					else {
-						sort.setAttribute('class', 'table-sort ui-icon ui-icon-triangle-1-n');
-					}
-					sort.innerHTML = '';
 				}
 
 				footer.setAttribute('class', 'fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix');
@@ -542,13 +550,15 @@
 				var headCells = table.querySelectorAll('th');
 				for (var i = 0; i < headCells.length; ++i) {
 					var sort = headCells[i].querySelector('.table-sort');
-					if (sort.innerHTML == 'v') {
-						sort.setAttribute('class', 'table-sort glyphicon glyphicon-chevron-down');
+					if (sort) {
+						if (sort.innerHTML == 'v') {
+							sort.setAttribute('class', 'table-sort glyphicon glyphicon-chevron-down');
+						}
+						else {
+							sort.setAttribute('class', 'table-sort glyphicon glyphicon-chevron-up');
+						}
+						sort.innerHTML = '';
 					}
-					else {
-						sort.setAttribute('class', 'table-sort glyphicon glyphicon-chevron-up');
-					}
-					sort.innerHTML = '';
 				}
 
 				var pageClass = 'btn btn-default table-page';
@@ -728,16 +738,18 @@
 					nameSpan.innerHTML = $export.columnData[i].FriendlyName + ' ';
 					tempCell.appendChild(nameSpan);
 
-					var sortSpan = span.cloneNode(false);
-					sortSpan.setAttribute('class', 'table-sort');
-					sortSpan.innerHTML = 'v';
-					tempCell.appendChild(sortSpan);
+					if ($export.columnData[i].CustomSortFunc !== false) {
+						var sortSpan = span.cloneNode(false);
+						sortSpan.setAttribute('class', 'table-sort');
+						sortSpan.innerHTML = 'v';
+						tempCell.appendChild(sortSpan);
+						tempCell.onclick = $export.sortFunc;
+					}
 
 					var clear = span.cloneNode(false);
 					tempCell.appendChild(clear);
 
 					tempCell.setAttribute('data-tag', $export.columnData[i].Tag);
-					tempCell.onclick = $export.sortFunc;
 					headRow.appendChild(tempCell);
 				}
 				head.appendChild(headRow);
