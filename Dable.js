@@ -375,6 +375,17 @@
 				for (var i = 0; i < theadCells.length; ++i) {
 					theadCells[i].removeAttribute('class');
 				}
+				var sorts = tableDiv.querySelectorAll('.table-sort');
+				for (var i = 0; i < sorts.length; ++i) {
+					sorts[i].innerHTML = '^';
+					sorts[i].setAttribute('class', 'table-sort');
+					if (i == $export.sortColumn) {
+						if ($export.sortOrder.toLowerCase().substr(0, 4) == 'desc') {
+							sorts[i].innerHTML = 'v';
+						}
+					}
+				}
+				
 				var tbody = table.children[1];
 				tbody.removeAttribute('class');
 				
@@ -384,10 +395,8 @@
 				for (var i = 0; i < leftChildren.length; ++i) {
 					leftChildren[i].removeAttribute('class');
 				}
-				var rightChildren = footerChildren[1].children;
-				for (var i = 0; i < rightChildren.length; ++i) {
-					rightChildren[i].removeAttribute('class');
-				}
+				var right = footer.querySelector('#' + $export.id + '_page_prev').parentElement;
+				footer.replaceChild($export.BuildPager(), right);
 
 				RemoveStyle(tableDiv);  //recursive function to remove style attributes
 			}
@@ -395,16 +404,6 @@
 				var table = tableDiv.querySelector('table');
 				table.setAttribute('style', 'width: 100%;');
 				
-				var sorts = tableDiv.querySelectorAll('.table-sort');
-				for (var i = 0; i < sorts.length; ++i) {
-					sorts[i].setAttribute('class', 'table-sort');
-					sorts[i].innerHTML = '^';
-					if (i == $export.sortColumn) {
-						if ($export.sortOrder.toLowerCase().substr(0, 4) == 'desc') {
-							sorts[i].innerHTML = 'v';
-						}
-					}
-				}
 				var oddRows = tableDiv.querySelectorAll('.table-row-odd');
 				for (var i = 0; i < oddRows.length; ++i) {
 					oddRows[i].setAttribute('style', 'background-color: ' + $export.oddRowColor);
@@ -457,9 +456,6 @@
 				footLeft.setAttribute('style', 'float: left;');
 				var footClear = footer.children[2];
 				footClear.setAttribute('style', 'clear: both;');
-
-				var right = footer.querySelector('#' + $export.id + '_page_prev').parentElement;
-				footer.replaceChild($export.BuildPager(), right);
 				var footRight = footer.children[1];
 				footRight.setAttribute('style', 'float: right;');
 			}
