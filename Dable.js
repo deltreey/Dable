@@ -63,7 +63,7 @@
 			$export.sortFunc = function (event) {
 				var tag = event.srcElement.tagName;
 				//prevent sorting from some form elements
-				if(tag != "INPUT" && tag != "BUTTON" && tag != "SELECT" && tag != "TEXTAREA"){
+				if(tag != 'INPUT' && tag != 'BUTTON' && tag != 'SELECT' && tag != 'TEXTAREA'){
 					var columnCell = this;  //use this here, as the event.srcElement is probably a <span>
 					var sortSpan = columnCell.querySelector('.table-sort');
 					var columnTag = columnCell.getAttribute('data-tag');
