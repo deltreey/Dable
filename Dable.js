@@ -61,44 +61,48 @@
 				$export.UpdateStyle(document.getElementById($export.id));
 			};
 			$export.sortFunc = function (event) {
-				var columnCell = this;  //use this here, as the event.srcElement is probably a <span>
-				var sortSpan = columnCell.querySelector('.table-sort');
-				var columnTag = columnCell.getAttribute('data-tag');
-				var columnIndex = -1;
-
-				for (var i = 0; i < $export.columnData.length; ++i) {
-					if ($export.columnData[i].Tag.toLowerCase() == columnTag.toLowerCase()) {
-						columnIndex = i;
-						break;
+				var tag = event.srcElement.tagName;
+				//prevent sorting from some form elements
+				if(tag != "INPUT" && tag != "BUTTON" && tag != "SELECT" && tag != "TEXTAREA"){
+					var columnCell = this;  //use this here, as the event.srcElement is probably a <span>
+					var sortSpan = columnCell.querySelector('.table-sort');
+					var columnTag = columnCell.getAttribute('data-tag');
+					var columnIndex = -1;
+	
+					for (var i = 0; i < $export.columnData.length; ++i) {
+						if ($export.columnData[i].Tag.toLowerCase() == columnTag.toLowerCase()) {
+							columnIndex = i;
+							break;
+						}
 					}
+					if (columnIndex == -1) {
+						return false;
+					}
+					
+					$export.sortColumn = columnIndex;
+					var ascend = false;
+					if ($export.sortOrder.length > 3 && $export.sortOrder.substr(0, 4).toLowerCase() == 'desc') {
+						ascend = true;
+					}
+					if (ascend) {
+						$export.sortOrder = 'asc';
+						sortSpan.innerHTML = '^';
+					}
+					else {
+						$export.sortOrder = 'desc';
+						sortSpan.innerHTML = 'v';
+					}
+	
+					if ($export.columnData[columnIndex].CustomSortFunc) {
+						$export.visibleRows = $export.columnData[columnIndex].CustomSortFunc(columnIndex, ascend, $export.visibleRows);
+					}
+					else {
+						$export.visibleRows = $export.baseSort(columnIndex, ascend, $export.visibleRows);
+					}
+	
+					$export.UpdateDisplayedRows(document.getElementById($export.id + '_body'));
+					$export.UpdateStyle();
 				}
-				if (columnIndex == -1) {
-					return false;
-				}
-				
-				$export.sortColumn = columnIndex;
-				var ascend = false;
-				if ($export.sortOrder.length > 3 && $export.sortOrder.substr(0, 4).toLowerCase() == 'desc') {
-					ascend = true;
-				}
-				if (ascend) {
-					$export.sortOrder = 'asc';
-					sortSpan.innerHTML = '^';
-				}
-				else {
-					$export.sortOrder = 'desc';
-					sortSpan.innerHTML = 'v';
-				}
-
-				if ($export.columnData[columnIndex].CustomSortFunc) {
-					$export.visibleRows = $export.columnData[columnIndex].CustomSortFunc(columnIndex, ascend, $export.visibleRows);
-				}
-				else {
-					$export.visibleRows = $export.baseSort(columnIndex, ascend, $export.visibleRows);
-				}
-
-				$export.UpdateDisplayedRows(document.getElementById($export.id + '_body'));
-				$export.UpdateStyle();
 			};
 			
 			$export.baseSort = function (columnIndex, ascending, currentRows) {
