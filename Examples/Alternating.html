@@ -34,11 +34,14 @@
 		if (dable.style == "jqueryui") {
 			dable.style = "bootstrap";
 		}
-		else if (!dable.style) {
-			dable.style = "jqueryui";
+		else if (dable.style == "bootstrap") {
+			dable.style = "clear";
+		}
+		else if (dable.style == "clear") {
+			dable.style = "";
 		}
 		else {
-			dable.style = "";
+			dable.style = "jqueryui";
 		}
 		dable.UpdateStyle(document.getElementById("AlternatingDable"));
 	}, 3000);

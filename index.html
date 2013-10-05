@@ -253,11 +253,14 @@ Here are some examples of how you can use it.</p>
 			if (dable5.style == "jqueryui") {
 				dable5.style = "bootstrap";
 			}
-			else if (!dable5.style) {
-				dable5.style = "jqueryui";
+			else if (dable5.style == "bootstrap") {
+				dable5.style = "clear";
+			}
+			else if (dable5.style == "clear") {
+				dable5.style = "";
 			}
 			else {
-				dable5.style = "";
+				dable5.style = "jqueryui";
 			}
 			dable5.UpdateStyle(document.getElementById("AlternatingDable"));
 		}, 3000);
@@ -301,11 +304,14 @@ Here are some examples of how you can use it.</p>
 		<span class="kd">if</span> (<span class="vi">dable</span>.style == <span class="s1">&quot;jqueryui&quot;</span>) {
 			<span class="vi">dable</span>.style = <span class="s1">&quot;bootstrap&quot;</span>;
 		}
-		<span class="kd">else if</span> (!<span class="vi">dable</span>.style) {
-			<span class="vi">dable</span>.style = <span class="s1">&quot;jqueryui&quot;</span>;
+		<span class="kd">else if</span> (!<span class="vi">dable</span>.style == <span class="s1">&quot;bootstrap&quot;</span>) {
+			<span class="vi">dable</span>.style = <span class="s1">&quot;clear&quot;</span>;
+		}
+		<span class="kd">else if</span> (!<span class="vi">dable</span>.style == <span class="s1">&quot;clear&quot;</span>) {
+			<span class="vi">dable</span>.style = <span class="s1">&quot;&quot;</span>;
 		}
 		<span class="kd">else</span> {
-			<span class="vi">dable</span>.style = <span class="s1">&quot;&quot;</span>;
+			<span class="vi">dable</span>.style = <span class="s1">&quot;jqueryui&quot;</span>;
 		}
 		<span class="vi">dable</span>.UpdateStyle(<span class="vg">document</span>.getElementById(<span class="s1">&quot;AlternatingDable&quot;</span>));
 	}, <span class="m">3000</span>);
