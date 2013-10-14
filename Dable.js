@@ -40,7 +40,10 @@
 			    return Math.ceil(row / $export.pageSize);
 			}
 			
-			$export.asyncRequest = function (start, filter, sortColumn, ascending) {
+			$export.asyncRequest = function (start, filter, sortColumn, ascending, asynchronous) {
+			    if (typeof asynchronous == 'undefined') {
+			        asynchronous = false;
+			    }
 			    var dableRequest = new XMLHttpRequest();
 			    dableRequest.onreadystatechange = function () {
 			        if (dableRequest.readyState == 4 && dableRequest.status == 200) {
@@ -60,9 +63,12 @@
 			            $export.SetDataAsRows(actualRows);
 			            $export.RowCount = function () { return actualData.rowCount; };
 			            $export.VisibleRowCount = function () { return actualData.includedRowCount; };
+			            if (asynchronous != false && !!(asynchronous && asynchronous.call && asynchronous.apply)) {
+			                asynchronous();
+			            }
 			        }
 			    }
-			    dableRequest.open('POST', $export.async, false);
+			    dableRequest.open('POST', $export.async, asynchronous != false);
 			    dableRequest.setRequestHeader('content-type', 'application/json');
 			    var requestObject = JSON.parse(JSON.stringify($export.asyncData));
 			    requestObject['start'] = start;
@@ -80,27 +86,33 @@
 				}
 				if (!searchBox.value || searchBox.value.length < $export.minimumSearchLength) {
 				    $export.currentFilter = '';
-					return true;
 				}
-				var searchText = searchBox.value;
-				$export.currentFilter = searchText;
+				else {
+				    var searchText = searchBox.value;
+				    $export.currentFilter = searchText;
+				}
 				if ($export.async) {
 				    var ascending = true;
 				    if ($export.sortOrder.length > 3 && $export.sortOrder.substr(0, 4).toLowerCase() == 'desc') {
 				        ascending = false;
 				    }
-				    $export.asyncRequest(0, searchText, sortColumn, ascending);
+				    //search is wired up to be async so the user can keep typing, but it creates a race condition
+                    //that is not conducive to fast typing, so I'll have to figure out a fix
+				    $export.asyncRequest(0, $export.currentFilter, $export.sortColumn, ascending);
+				    var body = document.getElementById($export.id + '_body');
+				    $export.UpdateDisplayedRows(body);
+				    $export.UpdateStyle(document.getElementById($export.id));
 				}
 				else {
 				    var includedRows = [];
-				    if (searchText) {
+				    if ($export.currentFilter) {
 				        for (var i = 0; i < $export.filters.length; ++i) {
 				            for (var j = 0; j < $export.rows.length; ++j) {
 				                if (ArrayContains(includedRows, $export.rows[j])) {
 				                    continue;
 				                }
 				                for (var k = 0; k < $export.rows[j].length; ++k) {
-				                    if ($export.filters[i](searchText, $export.rows[j][k])) {
+				                    if ($export.filters[i]($export.currentFilter, $export.rows[j][k])) {
 				                        includedRows.push($export.rows[j]);
 				                        break;
 				                    }
@@ -112,11 +124,10 @@
 				        includedRows = $export.rows;
 				    }
 				    $export.visibleRows = includedRows;
+				    var body = document.getElementById($export.id + '_body');
+				    $export.UpdateDisplayedRows(body);
+				    $export.UpdateStyle(document.getElementById($export.id));
 				}
-
-				var body = document.getElementById($export.id + '_body');
-				$export.UpdateDisplayedRows(body);
-				$export.UpdateStyle(document.getElementById($export.id));
 			};
 			$export.sortFunc = function (event) {
 				var tag = this.tagName;
