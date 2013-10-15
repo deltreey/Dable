@@ -148,9 +148,9 @@
 						return false;
 					}
 					$export.sortColumn = columnIndex;
-					var ascend = true;
+					var ascend = false;
 					if ($export.sortOrder.length > 3 && $export.sortOrder.substr(0, 4).toLowerCase() == 'desc') {
-						ascend = false;
+						ascend = true;  //switching from descending to ascending
 					}
 					if (ascend) {
 						$export.sortOrder = 'asc';
