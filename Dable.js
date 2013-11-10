@@ -529,7 +529,11 @@
 				var footClear = footer.children[2];
 				footClear.setAttribute('style', 'clear: both;');
 				var footRight = footer.children[1];
-				footRight.setAttribute('style', 'float: right;');
+				footRight.setAttribute('style', 'float: right; list-style: none;');
+				var footRightItems = footRight.querySelectorAll('li');
+				for (var i = 0; i < footRightItems.length; ++i) {
+					footRightItems[i].setAttribute('style', 'display: inline; margin-right: 5px;');
+				}
 			}
 			$export.ApplyJqueryUIStyles = function (tableDiv) {
 				if (!tableDiv) {
@@ -556,6 +560,10 @@
 					}
 				}
 
+				var pagerItems = footer.querySelectorAll('li');
+				for (var i = 0; i < pagerItems.length; ++i) {
+					RemoveStyle(pagerItems[i]);
+				}
 				footer.setAttribute('class', 'fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix');
 				var pageClass = 'fg-button ui-button ui-state-default ui-corner-left table-page';
 
@@ -633,6 +641,11 @@
 				var pageLeft = footer.querySelector('#' + $export.id + '_page_prev');
 				var pageRight = footer.querySelector('#' + $export.id + '_page_next');
 				var pageParent = pageLeft.parentElement;
+				
+				var pagerItems = footer.querySelectorAll('li');
+				for (var i = 0; i < pagerItems.length; ++i) {
+					RemoveStyle(pagerItems[i]);
+				}
 				
 				pageParent.setAttribute('class', 'btn-group');
 
@@ -860,17 +873,18 @@
 				return $export.UpdateFooter(footer);
 			};
 			$export.BuildPager = function () {
-			    var div = document.createElement('div');
-			    var button = document.createElement('button');
-			    var right = div.cloneNode(false);
+			    var ul = document.createElement('ul');
+			    var li = document.createElement('li');
+				var anchor = document.createElement('a');
+			    var right = ul.cloneNode(false);
 
 			    if ($export.pagerIncludeFirstAndLast) {
-			        var pageFirst = button.cloneNode(false);
-			        pageFirst.innerHTML = 'First';
-			        pageFirst.setAttribute('type', 'button');
+			        var pageFirst = li.cloneNode(false);
+					var pageFirstAnchor = anchor.cloneNode(false);
+			        pageFirstAnchor.innerHTML = 'First';
 			        pageFirst.setAttribute('class', 'table-page');
 			        pageFirst.id = $export.id + '_page_first';
-			        pageFirst.onclick = function () {
+			        pageFirstAnchor.onclick = function () {
 			            $export.pageNumber = 0;
 			            if ($export.async &&
                         ($export.asyncStart > $export.pageNumber * $export.pageSize
@@ -887,15 +901,16 @@
 					if ($export.pageNumber <= 0) {
 						pageFirst.setAttribute('disabled', 'disabled');
 					}
+					pageFirst.appendChild(pageFirstAnchor);
 			        right.appendChild(pageFirst);
 			    }
 
-			    var pageLeft = button.cloneNode(false);
-			    pageLeft.innerHTML = 'Prev';
-			    pageLeft.setAttribute('type', 'button');
+			    var pageLeft = li.cloneNode(false);
+				var pageLeftAnchor = anchor.cloneNode(false);
+			    pageLeftAnchor.innerHTML = 'Prev';
 			    pageLeft.setAttribute('class', 'table-page');
 			    pageLeft.id = $export.id + '_page_prev';
-			    pageLeft.onclick = function () {
+			    pageLeftAnchor.onclick = function () {
 			        $export.pageNumber -= 1;
 			        if ($export.async &&
                         ($export.asyncStart > $export.pageNumber * $export.pageSize
@@ -917,7 +932,7 @@
 			    if ($export.pageNumber <= 0) {
 			        pageLeft.setAttribute('disabled', 'disabled');
 			    }
-
+				pageLeft.appendChild(pageLeftAnchor);
 			    right.appendChild(pageLeft);
 
 			    if ($export.pagerSize > 0) {
@@ -938,10 +953,11 @@
 			        }
 
 			        for (var i = start; i < length; ++i) {
-			            var btn = button.cloneNode(false);
-			            btn.innerHTML = (i + 1).toString();
+			            var liNode = li.cloneNode(false);
+						var liNodeAnchor = anchor.cloneNode(false);
+			            liNodeAnchor.innerHTML = (i + 1).toString();
 						var page = i;
-			            btn.onclick = function (j) {
+			            liNodeAnchor.onclick = function (j) {
 			                return function() {
 			                    $export.pageNumber = j;
 			                    if ($export.async &&
@@ -958,21 +974,21 @@
 								$export.UpdateStyle();
 							}
 			            }(i);
-			            btn.setAttribute('type', 'button');
-			            btn.setAttribute('class', 'table-page');
+			            liNode.setAttribute('class', 'table-page');
 			            if (i == $export.pageNumber) {
-			                btn.setAttribute('disabled', 'disabled');
+			                liNode.setAttribute('disabled', 'disabled');
 			            }
-			            right.appendChild(btn);
+						liNode.appendChild(liNodeAnchor);
+			            right.appendChild(liNode);
 			        }
 			    }
 
-			    var pageRight = button.cloneNode(false);
-			    pageRight.innerHTML = 'Next';
-			    pageRight.setAttribute('type', 'button');
+			    var pageRight = li.cloneNode(false);
+				var pageRightAnchor = anchor.cloneNode(false);
+			    pageRightAnchor.innerHTML = 'Next';
 			    pageRight.setAttribute('class', 'table-page');
 			    pageRight.id = $export.id + '_page_next';
-			    pageRight.onclick = function () {
+			    pageRightAnchor.onclick = function () {
 			        $export.pageNumber += 1;
 			        if ($export.async &&
                         ($export.asyncStart > $export.pageNumber * $export.pageSize
@@ -990,16 +1006,16 @@
 			    if ($export.NumberOfPages() - 1 == $export.pageNumber) {
 			        pageRight.setAttribute('disabled', 'disabled');
 			    }
-
+				pageRight.appendChild(pageRightAnchor);
 			    right.appendChild(pageRight);
 
 			    if ($export.pagerIncludeFirstAndLast) {
-			        var pageLast = button.cloneNode(false);
-			        pageLast.innerHTML = 'Last';
-			        pageLast.setAttribute('type', 'button');
+			        var pageLast = li.cloneNode(false);
+					var pageLastAnchor = anchor.cloneNode(false);
+			        pageLastAnchor.innerHTML = 'Last';
 			        pageLast.setAttribute('class', 'table-page');
 			        pageLast.id = $export.id + '_page_last';
-			        pageLast.onclick = function () {
+			        pageLastAnchor.onclick = function () {
 			            $export.pageNumber = $export.NumberOfPages() - 1;   //page number is 0 based
 			            if ($export.async &&
                         ($export.asyncStart > $export.pageNumber * $export.pageSize
@@ -1021,6 +1037,7 @@
 					if ($export.NumberOfPages() - 1 == $export.pageNumber) {
 						pageLast.setAttribute('disabled', 'disabled');
 					}
+					pageLast.appendChild(pageLastAnchor);
 			        right.appendChild(pageLast);
 			    }
 
