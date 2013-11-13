@@ -900,6 +900,7 @@
 			        };
 					if ($export.pageNumber <= 0) {
 						pageFirst.setAttribute('disabled', 'disabled');
+						pageFirstAnchor.onclick = function () {};	//disable onclick
 					}
 					pageFirst.appendChild(pageFirstAnchor);
 			        right.appendChild(pageFirst);
@@ -931,6 +932,7 @@
 			    };
 			    if ($export.pageNumber <= 0) {
 			        pageLeft.setAttribute('disabled', 'disabled');
+					pageLeftAnchor.onclick = function () {};	//disable onclick
 			    }
 				pageLeft.appendChild(pageLeftAnchor);
 			    right.appendChild(pageLeft);
@@ -977,6 +979,7 @@
 			            liNode.setAttribute('class', 'table-page');
 			            if (i == $export.pageNumber) {
 			                liNode.setAttribute('disabled', 'disabled');
+							liNodeAnchor.onclick = function () {};	//disable onclick
 			            }
 						liNode.appendChild(liNodeAnchor);
 			            right.appendChild(liNode);
@@ -1005,6 +1008,7 @@
 			    };
 			    if ($export.NumberOfPages() - 1 == $export.pageNumber) {
 			        pageRight.setAttribute('disabled', 'disabled');
+					pageRightAnchor.onclick = function () {};	//disable onclick
 			    }
 				pageRight.appendChild(pageRightAnchor);
 			    right.appendChild(pageRight);
@@ -1036,6 +1040,7 @@
 			        };
 					if ($export.NumberOfPages() - 1 == $export.pageNumber) {
 						pageLast.setAttribute('disabled', 'disabled');
+						pageLastAnchor.onclick = function () {};	//disable onclick
 					}
 					pageLast.appendChild(pageLastAnchor);
 			        right.appendChild(pageLast);
