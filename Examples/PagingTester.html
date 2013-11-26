@@ -23,19 +23,6 @@
 	dable.pagerSize = 5;					// The pager is our previous/next buttons, we're adding a 5 page display to it
 	dable.pagerIncludeFirstAndLast = true;	//we're going to include first and last buttons
 	dable.BuildAll("PagingDable");
-	
-	setInterval(function() {	//lets alternate the styles so we can see the pager works on all styles
-		if (dable.style == "jqueryui") {
-			dable.style = "bootstrap";
-		}
-		else if (!dable.style) {
-			dable.style = "jqueryui";
-		}
-		else {
-			dable.style = "";
-		}
-		dable.UpdateStyle(document.getElementById("AlternatingDable"));
-	}, 3000);
 </script>
 </body>
 </html>

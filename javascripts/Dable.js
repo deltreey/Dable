@@ -7,6 +7,7 @@
 				rows: [],
 				visibleRows: [],
 				hiddenColumns: [],
+				currentFilter: '',
 				sortColumn: null,
 				sortOrder: 'descending',
 				minimumSearchLength: 1,
@@ -15,57 +16,135 @@
 				pageSize: 10,
 				pageSizes: [10, 25, 50, 100],
 				pagerSize: 0,
-                pagerIncludeFirstAndLast: false,
+				pagerIncludeFirstAndLast: false,
+				async: false,
+				asyncData: {},
+				asyncStart: 0,
+                asyncLength: 1000,
+				//Basic Styling
 				style: 'none',
 				evenRowColor: '#E2E4FF',
-				oddRowColor: 'white'
+				oddRowColor: 'white',
+				//Classes
+				dableClass: '',
+				headerClass: '',
+				tableClass: '',
+					sortClass: 'table-sort',
+					evenRowClass: 'table-row-even',
+					oddRowClass: 'table-row-odd',
+				footerClass: '',
+				pagerButtonsClass: 'table-page'
 			};
 
+			$export.RowCount = function () {
+			    return $export.rows.length;
+			}
+			$export.VisibleRowCount = function () {
+			    return $export.visibleRows.length;
+			}
 			$export.NumberOfPages = function () {
-			    var n = $export.visibleRows.length / $export.pageSize;
-			    return Math.round(n);
+			    var n = $export.VisibleRowCount() / $export.pageSize;
+			    return Math.ceil(n);
 			};
-				
+			$export.GetPageForRow = function (row) {
+			    return Math.ceil(row / $export.pageSize);
+			}
+			
+			$export.asyncRequest = function (start, filter, sortColumn, ascending, asynchronous) {
+			    if (typeof asynchronous == 'undefined') {
+			        asynchronous = false;
+			    }
+			    var dableRequest = new XMLHttpRequest();
+			    dableRequest.onreadystatechange = function () {
+			        if (dableRequest.readyState == 4 && dableRequest.status == 200) {
+			            var data = JSON.parse(dableRequest.responseText);
+			            var actualData = JSON.parse(data.d);    //stupid json
+			            var actualRows = actualData.rows;
+                        //create empty rows for the rest of the set
+			            actualRows.reverse();
+			            for (var i = 0; i < start; ++i) {
+			                actualRows.push([]);
+			            }
+			            actualRows.reverse();
+			            for (var i = (start + $export.asyncLength) ; i < actualData.includedRowCount; ++i) {
+			                actualRows.push([]);
+			            }
+                        //update
+			            $export.SetDataAsRows(actualRows);
+			            $export.RowCount = function () { return actualData.rowCount; };
+			            $export.VisibleRowCount = function () { return actualData.includedRowCount; };
+			            if (asynchronous != false && !!(asynchronous && asynchronous.call && asynchronous.apply)) {
+			                asynchronous();
+			            }
+			        }
+			    }
+			    dableRequest.open('POST', $export.async, asynchronous != false);
+			    dableRequest.setRequestHeader('content-type', 'application/json');
+			    var requestObject = JSON.parse(JSON.stringify($export.asyncData));
+			    requestObject['start'] = start;
+			    $export.asyncStart = start;
+			    requestObject['count'] = $export.asyncLength;
+			    requestObject['filter'] = filter;
+			    requestObject['sortColumn'] = sortColumn == null ? -1 : sortColumn;
+			    requestObject['ascending'] = ascending;
+			    dableRequest.send(JSON.stringify(requestObject));
+			}
 			$export.searchFunc = function (event) {
 				var searchBox = this;
 				if (searchBox.id != $export.id + '_search') {
 					return false;
 				}
-				if (searchBox.value && searchBox.value.length < $export.minimumSearchLength) {
-					return true;
-				}
-				var searchText = searchBox.value;
-				var includedRows = [];
-				if (searchText) {
-					for (var i = 0; i < $export.filters.length; ++i) {
-						for (var j = 0; j < $export.rows.length; ++j) {
-							if (ArrayContains(includedRows, $export.rows[j])) {
-								continue;
-							}
-							for (var k = 0; k < $export.rows[j].length; ++k) {
-								if ($export.filters[i](searchText, $export.rows[j][k])) {
-									includedRows.push($export.rows[j]);
-									break;
-								}
-							}
-						}
-					}
+				if (!searchBox.value || searchBox.value.length < $export.minimumSearchLength) {
+				    $export.currentFilter = '';
 				}
 				else {
-					includedRows = $export.rows;
+				    var searchText = searchBox.value;
+				    $export.currentFilter = searchText;
 				}
-
-				$export.visibleRows = includedRows;
-				var body = document.getElementById($export.id + '_body');
-				$export.UpdateDisplayedRows(body);
-				$export.UpdateStyle(document.getElementById($export.id));
+				if ($export.async) {
+				    var ascending = true;
+				    if ($export.sortOrder.length > 3 && $export.sortOrder.substr(0, 4).toLowerCase() == 'desc') {
+				        ascending = false;
+				    }
+				    //search is wired up to be async so the user can keep typing, but it creates a race condition
+                    //that is not conducive to fast typing, so I'll have to figure out a fix
+				    $export.asyncRequest(0, $export.currentFilter, $export.sortColumn, ascending);
+				    var body = document.getElementById($export.id + '_body');
+				    $export.UpdateDisplayedRows(body);
+				    $export.UpdateStyle(document.getElementById($export.id));
+				}
+				else {
+				    var includedRows = [];
+				    if ($export.currentFilter) {
+				        for (var i = 0; i < $export.filters.length; ++i) {
+				            for (var j = 0; j < $export.rows.length; ++j) {
+				                if (ArrayContains(includedRows, $export.rows[j])) {
+				                    continue;
+				                }
+				                for (var k = 0; k < $export.rows[j].length; ++k) {
+				                    if ($export.filters[i]($export.currentFilter, $export.rows[j][k])) {
+				                        includedRows.push($export.rows[j]);
+				                        break;
+				                    }
+				                }
+				            }
+				        }
+				    }
+				    else {
+				        includedRows = $export.rows;
+				    }
+				    $export.visibleRows = includedRows;
+				    var body = document.getElementById($export.id + '_body');
+				    $export.UpdateDisplayedRows(body);
+				    $export.UpdateStyle(document.getElementById($export.id));
+				}
 			};
 			$export.sortFunc = function (event) {
-				var tag = event.srcElement.tagName;
+				var tag = this.tagName;
 				//prevent sorting from some form elements
 				if(tag != 'INPUT' && tag != 'BUTTON' && tag != 'SELECT' && tag != 'TEXTAREA') {
 					var columnCell = this;  //use this here, as the event.srcElement is probably a <span>
-					var sortSpan = columnCell.querySelector('.table-sort');
+					var sortSpan = columnCell.querySelector('.' + $export.sortClass);
 					var columnTag = columnCell.getAttribute('data-tag');
 					var columnIndex = -1;
 	
@@ -78,11 +157,10 @@
 					if (columnIndex == -1) {
 						return false;
 					}
-					
 					$export.sortColumn = columnIndex;
 					var ascend = false;
 					if ($export.sortOrder.length > 3 && $export.sortOrder.substr(0, 4).toLowerCase() == 'desc') {
-						ascend = true;
+						ascend = true;  //switching from descending to ascending
 					}
 					if (ascend) {
 						$export.sortOrder = 'asc';
@@ -92,8 +170,11 @@
 						$export.sortOrder = 'desc';
 						sortSpan.innerHTML = 'v';
 					}
-	
-					if ($export.columnData[columnIndex].CustomSortFunc) {
+	                
+					if ($export.async) {
+					    $export.asyncRequest($export.asyncStart, $export.currentFilter, columnIndex, ascend);
+					}
+					else if ($export.columnData[columnIndex].CustomSortFunc) {
 						$export.visibleRows = $export.columnData[columnIndex].CustomSortFunc(columnIndex, ascend, $export.visibleRows);
 					}
 					else {
@@ -241,6 +322,7 @@
 
 				$export.columns = tableColumns;
 				$export.rows = rows;
+				$export.visibleRows = rows;
 			};
 
 			$export.UpdateDisplayedRows = function (body) {
@@ -259,24 +341,24 @@
 				var cell = document.createElement('td');
 				//get the display start id
 				var pageDisplay = ($export.pageNumber * $export.pageSize);
-				if ($export.visibleRows.length <= pageDisplay) {    //if this is too big, go back to page 1
+				if ($export.VisibleRowCount() <= pageDisplay) {    //if this is too big, go back to page 1
 					$export.pageNumber = 0;
 					pageDisplay = 0;
 				}
 				//get the display end id
 				var length = pageDisplay + $export.pageSize;
-				if (pageDisplay + $export.pageSize >= $export.visibleRows.length) { //if this is too big, only show remaining rows
-					length = $export.visibleRows.length;
+				if (pageDisplay + $export.pageSize >= $export.VisibleRowCount()) { //if this is too big, only show remaining rows
+					length = $export.VisibleRowCount();
 				}
 			    //loop through the visible rows and display this page
 				var rows = [];
 				for (var i = pageDisplay; i < length; ++i) {
 					var tempRow = row.cloneNode(false);
 					if (i % 2 == 0) {
-						tempRow.setAttribute('class', 'table-row-even');
+						tempRow.setAttribute('class', $export.evenRowClass);
 					}
 					else {
-						tempRow.setAttribute('class', 'table-row-odd');
+						tempRow.setAttribute('class', $export.oddRowClass);
 					}
 
 					for (var j = 0; j < $export.visibleRows[i].length; ++j) {
@@ -306,15 +388,15 @@
 				}
 				var start = ($export.pageNumber * $export.pageSize) + 1;
 				var end = start + $export.pageSize - 1;
-				if (end > $export.visibleRows.length) {
-					end = $export.visibleRows.length;
+				if (end > $export.VisibleRowCount()) {
+					end = $export.VisibleRowCount();
 				}
 				
 				var showing = footer.querySelector('#' + $export.id + '_showing');
 				if (showing) {
-					showing.innerHTML = "Showing " + start + " to " + end + " of " + ($export.visibleRows.length) + " entries";
-					if ($export.visibleRows.length != $export.rows.length) {
-						showing.innerHTML += " (filtered from " + ($export.rows.length) + " total entries)";
+					showing.innerHTML = "Showing " + start + " to " + end + " of " + ($export.VisibleRowCount()) + " entries";
+					if ($export.VisibleRowCount() != $export.RowCount()) {
+						showing.innerHTML += " (filtered from " + ($export.RowCount()) + " total entries)";
 					}
 				}
 				var right = footer.querySelector('#' + $export.id + '_page_prev').parentElement;
@@ -375,10 +457,10 @@
 				for (var i = 0; i < theadCells.length; ++i) {
 					theadCells[i].removeAttribute('class');
 				}
-				var sorts = tableDiv.querySelectorAll('.table-sort');
+				var sorts = tableDiv.querySelectorAll('.' + $export.sortClass);
 				for (var i = 0; i < sorts.length; ++i) {
 					sorts[i].innerHTML = '^';
-					sorts[i].setAttribute('class', 'table-sort');
+					sorts[i].setAttribute('class', $export.sortClass);
 					if (i == $export.sortColumn) {
 						if ($export.sortOrder.toLowerCase().substr(0, 4) == 'desc') {
 							sorts[i].innerHTML = 'v';
@@ -401,14 +483,20 @@
 				RemoveStyle(tableDiv);  //recursive function to remove style attributes
 			}
 			$export.ApplyBaseStyles = function (tableDiv) {
+				if ($export.dableClass) {
+					tableDiv.setAttribute('class', $export.dableClass);
+				}
 				var table = tableDiv.querySelector('table');
 				table.setAttribute('style', 'width: 100%;');
+				if ($export.tableClass) {
+					table.setAttribute('class', $export.tableClass);
+				}
 				
-				var oddRows = tableDiv.querySelectorAll('.table-row-odd');
+				var oddRows = tableDiv.querySelectorAll('.' + $export.oddRowClass);
 				for (var i = 0; i < oddRows.length; ++i) {
 					oddRows[i].setAttribute('style', 'background-color: ' + $export.oddRowColor);
 				}
-				var evenRows = tableDiv.querySelectorAll('.table-row-even');
+				var evenRows = tableDiv.querySelectorAll('.' + $export.evenRowClass);
 				for (var i = 0; i < evenRows.length; ++i) {
 					evenRows[i].setAttribute('style', 'background-color: ' + $export.evenRowColor);
 				}
@@ -443,6 +531,9 @@
 
 				var header = tableDiv.querySelector('#' + $export.id + '_header');
 				header.setAttribute('style', 'padding: 5px;');
+				if ($export.headerClass) {
+					header.setAttribute('class', $export.headerClass);
+				}
 				var headLeft = header.children[0];
 				headLeft.setAttribute('style', 'float: left;');
 				var headRight = header.children[1];
@@ -452,12 +543,19 @@
 
 				var footer = tableDiv.querySelector('#' + $export.id + '_footer');
 				footer.setAttribute('style', 'padding: 5px;');
+				if ($export.footerClass) {
+					footer.setAttribute('class', $export.footerClass);
+				}
 				var footLeft = footer.children[0];
 				footLeft.setAttribute('style', 'float: left;');
 				var footClear = footer.children[2];
 				footClear.setAttribute('style', 'clear: both;');
 				var footRight = footer.children[1];
-				footRight.setAttribute('style', 'float: right;');
+				footRight.setAttribute('style', 'float: right; list-style: none;');
+				var footRightItems = footRight.querySelectorAll('li');
+				for (var i = 0; i < footRightItems.length; ++i) {
+					footRightItems[i].setAttribute('style', 'display: inline; margin-right: 5px;');
+				}
 			}
 			$export.ApplyJqueryUIStyles = function (tableDiv) {
 				if (!tableDiv) {
@@ -472,22 +570,26 @@
 				var headCells = tableDiv.querySelectorAll('th');
 				for (var i = 0; i < headCells.length; ++i) {
 					headCells[i].setAttribute('class', 'ui-state-default');
-					var sort = headCells[i].querySelector('.table-sort');
+					var sort = headCells[i].querySelector('.' + $export.sortClass);
 					if (sort) {
 						if (sort.innerHTML == 'v') {
-							sort.setAttribute('class', 'table-sort ui-icon ui-icon-triangle-1-s');
+							sort.setAttribute('class', $export.sortClass + ' ui-icon ui-icon-triangle-1-s');
 						}
 						else {
-							sort.setAttribute('class', 'table-sort ui-icon ui-icon-triangle-1-n');
+							sort.setAttribute('class', $export.sortClass + ' ui-icon ui-icon-triangle-1-n');
 						}
 						sort.innerHTML = '';
 					}
 				}
 
+				var pagerItems = footer.querySelectorAll('li');
+				for (var i = 0; i < pagerItems.length; ++i) {
+					RemoveStyle(pagerItems[i]);
+				}
 				footer.setAttribute('class', 'fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix');
-				var pageClass = 'fg-button ui-button ui-state-default ui-corner-left table-page';
+				var pageClass = 'fg-button ui-button ui-state-default ui-corner-left ' + $export.pagerButtonsClass;
 
-				var pageButtons = footer.querySelectorAll('.table-page');
+				var pageButtons = footer.querySelectorAll('.' + $export.pagerButtonsClass);
 				for (var i = 0; i < pageButtons.length; ++i) {
 				    pageButtons[i].setAttribute('class', pageClass);
 				}
@@ -545,22 +647,27 @@
 
 				var headCells = table.querySelectorAll('th');
 				for (var i = 0; i < headCells.length; ++i) {
-					var sort = headCells[i].querySelector('.table-sort');
+					var sort = headCells[i].querySelector('.' + $export.sortClass);
 					if (sort) {
 						if (sort.innerHTML == 'v') {
-							sort.setAttribute('class', 'table-sort glyphicon glyphicon-chevron-down');
+							sort.setAttribute('class', $export.sortClass + ' glyphicon glyphicon-chevron-down');
 						}
 						else {
-							sort.setAttribute('class', 'table-sort glyphicon glyphicon-chevron-up');
+							sort.setAttribute('class', $export.sortClass + ' glyphicon glyphicon-chevron-up');
 						}
 						sort.innerHTML = '';
 					}
 				}
 
-				var pageClass = 'btn btn-default table-page';
+				var pageClass = 'btn btn-default ' + $export.pagerButtonsClass;
 				var pageLeft = footer.querySelector('#' + $export.id + '_page_prev');
 				var pageRight = footer.querySelector('#' + $export.id + '_page_next');
 				var pageParent = pageLeft.parentElement;
+				
+				var pagerItems = footer.querySelectorAll('li');
+				for (var i = 0; i < pagerItems.length; ++i) {
+					RemoveStyle(pagerItems[i]);
+				}
 				
 				pageParent.setAttribute('class', 'btn-group');
 
@@ -587,7 +694,7 @@
 				    pageLast.appendChild(pageLastSpan);
 				}
 
-				var pageButtons = footer.querySelectorAll('.table-page');
+				var pageButtons = footer.querySelectorAll('.' + $export.pagerButtonsClass);
 				for (var i = 0; i < pageButtons.length; ++i) {
 				    pageButtons[i].setAttribute('class', pageClass);
 				}
@@ -598,6 +705,9 @@
 				if (tableDiv) {
 					var table = tableDiv.querySelector("table");
 					if (table) {
+							if (tableDiv.hasAttribute('class')) {
+								$export.dableClass = tableDiv.getAttribute('class');
+							}
 							var newTable = $export.GenerateTableFromHtml(table);	//Make it a Dable!
 							$export.BuildAll(newTable);
 							return true;
@@ -609,6 +719,9 @@
 				if (!tableNode) {
 					return false;
 				}
+				if (tableNode.hasAttribute('class')) {
+					$export.tableClass = tableNode.getAttribute('class');
+				}
 				var headers = tableNode.querySelectorAll("thead tr th");
 				var colNames = [];
 				for (var i = 0; i < headers.length; ++i) {	//add our column names
@@ -618,6 +731,10 @@
 				
 				var rowsHtml = tableNode.querySelectorAll("tbody tr");
 				var allRows = [];
+				if (rowsHtml.length > 1 && rowsHtml[0].hasAttribute('class') && rowsHtml[1].hasAttribute('class')) {
+					$export.evenRowClass = rowsHtml[0].getAttribute('class');
+					$export.oddRowClass = rowsHtml[1].getAttribute('class');
+				}
 				for (var i = 0; i < rowsHtml.length; ++i) {
 					allRows.push([]);
 					var rowCells = rowsHtml[i].children;
@@ -652,6 +769,10 @@
 				}
 				else if (tableDiv.nodeName.toLowerCase() != 'div') {
 					return false;
+				}
+
+				if ($export.async) {
+				    $export.asyncRequest(0, '', -1, true);
 				}
 				
 				tableDiv.innerHTML = '';
@@ -736,7 +857,7 @@
 
 					if ($export.columnData[i].CustomSortFunc !== false) {
 						var sortSpan = span.cloneNode(false);
-						sortSpan.setAttribute('class', 'table-sort');
+						sortSpan.setAttribute('class', $export.sortClass);
 						sortSpan.innerHTML = 'v';
 						tempCell.appendChild(sortSpan);
 						tempCell.onclick = $export.sortFunc;
@@ -784,41 +905,68 @@
 				return $export.UpdateFooter(footer);
 			};
 			$export.BuildPager = function () {
-			    var div = document.createElement('div');
-			    var button = document.createElement('button');
-			    var right = div.cloneNode(false);
+			    var ul = document.createElement('ul');
+			    var li = document.createElement('li');
+				var anchor = document.createElement('a');
+			    var right = ul.cloneNode(false);
 
 			    if ($export.pagerIncludeFirstAndLast) {
-			        var pageFirst = button.cloneNode(false);
-			        pageFirst.innerHTML = 'First';
-			        pageFirst.setAttribute('type', 'button');
-			        pageFirst.setAttribute('class', 'table-page');
+			        var pageFirst = li.cloneNode(false);
+					var pageFirstAnchor = anchor.cloneNode(false);
+			        pageFirstAnchor.innerHTML = 'First';
+			        pageFirst.setAttribute('class', $export.pagerButtonsClass);
 			        pageFirst.id = $export.id + '_page_first';
-			        pageFirst.onclick = function () {
+			        pageFirstAnchor.onclick = function () {
 			            $export.pageNumber = 0;
+			            if ($export.async &&
+                        ($export.asyncStart > $export.pageNumber * $export.pageSize
+                        || $export.pageNumber * $export.pageSize > $export.asyncStart + $export.asyncLength)) {
+			                var ascending = true;
+			                if ($export.sortOrder.length > 3 && $export.sortOrder.substr(0, 4).toLowerCase() == 'desc') {
+			                    ascending = false;
+			                }
+			                $export.asyncRequest(0, $export.currentFilter, $export.sortColumn, ascending);
+			            }
 			            $export.UpdateDisplayedRows(document.getElementById($export.id + '_body'));
 			            $export.UpdateStyle();
 			        };
 					if ($export.pageNumber <= 0) {
 						pageFirst.setAttribute('disabled', 'disabled');
+						pageFirstAnchor.onclick = function () {};	//disable onclick
 					}
+					pageFirst.appendChild(pageFirstAnchor);
 			        right.appendChild(pageFirst);
 			    }
 
-			    var pageLeft = button.cloneNode(false);
-			    pageLeft.innerHTML = 'Prev';
-			    pageLeft.setAttribute('type', 'button');
-			    pageLeft.setAttribute('class', 'table-page');
+			    var pageLeft = li.cloneNode(false);
+				var pageLeftAnchor = anchor.cloneNode(false);
+			    pageLeftAnchor.innerHTML = 'Prev';
+			    pageLeft.setAttribute('class', $export.pagerButtonsClass);
 			    pageLeft.id = $export.id + '_page_prev';
-			    pageLeft.onclick = function () {
+			    pageLeftAnchor.onclick = function () {
 			        $export.pageNumber -= 1;
+			        if ($export.async &&
+                        ($export.asyncStart > $export.pageNumber * $export.pageSize
+                        || $export.pageNumber * $export.pageSize > $export.asyncStart + $export.asyncLength)) {
+			            var newStart = $export.pageNumber * $export.pageSize;
+			            var pages = 500 / $export.pageSize;
+			            if ($export.pageNumber - pages > -1) {
+			                newStart = ($export.pageNumber - pages) * $export.pageSize;
+			            }
+			            var ascending = true;
+			            if ($export.sortOrder.length > 3 && $export.sortOrder.substr(0, 4).toLowerCase() == 'desc') {
+			                ascending = false;
+			            }
+			            $export.asyncRequest(newStart, $export.currentFilter, $export.sortColumn, ascending);
+			        }
 			        $export.UpdateDisplayedRows(document.getElementById($export.id + '_body'));
 			        $export.UpdateStyle();
 			    };
 			    if ($export.pageNumber <= 0) {
 			        pageLeft.setAttribute('disabled', 'disabled');
+					pageLeftAnchor.onclick = function () {};	//disable onclick
 			    }
-
+				pageLeft.appendChild(pageLeftAnchor);
 			    right.appendChild(pageLeft);
 
 			    if ($export.pagerSize > 0) {
@@ -839,55 +987,94 @@
 			        }
 
 			        for (var i = start; i < length; ++i) {
-			            var btn = button.cloneNode(false);
-			            btn.innerHTML = (i + 1).toString();
+			            var liNode = li.cloneNode(false);
+						var liNodeAnchor = anchor.cloneNode(false);
+			            liNodeAnchor.innerHTML = (i + 1).toString();
 						var page = i;
-			            btn.onclick = function (j) {
+			            liNodeAnchor.onclick = function (j) {
 			                return function() {
-								$export.pageNumber = j;
+			                    $export.pageNumber = j;
+			                    if ($export.async &&
+                                    ($export.asyncStart > $export.pageNumber * $export.pageSize
+                                    || $export.pageNumber * $export.pageSize >= $export.asyncStart + $export.asyncLength)) {
+			                        var newStart = $export.pageNumber * $export.pageSize;
+			                        var ascending = true;
+			                        if ($export.sortOrder.length > 3 && $export.sortOrder.substr(0, 4).toLowerCase() == 'desc') {
+			                            ascending = false;
+			                        }
+			                        $export.asyncRequest(newStart, $export.currentFilter, $export.sortColumn, ascending);
+			                    }
 								$export.UpdateDisplayedRows(document.getElementById($export.id + '_body'));
 								$export.UpdateStyle();
 							}
 			            }(i);
-			            btn.setAttribute('type', 'button');
-			            btn.setAttribute('class', 'table-page');
+			            liNode.setAttribute('class', $export.pagerButtonsClass);
 			            if (i == $export.pageNumber) {
-			                btn.setAttribute('disabled', 'disabled');
+			                liNode.setAttribute('disabled', 'disabled');
+							liNodeAnchor.onclick = function () {};	//disable onclick
 			            }
-			            right.appendChild(btn);
+						liNode.appendChild(liNodeAnchor);
+			            right.appendChild(liNode);
 			        }
 			    }
 
-			    var pageRight = button.cloneNode(false);
-			    pageRight.innerHTML = 'Next';
-			    pageRight.setAttribute('type', 'button');
-			    pageRight.setAttribute('class', 'table-page');
+			    var pageRight = li.cloneNode(false);
+				var pageRightAnchor = anchor.cloneNode(false);
+			    pageRightAnchor.innerHTML = 'Next';
+			    pageRight.setAttribute('class', $export.pagerButtonsClass);
 			    pageRight.id = $export.id + '_page_next';
-			    pageRight.onclick = function () {
+			    pageRightAnchor.onclick = function () {
 			        $export.pageNumber += 1;
+			        if ($export.async &&
+                        ($export.asyncStart > $export.pageNumber * $export.pageSize
+                        || $export.pageNumber * $export.pageSize > $export.asyncStart + $export.asyncLength)) {
+			            var newStart = $export.pageNumber * $export.pageSize;
+			            var ascending = true;
+			            if ($export.sortOrder.length > 3 && $export.sortOrder.substr(0, 4).toLowerCase() == 'desc') {
+			                ascending = false;
+			            }
+			            $export.asyncRequest(newStart, $export.currentFilter, $export.sortColumn, ascending);
+			        }
 			        $export.UpdateDisplayedRows(document.getElementById($export.id + '_body'));
 			        $export.UpdateStyle();
 			    };
 			    if ($export.NumberOfPages() - 1 == $export.pageNumber) {
 			        pageRight.setAttribute('disabled', 'disabled');
+					pageRightAnchor.onclick = function () {};	//disable onclick
 			    }
-
+				pageRight.appendChild(pageRightAnchor);
 			    right.appendChild(pageRight);
 
 			    if ($export.pagerIncludeFirstAndLast) {
-			        var pageLast = button.cloneNode(false);
-			        pageLast.innerHTML = 'Last';
-			        pageLast.setAttribute('type', 'button');
-			        pageLast.setAttribute('class', 'table-page');
+			        var pageLast = li.cloneNode(false);
+					var pageLastAnchor = anchor.cloneNode(false);
+			        pageLastAnchor.innerHTML = 'Last';
+			        pageLast.setAttribute('class', $export.pagerButtonsClass);
 			        pageLast.id = $export.id + '_page_last';
-			        pageLast.onclick = function () {
-			            $export.pageNumber = $export.NumberOfPages() - 1;
+			        pageLastAnchor.onclick = function () {
+			            $export.pageNumber = $export.NumberOfPages() - 1;   //page number is 0 based
+			            if ($export.async &&
+                        ($export.asyncStart > $export.pageNumber * $export.pageSize
+                        || $export.pageNumber * $export.pageSize > $export.asyncStart + $export.asyncLength)) {
+			                var newStart = 0;
+			                var pages = (1000 / $export.pageSize) - 1;  //-1 for the page number and -1 to include current page
+			                if ($export.pageNumber - pages > -1) {
+			                    newStart = ($export.pageNumber - pages) * $export.pageSize;
+			                }
+			                var ascending = true;
+			                if ($export.sortOrder.length > 3 && $export.sortOrder.substr(0, 4).toLowerCase() == 'desc') {
+			                    ascending = false;
+			                }
+			                $export.asyncRequest(newStart, $export.currentFilter, $export.sortColumn, ascending);
+			            }
 			            $export.UpdateDisplayedRows(document.getElementById($export.id + '_body'));
 			            $export.UpdateStyle();
 			        };
 					if ($export.NumberOfPages() - 1 == $export.pageNumber) {
 						pageLast.setAttribute('disabled', 'disabled');
+						pageLastAnchor.onclick = function () {};	//disable onclick
 					}
+					pageLast.appendChild(pageLastAnchor);
 			        right.appendChild(pageLast);
 			    }
 
