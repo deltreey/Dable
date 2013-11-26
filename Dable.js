@@ -1,8 +1,8 @@
 !(function (define) {
 	define([], function () {
-		return function (tableId) {
+		return function (tableOrId) {
 			var $export = {
-				id: tableId,
+				id: '',
 				columns: [],
 				rows: [],
 				visibleRows: [],
@@ -700,18 +700,42 @@
 				}
 			};
 			
-			$export.CheckForTable = function () {//Check for existing table
-				var tableDiv = document.getElementById($export.id);
-				if (tableDiv) {
-					var table = tableDiv.querySelector("table");
-					if (table) {
-							if (tableDiv.hasAttribute('class')) {
-								$export.dableClass = tableDiv.getAttribute('class');
-							}
-							var newTable = $export.GenerateTableFromHtml(table);	//Make it a Dable!
-							$export.BuildAll(newTable);
-							return true;
+			$export.CheckForTable = function (input) {//Check for existing table
+				if (input) {
+					if (input.nodeType && input.nodeName.toLowerCase() == 'div') {
+						if (input.hasAttribute('id')) {
+							$export.id = input.getAttribute('id');
+						}
+						else {
+							$export.id = 'Dable1';
+							input.setAttribute('id', 'Dable1');
+						}
 					}
+					else if (window.jQuery && input instanceof jQuery && input[0].nodeType) {
+						//jquery object
+						if (input[0].hasAttribute('id')) {
+							$export.id = input[0].getAttribute('id');
+						}
+						else {
+							$export.id = 'Dable1';
+							input[0].setAttribute('id', 'Dable1');
+						}
+					}
+					else {
+						$export.id = input.toString()
+					}
+					var tableDiv = document.getElementById($export.id);
+					if (tableDiv && $export.rows && $export.rows.length < 1) {
+						var table = tableDiv.querySelector('table');
+						if (table) {
+								if (tableDiv.hasAttribute('class')) {
+									$export.dableClass = tableDiv.getAttribute('class');
+								}
+								var newTable = $export.GenerateTableFromHtml(table);	//Make it a Dable!
+								return newTable;
+						}
+					}
+					return $export.id;
 				}
 				return false;
 			}
@@ -722,14 +746,14 @@
 				if (tableNode.hasAttribute('class')) {
 					$export.tableClass = tableNode.getAttribute('class');
 				}
-				var headers = tableNode.querySelectorAll("thead tr th");
+				var headers = tableNode.querySelectorAll('thead tr th');
 				var colNames = [];
 				for (var i = 0; i < headers.length; ++i) {	//add our column names
 					colNames.push(headers[i].innerHTML);
 				}
 				$export.SetColumnNames(colNames);
 				
-				var rowsHtml = tableNode.querySelectorAll("tbody tr");
+				var rowsHtml = tableNode.querySelectorAll('tbody tr');
 				var allRows = [];
 				if (rowsHtml.length > 1 && rowsHtml[0].hasAttribute('class') && rowsHtml[1].hasAttribute('class')) {
 					$export.evenRowClass = rowsHtml[0].getAttribute('class');
@@ -750,24 +774,13 @@
 				return parentDiv.id;
 			};
 			
-			$export.BuildAll = function (tableId) {
+			$export.BuildAll = function (tableInput) {
+				var tableId = $export.CheckForTable(tableInput);
 				if (!tableId) {
-					tableId = $export.id;
+					return false;
 				}
-				$export.id = tableId;
 				var tableDiv = document.getElementById(tableId);
-				
 				if (!tableDiv) {
-					if (!$export.rows || $export.rows.length < 1) {
-						if ($export.CheckForTable()) {
-							return true;	//build table off of existing data
-						}
-					}
-					else {
-						return false;   //get the right element type
-					}
-				}
-				else if (tableDiv.nodeName.toLowerCase() != 'div') {
 					return false;
 				}
 
@@ -1100,7 +1113,7 @@
 			    }
 			}
 			
-			$export.CheckForTable();
+			$export.BuildAll(tableOrId);
 			return $export;
 		};
 	});
