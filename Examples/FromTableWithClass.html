@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="../Dable.js"></script>
+<style type="text/css">
+	.WhiteOnBlack {
+		background-color: black;
+		color: white;
+	}
+	.NoBorders {
+		border: 0px;
+		border-collapse: collapse;
+	}
+	.Green {
+		background-color: green !important;
+	}
+	.Blue {
+		background-color: blue !important;
+	}
+</style>
+</head>
+<body>
+<div id="TableDable" class="WhiteOnBlack">
+	<table class="NoBorders">
+		<thead>
+			<tr>
+				<th>Odd</th>
+				<th>Even</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr class="Green">
+				<td>1</td>
+				<td>2</td>
+			</tr>
+			<tr class="Blue">
+				<td>3</td>
+				<td>4</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+<script type="text/javascript">
+	var dable = new Dable("TableDable");
+</script>
+</body>
+</html>
