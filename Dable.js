@@ -21,6 +21,7 @@
 				asyncData: {},
 				asyncStart: 0,
         asyncLength: 1000,
+				tfoothtml: '',
 				//Basic Styling
 				style: 'none',
 				evenRowColor: '#E2E4FF',
@@ -521,7 +522,13 @@
 					.parentElement;
 				footer.replaceChild($export.BuildPager(), right);
 
-				RemoveStyle(tableDiv);  //recursive function to remove style attributes
+				//basically, don't remove style from tfoot, in case user added it
+				tableDiv.removeAttribute('style');
+				RemoveStyle(children[0]);
+				children[1].removeAttribute('style');
+				RemoveStyle(children[2]);
+				RemoveStyle(thead);
+				RemoveStyle(tbody);
 			}
 			$export.ApplyBaseStyles = function (tableDiv) {
 				if ($export.dableClass) {
@@ -543,7 +550,7 @@
 					evenRows[i].setAttribute('style', 'background-color: ' +
 						$export.evenRowColor);
 				}
-				var cells = tableDiv.querySelectorAll('td');
+				var cells = tableDiv.querySelectorAll('tbody td');
 				for (var i = 0; i < cells.length; ++i) {
 					cells[i].setAttribute('style', 'padding: 5px;');
 				}
@@ -818,6 +825,10 @@
 					$export.tableClass = tableNode.getAttribute('class');
 				}
 				var headers = tableNode.querySelectorAll('thead tr th');
+				var tfoot = tableNode.querySelector('tfoot');
+				if (tfoot) {
+					$export.tfoothtml = tfoot.innerHTML;
+				}
 				var colNames = [];
 				for (var i = 0; i < headers.length; ++i) {	//add our column names
 					colNames.push(headers[i].innerHTML);
@@ -963,6 +974,11 @@
 				body = $export.UpdateDisplayedRows(body);
 				body.id = $export.id + '_body';
 				table.appendChild(body);
+				if ($export.tfoothtml) {
+					var foot = document.createElement('tfoot');
+					foot.innerHTML = $export.tfoothtml;
+					table.appendChild(foot);
+				}
 
 				return table;
 			};
