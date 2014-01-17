@@ -5,7 +5,9 @@
 				id: '',
 				columns: [],
 				rows: [],
+				rowObjects: [],
 				visibleRows: [],
+				visibleRowObjects: [],
 				hiddenColumns: [],
 				currentFilter: '',
 				sortColumn: null,
@@ -134,6 +136,7 @@
 				}
 				else {
 					var includedRows = [];
+					var includedRowObjects = [];
 					if ($export.currentFilter) {
 						for (var i = 0; i < $export.filters.length; ++i) {
 							for (var j = 0; j < $export.rows.length; ++j) {
@@ -145,6 +148,7 @@
 											$export.currentFilter,
 											$export.rows[j][k])) {
 										includedRows.push($export.rows[j]);
+										includedRowObjects.push($export.rowObjects[j]);
 										break;
 									}
 								}
@@ -153,8 +157,10 @@
 					}
 					else {
 						includedRows = $export.rows;
+						includedRowObjects = $export.rowObjects;
 					}
 					$export.visibleRows = includedRows;
+					$export.visibleRowObjects = includedRowObjects;
 					var body = document.getElementById($export.id + '_body');
 					$export.UpdateDisplayedRows(body);
 					$export.UpdateStyle(document.getElementById($export.id));
@@ -205,25 +211,26 @@
 							columnIndex, ascend);
 					}
 					else if ($export.columnData[columnIndex].CustomSortFunc) {
-						$export.visibleRows = $export.columnData[columnIndex]
-							.CustomSortFunc(columnIndex, ascend, $export.visibleRows);
+						$export.visibleRowObjects = $export.columnData[columnIndex]
+							.CustomSortFunc(columnIndex, ascend, $export.visibleRowObjects);
 					}
 					else {
-						$export.visibleRows = $export
-							.baseSort(columnIndex, ascend, $export.visibleRows);
+						$export.visibleRowObjects = $export
+							.baseSort(columnIndex, ascend, $export.visibleRowObjects);
 					}
-	
+					
+					$export.visibleRows = $export.CreateRowsFromObjects($export.visibleRowObjects);
 					$export.UpdateDisplayedRows(
 						document.getElementById($export.id + '_body'));
 					$export.UpdateStyle();
 				}
 			};
 			
-			$export.baseSort = function (columnIndex, ascending, currentRows) {
+			$export.baseSort = function (columnIndex, ascending, currentRowObjects) {
 				var isInt = true;
-				var newRows = currentRows.slice(0);
-				for (var i = 0; i < currentRows.length; ++i) {
-					if (parseInt(currentRows[i][columnIndex]).toString()
+				var newRowObjects = currentRowObjects.slice(0);
+				for (var i = 0; i < currentRowObjects.length; ++i) {
+					if (parseInt(currentRowObjects[i].Row[columnIndex]).toString()
 						.toLowerCase() == 'nan') {
 						isInt = false;
 						break;
@@ -231,16 +238,16 @@
 				}
 
 				if (isInt) {
-					newRows = newRows.sort(function (a, b) {
-						return parseInt(a[columnIndex]) - parseInt(b[columnIndex]);
+					newRowObjects = newRowObjects.sort(function (a, b) {
+						return parseInt(a.Row[columnIndex]) - parseInt(b.Row[columnIndex]);
 					});
 				}
 				else {
-					newRows = newRows.sort(function (a, b) {
-						if (a[columnIndex] > b[columnIndex]) {
+					newRowObjects = newRowObjects.sort(function (a, b) {
+						if (a.Row[columnIndex] > b.Row[columnIndex]) {
 							return 1;
 						}
-						else if (a[columnIndex] < b[columnIndex]) {
+						else if (a.Row[columnIndex] < b.Row[columnIndex]) {
 							return -1;
 						}
 						else {
@@ -250,10 +257,10 @@
 				}
 
 				if (!ascending) {
-					newRows = newRows.reverse();
+					newRowObjects = newRowObjects.reverse();
 				}
 
-				return newRows;
+				return newRowObjects;
 			};
 			$export.filters = [
 				//PHRASES FILTER
@@ -321,6 +328,43 @@
 					}
 				}
 			};
+			
+			$export.DeleteRow = function(rowNumber) {
+				for (var i = 0; i < $export.rowObjects.length; ++i) {
+					if ($export.rowObjects[i].RowNumber == rowNumber) {
+						$export.rowObjects.splice(i, 1);
+						$export.rows = $export.CreateRowsFromObjects($export.rowObjects);
+						break;
+					}
+				}
+				$export.UpdateDisplayedRows();
+				$export.UpdateStyle();
+			};
+			
+			$export.AddRow = function(row) {
+				$export.rows.push(row);
+				$export.rowObjects.push({ Row: row, RowNumber: $export.rowObjects[$export.rows.length - 1].RowNumber + 1 });
+				$export.UpdateDisplayedRows();
+				$export.UpdateStyle();
+			};
+			
+			$export.CreateObjectsFromRows = function(rows) {
+				var rowObjects = [];
+				
+				for (var i = 0; i < rows.length; ++i) {
+					rowObjects.push({ Row: rows[i], RowNumber: i});
+				}
+				return rowObjects;
+			};
+			$export.CreateRowsFromObjects = function(objects) {
+				var rows = [];
+				
+				for (var i = 0; i < objects.length; ++i) {
+					rows.push(objects[i].Row);
+				}
+				
+				return rows;
+			}
 			$export.SetDataAsColumns = function (columns) {
 				if (!columns) {
 					return false;
@@ -338,6 +382,9 @@
 
 				$export.columns = columns;
 				$export.rows = tableRows;
+				$export.rowObjects = $export.CreateObjectsFromRows(tableRows);
+				$export.visibleRows = rows;
+				$export.visibleRowObjects = $export.rowObjects;
 			};
 			$export.SetDataAsRows = function (rows) {
 				if (!rows) {
@@ -356,7 +403,9 @@
 
 				$export.columns = tableColumns;
 				$export.rows = rows;
+				$export.rowObjects = $export.CreateObjectsFromRows(rows);
 				$export.visibleRows = rows;
+				$export.visibleRowObjects = $export.rowObjects;
 			};
 
 			$export.UpdateDisplayedRows = function (body) {
@@ -401,7 +450,7 @@
 						var tempCell = cell.cloneNode(false);
 						var text = $export.visibleRows[i][j];
 						if ($export.columnData[j].CustomRendering != null) {
-							text = $export.columnData[j].CustomRendering(text);
+							text = $export.columnData[j].CustomRendering(text, $export.visibleRowObjects[i].RowNumber);
 						}
 						tempCell.innerHTML = text;
 						tempRow.appendChild(tempCell);
@@ -971,6 +1020,7 @@
 				table.appendChild(head);
 				
 				$export.visibleRows = $export.rows;
+				$export.visibleRowObjects = $export.rowObjects;
 				body = $export.UpdateDisplayedRows(body);
 				body.id = $export.id + '_body';
 				table.appendChild(body);
