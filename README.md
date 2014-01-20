@@ -101,3 +101,8 @@ dable.UpdateStyle();				// Reapply our styles
 Every function inside of Dable is accessible, down to the initial rendering functions!
 
 For more examples, check out the site! http://deltreey.github.io/Dable/
+
+Breaking Changes
+-----
+
+`1.0 - 1.1:` Dable custom rendering functions now use rowObjects instead of rows.  rowObjects have the `Row` property which contains the row as it existed before but also includes the `RowNumber` property which makes things like delete buttons easier to implement.
