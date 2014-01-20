@@ -5,7 +5,9 @@
 				id: '',
 				columns: [],
 				rows: [],
+				rowObjects: [],
 				visibleRows: [],
+				visibleRowObjects: [],
 				hiddenColumns: [],
 				currentFilter: '',
 				sortColumn: null,
@@ -20,7 +22,8 @@
 				async: false,
 				asyncData: {},
 				asyncStart: 0,
-                asyncLength: 1000,
+				asyncLength: 1000,
+				tfoothtml: '',
 				//Basic Styling
 				style: 'none',
 				evenRowColor: '#E2E4FF',
@@ -29,127 +32,156 @@
 				dableClass: '',
 				headerClass: '',
 				tableClass: '',
-					sortClass: 'table-sort',
-					evenRowClass: 'table-row-even',
-					oddRowClass: 'table-row-odd',
+				sortClass: 'table-sort',
+				evenRowClass: 'table-row-even',
+				oddRowClass: 'table-row-odd',
 				footerClass: '',
 				pagerButtonsClass: 'table-page'
 			};
 
 			$export.RowCount = function () {
-			    return $export.rows.length;
+			  return $export.rows.length;
 			}
 			$export.VisibleRowCount = function () {
-			    return $export.visibleRows.length;
+			  return $export.visibleRows.length;
 			}
 			$export.NumberOfPages = function () {
-			    var n = $export.VisibleRowCount() / $export.pageSize;
-			    return Math.ceil(n);
+			  var n = $export.VisibleRowCount() / $export.pageSize;
+			  return Math.ceil(n);
 			};
 			$export.GetPageForRow = function (row) {
-			    return Math.ceil(row / $export.pageSize);
+			  return Math.ceil(row / $export.pageSize);
 			}
 			
-			$export.asyncRequest = function (start, filter, sortColumn, ascending, asynchronous) {
-			    if (typeof asynchronous == 'undefined') {
-			        asynchronous = false;
-			    }
-			    var dableRequest = new XMLHttpRequest();
-			    dableRequest.onreadystatechange = function () {
-			        if (dableRequest.readyState == 4 && dableRequest.status == 200) {
-			            var data = JSON.parse(dableRequest.responseText);
-			            var actualData = JSON.parse(data.d);    //stupid json
-			            var actualRows = actualData.rows;
-                        //create empty rows for the rest of the set
-			            actualRows.reverse();
-			            for (var i = 0; i < start; ++i) {
-			                actualRows.push([]);
-			            }
-			            actualRows.reverse();
-			            for (var i = (start + $export.asyncLength) ; i < actualData.includedRowCount; ++i) {
-			                actualRows.push([]);
-			            }
-                        //update
-			            $export.SetDataAsRows(actualRows);
-			            $export.RowCount = function () { return actualData.rowCount; };
-			            $export.VisibleRowCount = function () { return actualData.includedRowCount; };
-			            if (asynchronous != false && !!(asynchronous && asynchronous.call && asynchronous.apply)) {
-			                asynchronous();
-			            }
-			        }
-			    }
-			    dableRequest.open('POST', $export.async, asynchronous != false);
-			    dableRequest.setRequestHeader('content-type', 'application/json');
-			    var requestObject = JSON.parse(JSON.stringify($export.asyncData));
-			    requestObject['start'] = start;
-			    $export.asyncStart = start;
-			    requestObject['count'] = $export.asyncLength;
-			    requestObject['filter'] = filter;
-			    requestObject['sortColumn'] = sortColumn == null ? -1 : sortColumn;
-			    requestObject['ascending'] = ascending;
-			    dableRequest.send(JSON.stringify(requestObject));
+			$export.asyncRequest = function (start,
+			                                 filter,
+			                                 sortColumn,
+			                                 ascending,
+			                                 asynchronous) {
+			  if (typeof asynchronous == 'undefined') {
+			    asynchronous = false;
+			  }
+				var dableRequest = new XMLHttpRequest();
+				dableRequest.onreadystatechange = function () {
+					if (dableRequest.readyState == 4 && dableRequest.status == 200) {
+						var data = JSON.parse(dableRequest.responseText);
+						var actualData = JSON.parse(data.d);    //stupid json
+						var actualRows = actualData.rows;
+						//create empty rows for the rest of the set
+						actualRows.reverse();
+						for (var i = 0; i < start; ++i) {
+							actualRows.push([]);
+						}
+						actualRows.reverse();
+						for (var i = (start + $export.asyncLength);
+						     i < actualData.includedRowCount;
+						     ++i) {
+							actualRows.push([]);
+						}
+						//update
+						$export.SetDataAsRows(actualRows);
+						$export.RowCount = function () { return actualData.rowCount; };
+						$export.VisibleRowCount = function () {
+							return actualData.includedRowCount;
+						};
+						if (asynchronous != false
+						    && !!(asynchronous
+						          && asynchronous.call
+						          && asynchronous.apply)) {
+							asynchronous();
+						}
+					}
+				}
+				dableRequest.open('POST', $export.async, asynchronous != false);
+				dableRequest.setRequestHeader('content-type', 'application/json');
+				var requestObject = JSON.parse(JSON.stringify($export.asyncData));
+				requestObject['start'] = start;
+				$export.asyncStart = start;
+				requestObject['count'] = $export.asyncLength;
+				requestObject['filter'] = filter;
+				requestObject['sortColumn'] = sortColumn == null ? -1 : sortColumn;
+				requestObject['ascending'] = ascending;
+				dableRequest.send(JSON.stringify(requestObject));
 			}
 			$export.searchFunc = function (event) {
 				var searchBox = this;
 				if (searchBox.id != $export.id + '_search') {
 					return false;
 				}
-				if (!searchBox.value || searchBox.value.length < $export.minimumSearchLength) {
-				    $export.currentFilter = '';
+				if (!searchBox.value
+				    || searchBox.value.length < $export.minimumSearchLength) {
+				  $export.currentFilter = '';
 				}
 				else {
-				    var searchText = searchBox.value;
-				    $export.currentFilter = searchText;
+				  var searchText = searchBox.value;
+				  $export.currentFilter = searchText;
 				}
 				if ($export.async) {
-				    var ascending = true;
-				    if ($export.sortOrder.length > 3 && $export.sortOrder.substr(0, 4).toLowerCase() == 'desc') {
-				        ascending = false;
-				    }
-				    //search is wired up to be async so the user can keep typing, but it creates a race condition
-                    //that is not conducive to fast typing, so I'll have to figure out a fix
-				    $export.asyncRequest(0, $export.currentFilter, $export.sortColumn, ascending);
-				    var body = document.getElementById($export.id + '_body');
-				    $export.UpdateDisplayedRows(body);
-				    $export.UpdateStyle(document.getElementById($export.id));
+					var ascending = true;
+					if ($export.sortOrder.length > 3
+					    && $export.sortOrder.substr(0, 4).toLowerCase() == 'desc') {
+						ascending = false;
+					}
+					//search is wired up to be async so the user can keep typing,
+					//but it creates a race condition that is not conducive to
+					//fast typing, so I'll have to figure out a fix
+					$export.asyncRequest(
+						0,
+						$export.currentFilter,
+						$export.sortColumn,
+						ascending);
+					var body = document.getElementById($export.id + '_body');
+					$export.UpdateDisplayedRows(body);
+					$export.UpdateStyle(document.getElementById($export.id));
 				}
 				else {
-				    var includedRows = [];
-				    if ($export.currentFilter) {
-				        for (var i = 0; i < $export.filters.length; ++i) {
-				            for (var j = 0; j < $export.rows.length; ++j) {
-				                if (ArrayContains(includedRows, $export.rows[j])) {
-				                    continue;
-				                }
-				                for (var k = 0; k < $export.rows[j].length; ++k) {
-				                    if ($export.filters[i]($export.currentFilter, $export.rows[j][k])) {
-				                        includedRows.push($export.rows[j]);
-				                        break;
-				                    }
-				                }
-				            }
-				        }
-				    }
-				    else {
-				        includedRows = $export.rows;
-				    }
-				    $export.visibleRows = includedRows;
-				    var body = document.getElementById($export.id + '_body');
-				    $export.UpdateDisplayedRows(body);
-				    $export.UpdateStyle(document.getElementById($export.id));
+					var includedRows = [];
+					var includedRowObjects = [];
+					if ($export.currentFilter) {
+						for (var i = 0; i < $export.filters.length; ++i) {
+							for (var j = 0; j < $export.rows.length; ++j) {
+								if (ArrayContains(includedRows, $export.rows[j])) {
+									continue;
+								}
+								for (var k = 0; k < $export.rows[j].length; ++k) {
+									if ($export.filters[i](
+											$export.currentFilter,
+											$export.rows[j][k])) {
+										includedRows.push($export.rows[j]);
+										includedRowObjects.push($export.rowObjects[j]);
+										break;
+									}
+								}
+							}
+						}
+					}
+					else {
+						includedRows = $export.rows;
+						includedRowObjects = $export.rowObjects;
+					}
+					$export.visibleRows = includedRows;
+					$export.visibleRowObjects = includedRowObjects;
+					var body = document.getElementById($export.id + '_body');
+					$export.UpdateDisplayedRows(body);
+					$export.UpdateStyle(document.getElementById($export.id));
 				}
 			};
 			$export.sortFunc = function (event) {
 				var tag = this.tagName;
 				//prevent sorting from some form elements
-				if(tag != 'INPUT' && tag != 'BUTTON' && tag != 'SELECT' && tag != 'TEXTAREA') {
-					var columnCell = this;  //use this here, as the event.srcElement is probably a <span>
+				if(tag != 'INPUT'
+				   && tag != 'BUTTON'
+				   && tag != 'SELECT'
+				   && tag != 'TEXTAREA') {
+					var columnCell = this;  //use this here, as the event.srcElement
+																	//is probably a <span>
 					var sortSpan = columnCell.querySelector('.' + $export.sortClass);
 					var columnTag = columnCell.getAttribute('data-tag');
 					var columnIndex = -1;
 	
 					for (var i = 0; i < $export.columnData.length; ++i) {
-						if ($export.columnData[i].Tag.toLowerCase() == columnTag.toLowerCase()) {
+						if ($export.columnData[i].Tag.toLowerCase() ==
+							columnTag.toLowerCase()) {
 							columnIndex = i;
 							break;
 						}
@@ -159,7 +191,8 @@
 					}
 					$export.sortColumn = columnIndex;
 					var ascend = false;
-					if ($export.sortOrder.length > 3 && $export.sortOrder.substr(0, 4).toLowerCase() == 'desc') {
+					if ($export.sortOrder.length > 3
+					    && $export.sortOrder.substr(0, 4).toLowerCase() == 'desc') {
 						ascend = true;  //switching from descending to ascending
 					}
 					if (ascend) {
@@ -172,41 +205,49 @@
 					}
 	                
 					if ($export.async) {
-					    $export.asyncRequest($export.asyncStart, $export.currentFilter, columnIndex, ascend);
+					  $export.asyncRequest(
+							$export.asyncStart,
+							$export.currentFilter,
+							columnIndex, ascend);
 					}
 					else if ($export.columnData[columnIndex].CustomSortFunc) {
-						$export.visibleRows = $export.columnData[columnIndex].CustomSortFunc(columnIndex, ascend, $export.visibleRows);
+						$export.visibleRowObjects = $export.columnData[columnIndex]
+							.CustomSortFunc(columnIndex, ascend, $export.visibleRowObjects);
 					}
 					else {
-						$export.visibleRows = $export.baseSort(columnIndex, ascend, $export.visibleRows);
+						$export.visibleRowObjects = $export
+							.baseSort(columnIndex, ascend, $export.visibleRowObjects);
 					}
-	
-					$export.UpdateDisplayedRows(document.getElementById($export.id + '_body'));
+					
+					$export.visibleRows = $export.CreateRowsFromObjects($export.visibleRowObjects);
+					$export.UpdateDisplayedRows(
+						document.getElementById($export.id + '_body'));
 					$export.UpdateStyle();
 				}
 			};
 			
-			$export.baseSort = function (columnIndex, ascending, currentRows) {
+			$export.baseSort = function (columnIndex, ascending, currentRowObjects) {
 				var isInt = true;
-				var newRows = currentRows.slice(0);
-				for (var i = 0; i < currentRows.length; ++i) {
-					if (parseInt(currentRows[i][columnIndex]).toString().toLowerCase() == 'nan') {
+				var newRowObjects = currentRowObjects.slice(0);
+				for (var i = 0; i < currentRowObjects.length; ++i) {
+					if (parseInt(currentRowObjects[i].Row[columnIndex]).toString()
+						.toLowerCase() == 'nan') {
 						isInt = false;
 						break;
 					}
 				}
 
 				if (isInt) {
-					newRows = newRows.sort(function (a, b) {
-						return parseInt(a[columnIndex]) - parseInt(b[columnIndex]);
+					newRowObjects = newRowObjects.sort(function (a, b) {
+						return parseInt(a.Row[columnIndex]) - parseInt(b.Row[columnIndex]);
 					});
 				}
 				else {
-					newRows = newRows.sort(function (a, b) {
-						if (a[columnIndex] > b[columnIndex]) {
+					newRowObjects = newRowObjects.sort(function (a, b) {
+						if (a.Row[columnIndex] > b.Row[columnIndex]) {
 							return 1;
 						}
-						else if (a[columnIndex] < b[columnIndex]) {
+						else if (a.Row[columnIndex] < b.Row[columnIndex]) {
 							return -1;
 						}
 						else {
@@ -216,10 +257,10 @@
 				}
 
 				if (!ascending) {
-					newRows = newRows.reverse();
+					newRowObjects = newRowObjects.reverse();
 				}
 
-				return newRows;
+				return newRowObjects;
 			};
 			$export.filters = [
 				//PHRASES FILTER
@@ -287,6 +328,52 @@
 					}
 				}
 			};
+			
+			$export.DeleteRow = function(rowNumber) {
+				for (var i = 0; i < $export.rowObjects.length; ++i) {
+					if ($export.rowObjects[i].RowNumber == rowNumber) {
+						$export.rowObjects.splice(i, 1);
+						$export.rows = $export.CreateRowsFromObjects($export.rowObjects);
+						break;
+					}
+				}
+				for (var i = 0; i < $export.visibleRowObjects.length; ++i) {
+					if ($export.visibleRowObjects[i].RowNumber == rowNumber) {
+						$export.visibleRowObjects.splice(i, 1);
+						$export.visibleRows = $export.CreateRowsFromObjects($export.visibleRowObjects);
+					}
+				}
+				var event = document.createEvent('KeyboardEvent');
+				event.initEvent('keyup', true, true, window, false, false, false, false, 38, 38);
+				document.querySelector('#' + $export.id + '_search').dispatchEvent(event);
+			};
+			
+			$export.AddRow = function(row) {
+				$export.rows.push(row);
+				$export.rowObjects.push({ Row: row, RowNumber: $export.rowObjects[$export.rowObjects.length - 1].RowNumber + 1 });
+				
+				var event = document.createEvent('KeyboardEvent');
+				event.initEvent('keyup', true, true, window, false, false, false, false, 38, 38);
+				document.querySelector('#' + $export.id + '_search').dispatchEvent(event);
+			};
+			
+			$export.CreateObjectsFromRows = function(rows) {
+				var rowObjects = [];
+				
+				for (var i = 0; i < rows.length; ++i) {
+					rowObjects.push({ Row: rows[i], RowNumber: i});
+				}
+				return rowObjects;
+			};
+			$export.CreateRowsFromObjects = function(objects) {
+				var rows = [];
+				
+				for (var i = 0; i < objects.length; ++i) {
+					rows.push(objects[i].Row);
+				}
+				
+				return rows;
+			}
 			$export.SetDataAsColumns = function (columns) {
 				if (!columns) {
 					return false;
@@ -304,6 +391,9 @@
 
 				$export.columns = columns;
 				$export.rows = tableRows;
+				$export.rowObjects = $export.CreateObjectsFromRows(tableRows);
+				$export.visibleRows = rows.slice(0);
+				$export.visibleRowObjects = $export.rowObjects.slice(0);
 			};
 			$export.SetDataAsRows = function (rows) {
 				if (!rows) {
@@ -322,7 +412,9 @@
 
 				$export.columns = tableColumns;
 				$export.rows = rows;
-				$export.visibleRows = rows;
+				$export.rowObjects = $export.CreateObjectsFromRows(rows);
+				$export.visibleRows = rows.slice(0);;
+				$export.visibleRowObjects = $export.rowObjects.slice(0);
 			};
 
 			$export.UpdateDisplayedRows = function (body) {
@@ -334,23 +426,25 @@
 				}
 				var tempBody = body.cloneNode(false);
 				while (tempBody.firstChild) {
-				    tempBody.removeChild(tempBody.firstChild);
+				  tempBody.removeChild(tempBody.firstChild);
 				}
 				var displayedRows = [];
 				var row = document.createElement('tr');
 				var cell = document.createElement('td');
 				//get the display start id
 				var pageDisplay = ($export.pageNumber * $export.pageSize);
-				if ($export.VisibleRowCount() <= pageDisplay) {    //if this is too big, go back to page 1
+				if ($export.VisibleRowCount() <= pageDisplay) {
+					//if this is too big, go back to page 1
 					$export.pageNumber = 0;
 					pageDisplay = 0;
 				}
 				//get the display end id
 				var length = pageDisplay + $export.pageSize;
-				if (pageDisplay + $export.pageSize >= $export.VisibleRowCount()) { //if this is too big, only show remaining rows
+				if (pageDisplay + $export.pageSize >= $export.VisibleRowCount()) {
+					//if this is too big, only show remaining rows
 					length = $export.VisibleRowCount();
 				}
-			    //loop through the visible rows and display this page
+			  //loop through the visible rows and display this page
 				var rows = [];
 				for (var i = pageDisplay; i < length; ++i) {
 					var tempRow = row.cloneNode(false);
@@ -365,7 +459,7 @@
 						var tempCell = cell.cloneNode(false);
 						var text = $export.visibleRows[i][j];
 						if ($export.columnData[j].CustomRendering != null) {
-							text = $export.columnData[j].CustomRendering(text);
+							text = $export.columnData[j].CustomRendering(text, $export.visibleRowObjects[i].RowNumber);
 						}
 						tempCell.innerHTML = text;
 						tempRow.appendChild(tempCell);
@@ -374,7 +468,7 @@
 				}
 				
 				if (body.parentElement) {
-				    body.parentElement.replaceChild(tempBody, body);
+				  body.parentElement.replaceChild(tempBody, body);
 				}
 				body = tempBody;
 
@@ -394,12 +488,15 @@
 				
 				var showing = footer.querySelector('#' + $export.id + '_showing');
 				if (showing) {
-					showing.innerHTML = "Showing " + start + " to " + end + " of " + ($export.VisibleRowCount()) + " entries";
+					showing.innerHTML = "Showing " + start + " to " + end + " of " +
+						($export.VisibleRowCount()) + " entries";
 					if ($export.VisibleRowCount() != $export.RowCount()) {
-						showing.innerHTML += " (filtered from " + ($export.RowCount()) + " total entries)";
+						showing.innerHTML += " (filtered from " + ($export.RowCount()) +
+							" total entries)";
 					}
 				}
-				var right = footer.querySelector('#' + $export.id + '_page_prev').parentElement;
+				var right = footer.querySelector('#' + $export.id +
+					'_page_prev').parentElement;
 				footer.replaceChild($export.BuildPager(), right);
 
 				return footer;
@@ -418,22 +515,24 @@
 
 				//initial style cleanup
 				$export.RemoveStyles(tableDiv);
-                //clear is a style option to completely avoid any styling so you can roll your own
+        //clear is a style option to completely avoid any styling so you can
+				//roll your own
 				if (style.toLowerCase() != 'clear') {
-				    //base styles for 'none', the other styles sometimes build on these, so we apply them beforehand
-				    $export.ApplyBaseStyles(tableDiv);
+				  //base styles for 'none', the other styles sometimes build on these
+					//so we apply them beforehand
+				  $export.ApplyBaseStyles(tableDiv);
 
-				    if (style.toLowerCase() == 'none') {
-				        return true;
-				    }
-				    else {
-				        if (style.toLowerCase() == 'jqueryui') {
-				            $export.ApplyJqueryUIStyles(tableDiv);
-				        }
-				        else if (style.toLowerCase() == 'bootstrap') {
-				            $export.ApplyBootstrapStyles(tableDiv);
-				        }
-				    }
+				  if (style.toLowerCase() == 'none') {
+				    return true;
+				  }
+					else {
+						if (style.toLowerCase() == 'jqueryui') {
+							$export.ApplyJqueryUIStyles(tableDiv);
+						}
+						else if (style.toLowerCase() == 'bootstrap') {
+							$export.ApplyBootstrapStyles(tableDiv);
+						}
+					}
 				}
 			};
 			
@@ -477,10 +576,17 @@
 				for (var i = 0; i < leftChildren.length; ++i) {
 					leftChildren[i].removeAttribute('class');
 				}
-				var right = footer.querySelector('#' + $export.id + '_page_prev').parentElement;
+				var right = footer.querySelector('#' + $export.id + '_page_prev')
+					.parentElement;
 				footer.replaceChild($export.BuildPager(), right);
 
-				RemoveStyle(tableDiv);  //recursive function to remove style attributes
+				//basically, don't remove style from tfoot, in case user added it
+				tableDiv.removeAttribute('style');
+				RemoveStyle(children[0]);
+				children[1].removeAttribute('style');
+				RemoveStyle(children[2]);
+				RemoveStyle(thead);
+				RemoveStyle(tbody);
 			}
 			$export.ApplyBaseStyles = function (tableDiv) {
 				if ($export.dableClass) {
@@ -494,21 +600,23 @@
 				
 				var oddRows = tableDiv.querySelectorAll('.' + $export.oddRowClass);
 				for (var i = 0; i < oddRows.length; ++i) {
-					oddRows[i].setAttribute('style', 'background-color: ' + $export.oddRowColor);
+					oddRows[i].setAttribute('style', 'background-color: ' +
+						$export.oddRowColor);
 				}
 				var evenRows = tableDiv.querySelectorAll('.' + $export.evenRowClass);
 				for (var i = 0; i < evenRows.length; ++i) {
-					evenRows[i].setAttribute('style', 'background-color: ' + $export.evenRowColor);
+					evenRows[i].setAttribute('style', 'background-color: ' +
+						$export.evenRowColor);
 				}
-				var cells = tableDiv.querySelectorAll('td');
+				var cells = tableDiv.querySelectorAll('tbody td');
 				for (var i = 0; i < cells.length; ++i) {
 					cells[i].setAttribute('style', 'padding: 5px;');
 				}
 
 				var headCells = tableDiv.querySelectorAll('th');
 				for (var i = 0; i < headCells.length; ++i) {
-				    headCells[i].setAttribute('style', 'padding: 5px;');
-				    var headCellLeft = headCells[i].children[0];
+					headCells[i].setAttribute('style', 'padding: 5px;');
+					var headCellLeft = headCells[i].children[0];
 					headCellLeft.setAttribute('style', 'float: left');
 					if ($export.columnData[i].CustomSortFunc !== false) {
 						var headCellRight = headCells[i].children[1];
@@ -554,7 +662,9 @@
 				footRight.setAttribute('style', 'float: right; list-style: none;');
 				var footRightItems = footRight.querySelectorAll('li');
 				for (var i = 0; i < footRightItems.length; ++i) {
-					footRightItems[i].setAttribute('style', 'display: inline; margin-right: 5px;');
+					footRightItems[i].setAttribute(
+						'style',
+						'display: inline; margin-right: 5px;');
 				}
 			}
 			$export.ApplyJqueryUIStyles = function (tableDiv) {
@@ -565,7 +675,9 @@
 				var footer = tableDiv.querySelector('#' + $export.id + '_footer');
 				var span = document.createElement('span');
 
-				header.setAttribute('class', 'fg-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix');
+				header.setAttribute(
+					'class',
+					'fg-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix');
 
 				var headCells = tableDiv.querySelectorAll('th');
 				for (var i = 0; i < headCells.length; ++i) {
@@ -573,10 +685,12 @@
 					var sort = headCells[i].querySelector('.' + $export.sortClass);
 					if (sort) {
 						if (sort.innerHTML == 'v') {
-							sort.setAttribute('class', $export.sortClass + ' ui-icon ui-icon-triangle-1-s');
+							sort.setAttribute('class', $export.sortClass +
+								' ui-icon ui-icon-triangle-1-s');
 						}
 						else {
-							sort.setAttribute('class', $export.sortClass + ' ui-icon ui-icon-triangle-1-n');
+							sort.setAttribute('class', $export.sortClass +
+								' ui-icon ui-icon-triangle-1-n');
 						}
 						sort.innerHTML = '';
 					}
@@ -586,12 +700,16 @@
 				for (var i = 0; i < pagerItems.length; ++i) {
 					RemoveStyle(pagerItems[i]);
 				}
-				footer.setAttribute('class', 'fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix');
-				var pageClass = 'fg-button ui-button ui-state-default ui-corner-left ' + $export.pagerButtonsClass;
+				footer.setAttribute(
+					'class',
+					'fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix');
+				var pageClass = 'fg-button ui-button ui-state-default ui-corner-left ' +
+					$export.pagerButtonsClass;
 
-				var pageButtons = footer.querySelectorAll('.' + $export.pagerButtonsClass);
+				var pageButtons = footer.querySelectorAll('.' +
+					$export.pagerButtonsClass);
 				for (var i = 0; i < pageButtons.length; ++i) {
-				    pageButtons[i].setAttribute('class', pageClass);
+					pageButtons[i].setAttribute('class', pageClass);
 				}
 
 				var pageLeft = footer.querySelector('#' + $export.id + '_page_prev');
@@ -612,15 +730,21 @@
 				}
 
 				if ($export.pagerIncludeFirstAndLast) {
-				    var pageFirst = footer.querySelector('#' + $export.id + '_page_first');
-				    var pageLast = footer.querySelector('#' + $export.id + '_page_last');
+				    var pageFirst = footer.querySelector('#' + $export.id +
+							'_page_first');
+				    var pageLast = footer.querySelector('#' + $export.id +
+							'_page_last');
 				    pageFirst.innerHTML = '';
 				    var pageFirstSpan = span.cloneNode(false);
-				    pageFirstSpan.setAttribute('class', 'ui-icon ui-icon-arrowthickstop-1-w');
+				    pageFirstSpan.setAttribute(
+							'class',
+							'ui-icon ui-icon-arrowthickstop-1-w');
 				    pageFirst.appendChild(pageFirstSpan);
 				    pageLast.innerHTML = '';
 				    var pageLastSpan = span.cloneNode(false);
-				    pageLastSpan.setAttribute('class', 'ui-icon ui-icon-arrowthickstop-1-e');
+				    pageLastSpan.setAttribute(
+							'class',
+							'ui-icon ui-icon-arrowthickstop-1-e');
 				    pageLast.appendChild(pageLastSpan);
 				}
 			};
@@ -650,10 +774,12 @@
 					var sort = headCells[i].querySelector('.' + $export.sortClass);
 					if (sort) {
 						if (sort.innerHTML == 'v') {
-							sort.setAttribute('class', $export.sortClass + ' glyphicon glyphicon-chevron-down');
+							sort.setAttribute('class', $export.sortClass +
+								' glyphicon glyphicon-chevron-down');
 						}
 						else {
-							sort.setAttribute('class', $export.sortClass + ' glyphicon glyphicon-chevron-up');
+							sort.setAttribute('class', $export.sortClass +
+								' glyphicon glyphicon-chevron-up');
 						}
 						sort.innerHTML = '';
 					}
@@ -682,21 +808,28 @@
 				pageRight.appendChild(pageRightSpan);
 
 				if ($export.pagerIncludeFirstAndLast) {
-				    var pageFirst = footer.querySelector('#' + $export.id + '_page_first');
-				    var pageLast = footer.querySelector('#' + $export.id + '_page_last');
-				    pageFirst.innerHTML = '';
-				    var pageFirstSpan = span.cloneNode(false);
-				    pageFirstSpan.setAttribute('class', 'glyphicon glyphicon-fast-backward');
-				    pageFirst.appendChild(pageFirstSpan);
-				    pageLast.innerHTML = '';
-				    var pageLastSpan = span.cloneNode(false);
-				    pageLastSpan.setAttribute('class', 'glyphicon glyphicon-fast-forward');
-				    pageLast.appendChild(pageLastSpan);
+					var pageFirst = footer.querySelector('#' + $export.id +
+						'_page_first');
+					var pageLast = footer.querySelector('#' + $export.id +
+						'_page_last');
+					pageFirst.innerHTML = '';
+					var pageFirstSpan = span.cloneNode(false);
+					pageFirstSpan.setAttribute(
+						'class',
+						'glyphicon glyphicon-fast-backward');
+					pageFirst.appendChild(pageFirstSpan);
+					pageLast.innerHTML = '';
+					var pageLastSpan = span.cloneNode(false);
+					pageLastSpan.setAttribute(
+						'class',
+						'glyphicon glyphicon-fast-forward');
+					pageLast.appendChild(pageLastSpan);
 				}
 
-				var pageButtons = footer.querySelectorAll('.' + $export.pagerButtonsClass);
+				var pageButtons = footer.querySelectorAll('.' +
+					$export.pagerButtonsClass);
 				for (var i = 0; i < pageButtons.length; ++i) {
-				    pageButtons[i].setAttribute('class', pageClass);
+						pageButtons[i].setAttribute('class', pageClass);
 				}
 			};
 			
@@ -711,7 +844,9 @@
 							input.setAttribute('id', 'Dable1');
 						}
 					}
-					else if (window.jQuery && input instanceof jQuery && input[0].nodeType) {
+					else if (window.jQuery 
+					         && input instanceof jQuery
+					         && input[0].nodeType) {
 						//jquery object
 						if (input[0].hasAttribute('id')) {
 							$export.id = input[0].getAttribute('id');
@@ -728,11 +863,12 @@
 					if (tableDiv && $export.rows && $export.rows.length < 1) {
 						var table = tableDiv.querySelector('table');
 						if (table) {
-								if (tableDiv.hasAttribute('class')) {
-									$export.dableClass = tableDiv.getAttribute('class');
-								}
-								var newTable = $export.GenerateTableFromHtml(table);	//Make it a Dable!
-								return newTable;
+							if (tableDiv.hasAttribute('class')) {
+								$export.dableClass = tableDiv.getAttribute('class');
+							}
+							var newTable = $export.GenerateTableFromHtml(table);
+							//Make it a Dable!
+							return newTable;
 						}
 					}
 					return $export.id;
@@ -747,6 +883,10 @@
 					$export.tableClass = tableNode.getAttribute('class');
 				}
 				var headers = tableNode.querySelectorAll('thead tr th');
+				var tfoot = tableNode.querySelector('tfoot');
+				if (tfoot) {
+					$export.tfoothtml = tfoot.innerHTML;
+				}
 				var colNames = [];
 				for (var i = 0; i < headers.length; ++i) {	//add our column names
 					colNames.push(headers[i].innerHTML);
@@ -755,7 +895,9 @@
 				
 				var rowsHtml = tableNode.querySelectorAll('tbody tr');
 				var allRows = [];
-				if (rowsHtml.length > 1 && rowsHtml[0].hasAttribute('class') && rowsHtml[1].hasAttribute('class')) {
+				if (rowsHtml.length > 1
+				    && rowsHtml[0].hasAttribute('class')
+				    && rowsHtml[1].hasAttribute('class')) {
 					$export.evenRowClass = rowsHtml[0].getAttribute('class');
 					$export.oddRowClass = rowsHtml[1].getAttribute('class');
 				}
@@ -825,7 +967,8 @@
 					var entCnt = this;
 					var value = entCnt.value;
 					$export.pageSize = parseInt(value);
-					$export.UpdateDisplayedRows(document.getElementById($export.id + '_body'));
+					$export.UpdateDisplayedRows(document.getElementById($export.id +
+						'_body'));
 					$export.UpdateStyle(tableDiv);
 				};
 				left.appendChild(entryCount);
@@ -885,10 +1028,16 @@
 				head.appendChild(headRow);
 				table.appendChild(head);
 				
-				$export.visibleRows = $export.rows;
+				$export.visibleRows = $export.rows.slice(0);
+				$export.visibleRowObjects = $export.rowObjects.slice(0);
 				body = $export.UpdateDisplayedRows(body);
 				body.id = $export.id + '_body';
 				table.appendChild(body);
+				if ($export.tfoothtml) {
+					var foot = document.createElement('tfoot');
+					foot.innerHTML = $export.tfoothtml;
+					table.appendChild(foot);
+				}
 
 				return table;
 			};
@@ -918,180 +1067,220 @@
 				return $export.UpdateFooter(footer);
 			};
 			$export.BuildPager = function () {
-			    var ul = document.createElement('ul');
-			    var li = document.createElement('li');
+				var ul = document.createElement('ul');
+				var li = document.createElement('li');
 				var anchor = document.createElement('a');
-			    var right = ul.cloneNode(false);
+				var right = ul.cloneNode(false);
 
-			    if ($export.pagerIncludeFirstAndLast) {
-			        var pageFirst = li.cloneNode(false);
-					var pageFirstAnchor = anchor.cloneNode(false);
-			        pageFirstAnchor.innerHTML = 'First';
-			        pageFirst.setAttribute('class', $export.pagerButtonsClass);
-			        pageFirst.id = $export.id + '_page_first';
-			        pageFirstAnchor.onclick = function () {
-			            $export.pageNumber = 0;
-			            if ($export.async &&
-                        ($export.asyncStart > $export.pageNumber * $export.pageSize
-                        || $export.pageNumber * $export.pageSize > $export.asyncStart + $export.asyncLength)) {
-			                var ascending = true;
-			                if ($export.sortOrder.length > 3 && $export.sortOrder.substr(0, 4).toLowerCase() == 'desc') {
-			                    ascending = false;
-			                }
-			                $export.asyncRequest(0, $export.currentFilter, $export.sortColumn, ascending);
-			            }
-			            $export.UpdateDisplayedRows(document.getElementById($export.id + '_body'));
-			            $export.UpdateStyle();
-			        };
-					if ($export.pageNumber <= 0) {
-						pageFirst.setAttribute('disabled', 'disabled');
-						pageFirstAnchor.onclick = function () {};	//disable onclick
-					}
-					pageFirst.appendChild(pageFirstAnchor);
-			        right.appendChild(pageFirst);
-			    }
+				if ($export.pagerIncludeFirstAndLast) {
+						var pageFirst = li.cloneNode(false);
+				var pageFirstAnchor = anchor.cloneNode(false);
+						pageFirstAnchor.innerHTML = 'First';
+						pageFirst.setAttribute('class', $export.pagerButtonsClass);
+						pageFirst.id = $export.id + '_page_first';
+						pageFirstAnchor.onclick = function () {
+								$export.pageNumber = 0;
+								if ($export.async &&
+								    ($export.asyncStart > $export.pageNumber * $export.pageSize
+								     || $export.pageNumber * $export.pageSize >
+							          $export.asyncStart + $export.asyncLength)) {
+										var ascending = true;
+										if ($export.sortOrder.length > 3
+										    && $export.sortOrder.substr(0, 4).toLowerCase() ==
+										       'desc') {
+												ascending = false;
+										}
+										$export.asyncRequest(
+											0,
+											$export.currentFilter,
+											$export.sortColumn,
+											ascending);
+								}
+								$export.UpdateDisplayedRows(document.getElementById($export.id +
+									'_body'));
+								$export.UpdateStyle();
+						};
+				if ($export.pageNumber <= 0) {
+					pageFirst.setAttribute('disabled', 'disabled');
+					pageFirstAnchor.onclick = function () {};	//disable onclick
+				}
+				pageFirst.appendChild(pageFirstAnchor);
+						right.appendChild(pageFirst);
+				}
 
-			    var pageLeft = li.cloneNode(false);
+				var pageLeft = li.cloneNode(false);
 				var pageLeftAnchor = anchor.cloneNode(false);
-			    pageLeftAnchor.innerHTML = 'Prev';
-			    pageLeft.setAttribute('class', $export.pagerButtonsClass);
-			    pageLeft.id = $export.id + '_page_prev';
-			    pageLeftAnchor.onclick = function () {
-			        $export.pageNumber -= 1;
-			        if ($export.async &&
-                        ($export.asyncStart > $export.pageNumber * $export.pageSize
-                        || $export.pageNumber * $export.pageSize > $export.asyncStart + $export.asyncLength)) {
-			            var newStart = $export.pageNumber * $export.pageSize;
-			            var pages = 500 / $export.pageSize;
-			            if ($export.pageNumber - pages > -1) {
-			                newStart = ($export.pageNumber - pages) * $export.pageSize;
-			            }
-			            var ascending = true;
-			            if ($export.sortOrder.length > 3 && $export.sortOrder.substr(0, 4).toLowerCase() == 'desc') {
-			                ascending = false;
-			            }
-			            $export.asyncRequest(newStart, $export.currentFilter, $export.sortColumn, ascending);
-			        }
-			        $export.UpdateDisplayedRows(document.getElementById($export.id + '_body'));
-			        $export.UpdateStyle();
-			    };
-			    if ($export.pageNumber <= 0) {
-			        pageLeft.setAttribute('disabled', 'disabled');
-					pageLeftAnchor.onclick = function () {};	//disable onclick
-			    }
+				pageLeftAnchor.innerHTML = 'Prev';
+				pageLeft.setAttribute('class', $export.pagerButtonsClass);
+				pageLeft.id = $export.id + '_page_prev';
+				pageLeftAnchor.onclick = function () {
+						$export.pageNumber -= 1;
+						if ($export.async &&
+						    ($export.asyncStart > $export.pageNumber * $export.pageSize
+						     || $export.pageNumber * $export.pageSize >
+						        $export.asyncStart + $export.asyncLength)) {
+							var newStart = $export.pageNumber * $export.pageSize;
+							var pages = 500 / $export.pageSize;
+							if ($export.pageNumber - pages > -1) {
+								newStart = ($export.pageNumber - pages) * $export.pageSize;
+							}
+							var ascending = true;
+							if ($export.sortOrder.length > 3
+							    && $export.sortOrder.substr(0, 4).toLowerCase() == 'desc') {
+								ascending = false;
+							}
+							$export.asyncRequest(
+								newStart,
+								$export.currentFilter,
+								$export.sortColumn,
+								ascending);
+						}
+						$export.UpdateDisplayedRows(document.getElementById($export.id +
+							'_body'));
+						$export.UpdateStyle();
+				};
+				if ($export.pageNumber <= 0) {
+						pageLeft.setAttribute('disabled', 'disabled');
+				pageLeftAnchor.onclick = function () {};	//disable onclick
+				}
 				pageLeft.appendChild(pageLeftAnchor);
-			    right.appendChild(pageLeft);
+				right.appendChild(pageLeft);
 
-			    if ($export.pagerSize > 0) {
-			        var start = $export.pageNumber - parseInt($export.pagerSize / 2);
-			        var length = start + $export.pagerSize;
-			        if ($export.pageNumber <= ($export.pagerSize / 2)) {
-			            // display from beginning
-			            length = $export.pagerSize;
-			            start = 0;
-			            if (length > $export.NumberOfPages()) {
-			                length = $export.NumberOfPages();
-			            }   //very small tables
-			        }
-			        else if (($export.NumberOfPages() - $export.pageNumber) <= ($export.pagerSize / 2)) {
-                        //display the last five pages
-			            length = $export.NumberOfPages();
-			            start = $export.NumberOfPages() - $export.pagerSize;
-			        }
+				if ($export.pagerSize > 0) {
+					var start = $export.pageNumber - parseInt($export.pagerSize / 2);
+					var length = start + $export.pagerSize;
+					if ($export.pageNumber <= ($export.pagerSize / 2)) {
+						// display from beginning
+						length = $export.pagerSize;
+						start = 0;
+						if (length > $export.NumberOfPages()) {
+							length = $export.NumberOfPages();
+						}   //very small tables
+					}
+					else if (($export.NumberOfPages() - $export.pageNumber) <=
+					         ($export.pagerSize / 2)) {
+						//display the last five pages
+						length = $export.NumberOfPages();
+						start = $export.NumberOfPages() - $export.pagerSize;
+					}
 
-			        for (var i = start; i < length; ++i) {
-			            var liNode = li.cloneNode(false);
+					for (var i = start; i < length; ++i) {
+						var liNode = li.cloneNode(false);
 						var liNodeAnchor = anchor.cloneNode(false);
-			            liNodeAnchor.innerHTML = (i + 1).toString();
+						liNodeAnchor.innerHTML = (i + 1).toString();
 						var page = i;
-			            liNodeAnchor.onclick = function (j) {
-			                return function() {
-			                    $export.pageNumber = j;
-			                    if ($export.async &&
-                                    ($export.asyncStart > $export.pageNumber * $export.pageSize
-                                    || $export.pageNumber * $export.pageSize >= $export.asyncStart + $export.asyncLength)) {
-			                        var newStart = $export.pageNumber * $export.pageSize;
-			                        var ascending = true;
-			                        if ($export.sortOrder.length > 3 && $export.sortOrder.substr(0, 4).toLowerCase() == 'desc') {
-			                            ascending = false;
-			                        }
-			                        $export.asyncRequest(newStart, $export.currentFilter, $export.sortColumn, ascending);
-			                    }
-								$export.UpdateDisplayedRows(document.getElementById($export.id + '_body'));
+						liNodeAnchor.onclick = function (j) {
+							return function() {
+								$export.pageNumber = j;
+								if ($export.async &&
+								($export.asyncStart > $export.pageNumber * $export.pageSize
+								|| $export.pageNumber * $export.pageSize >=
+							     $export.asyncStart + $export.asyncLength)) {
+									var newStart = $export.pageNumber * $export.pageSize;
+									var ascending = true;
+									if ($export.sortOrder.length > 3
+									    && $export.sortOrder.substr(0, 4).toLowerCase() ==
+									       'desc') {
+										ascending = false;
+									}
+									$export.asyncRequest(
+										newStart,
+										$export.currentFilter,
+										$export.sortColumn,
+										ascending);
+								}
+								$export.UpdateDisplayedRows(document.getElementById($export.id +
+									'_body'));
 								$export.UpdateStyle();
 							}
-			            }(i);
-			            liNode.setAttribute('class', $export.pagerButtonsClass);
-			            if (i == $export.pageNumber) {
-			                liNode.setAttribute('disabled', 'disabled');
+						}(i);
+						liNode.setAttribute('class', $export.pagerButtonsClass);
+						if (i == $export.pageNumber) {
+							liNode.setAttribute('disabled', 'disabled');
 							liNodeAnchor.onclick = function () {};	//disable onclick
-			            }
+						}
 						liNode.appendChild(liNodeAnchor);
-			            right.appendChild(liNode);
-			        }
-			    }
+						right.appendChild(liNode);
+					}
+				}
 
-			    var pageRight = li.cloneNode(false);
+				var pageRight = li.cloneNode(false);
 				var pageRightAnchor = anchor.cloneNode(false);
-			    pageRightAnchor.innerHTML = 'Next';
-			    pageRight.setAttribute('class', $export.pagerButtonsClass);
-			    pageRight.id = $export.id + '_page_next';
-			    pageRightAnchor.onclick = function () {
-			        $export.pageNumber += 1;
-			        if ($export.async &&
-                        ($export.asyncStart > $export.pageNumber * $export.pageSize
-                        || $export.pageNumber * $export.pageSize > $export.asyncStart + $export.asyncLength)) {
-			            var newStart = $export.pageNumber * $export.pageSize;
-			            var ascending = true;
-			            if ($export.sortOrder.length > 3 && $export.sortOrder.substr(0, 4).toLowerCase() == 'desc') {
-			                ascending = false;
-			            }
-			            $export.asyncRequest(newStart, $export.currentFilter, $export.sortColumn, ascending);
-			        }
-			        $export.UpdateDisplayedRows(document.getElementById($export.id + '_body'));
-			        $export.UpdateStyle();
-			    };
-			    if ($export.NumberOfPages() - 1 == $export.pageNumber) {
-			        pageRight.setAttribute('disabled', 'disabled');
+				pageRightAnchor.innerHTML = 'Next';
+				pageRight.setAttribute('class', $export.pagerButtonsClass);
+				pageRight.id = $export.id + '_page_next';
+				pageRightAnchor.onclick = function () {
+					$export.pageNumber += 1;
+					if ($export.async
+					    && ($export.asyncStart > $export.pageNumber * $export.pageSize
+					        || $export.pageNumber * $export.pageSize >
+					           $export.asyncStart + $export.asyncLength)) {
+						var newStart = $export.pageNumber * $export.pageSize;
+						var ascending = true;
+						if ($export.sortOrder.length > 3
+						    && $export.sortOrder.substr(0, 4).toLowerCase() == 'desc') {
+							ascending = false;
+						}
+						$export.asyncRequest(
+							newStart,
+							$export.currentFilter,
+							$export.sortColumn,
+							ascending);
+					}
+					$export.UpdateDisplayedRows(document.getElementById($export.id +
+						'_body'));
+					$export.UpdateStyle();
+				};
+				if ($export.NumberOfPages() - 1 == $export.pageNumber) {
+					pageRight.setAttribute('disabled', 'disabled');
 					pageRightAnchor.onclick = function () {};	//disable onclick
-			    }
+				}
 				pageRight.appendChild(pageRightAnchor);
-			    right.appendChild(pageRight);
+				right.appendChild(pageRight);
 
-			    if ($export.pagerIncludeFirstAndLast) {
-			        var pageLast = li.cloneNode(false);
+				if ($export.pagerIncludeFirstAndLast) {
+					var pageLast = li.cloneNode(false);
 					var pageLastAnchor = anchor.cloneNode(false);
-			        pageLastAnchor.innerHTML = 'Last';
-			        pageLast.setAttribute('class', $export.pagerButtonsClass);
-			        pageLast.id = $export.id + '_page_last';
-			        pageLastAnchor.onclick = function () {
-			            $export.pageNumber = $export.NumberOfPages() - 1;   //page number is 0 based
-			            if ($export.async &&
-                        ($export.asyncStart > $export.pageNumber * $export.pageSize
-                        || $export.pageNumber * $export.pageSize > $export.asyncStart + $export.asyncLength)) {
-			                var newStart = 0;
-			                var pages = (1000 / $export.pageSize) - 1;  //-1 for the page number and -1 to include current page
-			                if ($export.pageNumber - pages > -1) {
-			                    newStart = ($export.pageNumber - pages) * $export.pageSize;
-			                }
-			                var ascending = true;
-			                if ($export.sortOrder.length > 3 && $export.sortOrder.substr(0, 4).toLowerCase() == 'desc') {
-			                    ascending = false;
-			                }
-			                $export.asyncRequest(newStart, $export.currentFilter, $export.sortColumn, ascending);
-			            }
-			            $export.UpdateDisplayedRows(document.getElementById($export.id + '_body'));
-			            $export.UpdateStyle();
-			        };
+					pageLastAnchor.innerHTML = 'Last';
+					pageLast.setAttribute('class', $export.pagerButtonsClass);
+					pageLast.id = $export.id + '_page_last';
+					pageLastAnchor.onclick = function () {
+						$export.pageNumber = $export.NumberOfPages() - 1;
+						//page number is 0 based
+						if ($export.async
+						    && ($export.asyncStart > $export.pageNumber * $export.pageSize
+						        || $export.pageNumber * $export.pageSize >
+						           $export.asyncStart + $export.asyncLength)) {
+							var newStart = 0;
+							var pages = (1000 / $export.pageSize) - 1;
+							//-1 for the page number and -1 to include current page
+							if ($export.pageNumber - pages > -1) {
+								newStart = ($export.pageNumber - pages) * $export.pageSize;
+							}
+							var ascending = true;
+							if ($export.sortOrder.length > 3
+							    && $export.sortOrder.substr(0, 4).toLowerCase() == 'desc') {
+								ascending = false;
+							}
+							$export.asyncRequest(
+								newStart,
+								$export.currentFilter,
+								$export.sortColumn,
+								ascending);
+						}
+						$export.UpdateDisplayedRows(document.getElementById($export.id +
+							'_body'));
+						$export.UpdateStyle();
+					};
 					if ($export.NumberOfPages() - 1 == $export.pageNumber) {
 						pageLast.setAttribute('disabled', 'disabled');
 						pageLastAnchor.onclick = function () {};	//disable onclick
 					}
 					pageLast.appendChild(pageLastAnchor);
-			        right.appendChild(pageLast);
-			    }
+					right.appendChild(pageLast);
+				}
 
-			    return right;
+				return right;
 			};
 
 			//Utility functions
@@ -1104,13 +1293,13 @@
 				return false;
 			}
 			function RemoveStyle(node) {
-			    node.removeAttribute('style');
-			    var childNodes = node.children;
-			    if (childNodes && childNodes.length > 0) {
-			        for (var i = 0; i < childNodes.length; ++i) {
-			            RemoveStyle(childNodes[i]);
-			        }
-			    }
+				node.removeAttribute('style');
+				var childNodes = node.children;
+				if (childNodes && childNodes.length > 0) {
+					for (var i = 0; i < childNodes.length; ++i) {
+						RemoveStyle(childNodes[i]);
+					}
+				}
 			}
 			
 			$export.BuildAll(tableOrId);
