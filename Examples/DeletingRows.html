@@ -6,6 +6,7 @@
 </head>
 <body>
 <div id="DefaultDable"></div>
+<button type="button" id="addRow">Add Row</button>
 <script type="text/javascript">
 	$(document).ready(function() {
 		var dable = new Dable();
@@ -20,6 +21,9 @@
 		$(document).on('click', '.deleteRow', function() {
 			var rowNumber = $(this).attr('data-rownumber');
 			dable.DeleteRow(rowNumber);
+		});
+		$(document).on('click', '#addRow', function() {
+			dable.AddRow([ 24, 36, "" ]);
 		});
 	});
 </script>

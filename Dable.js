@@ -22,7 +22,7 @@
 				async: false,
 				asyncData: {},
 				asyncStart: 0,
-        asyncLength: 1000,
+				asyncLength: 1000,
 				tfoothtml: '',
 				//Basic Styling
 				style: 'none',
@@ -337,15 +337,24 @@
 						break;
 					}
 				}
-				$export.UpdateDisplayedRows();
-				$export.UpdateStyle();
+				for (var i = 0; i < $export.visibleRowObjects.length; ++i) {
+					if ($export.visibleRowObjects[i].RowNumber == rowNumber) {
+						$export.visibleRowObjects.splice(i, 1);
+						$export.visibleRows = $export.CreateRowsFromObjects($export.visibleRowObjects);
+					}
+				}
+				var event = document.createEvent('KeyboardEvent');
+				event.initEvent('keyup', true, true, window, false, false, false, false, 38, 38);
+				document.querySelector('#' + $export.id + '_search').dispatchEvent(event);
 			};
 			
 			$export.AddRow = function(row) {
 				$export.rows.push(row);
-				$export.rowObjects.push({ Row: row, RowNumber: $export.rowObjects[$export.rows.length - 1].RowNumber + 1 });
-				$export.UpdateDisplayedRows();
-				$export.UpdateStyle();
+				$export.rowObjects.push({ Row: row, RowNumber: $export.rowObjects[$export.rowObjects.length - 1].RowNumber + 1 });
+				
+				var event = document.createEvent('KeyboardEvent');
+				event.initEvent('keyup', true, true, window, false, false, false, false, 38, 38);
+				document.querySelector('#' + $export.id + '_search').dispatchEvent(event);
 			};
 			
 			$export.CreateObjectsFromRows = function(rows) {
@@ -383,8 +392,8 @@
 				$export.columns = columns;
 				$export.rows = tableRows;
 				$export.rowObjects = $export.CreateObjectsFromRows(tableRows);
-				$export.visibleRows = rows;
-				$export.visibleRowObjects = $export.rowObjects;
+				$export.visibleRows = rows.slice(0);
+				$export.visibleRowObjects = $export.rowObjects.slice(0);
 			};
 			$export.SetDataAsRows = function (rows) {
 				if (!rows) {
@@ -404,8 +413,8 @@
 				$export.columns = tableColumns;
 				$export.rows = rows;
 				$export.rowObjects = $export.CreateObjectsFromRows(rows);
-				$export.visibleRows = rows;
-				$export.visibleRowObjects = $export.rowObjects;
+				$export.visibleRows = rows.slice(0);;
+				$export.visibleRowObjects = $export.rowObjects.slice(0);
 			};
 
 			$export.UpdateDisplayedRows = function (body) {
@@ -1019,8 +1028,8 @@
 				head.appendChild(headRow);
 				table.appendChild(head);
 				
-				$export.visibleRows = $export.rows;
-				$export.visibleRowObjects = $export.rowObjects;
+				$export.visibleRows = $export.rows.slice(0);
+				$export.visibleRowObjects = $export.rowObjects.slice(0);
 				body = $export.UpdateDisplayedRows(body);
 				body.id = $export.id + '_body';
 				table.appendChild(body);
