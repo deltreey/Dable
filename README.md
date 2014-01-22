@@ -84,8 +84,8 @@ dable.columnData[0].CustomRendering = function (cellValue) {
 When you want to sort something uniquely, just return an array of the rows to present in whatever order you want.
 
 ```javascript
-dable.columnData[1].CustomSortFunc = function (columnIndex, ascending, currentRows) {
-	return currentRows.reverse();
+dable.columnData[1].CustomSortFunc = function (columnIndex, ascending, currentRowObjects) {
+	return currentRowObjects.reverse();
 }
 ```
 What about printing?  If your table is paged, you need to be able to output all the rows to print!
