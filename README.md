@@ -69,7 +69,7 @@ dable.filters.push(function (searchText, cellValue) {
 });
 ```
 Because it's a simple array, you can wipe out the existing filters altogether if you don't like them.
-Your columns are a simple object array.  Each object has a Tag, a FriendlyName, and can be provided with CustomRendering and CustomSortFunc callbacks
+Your columns are a simple object array.  Each object has a `Tag`, a `FriendlyName`, and can be provided with `CustomRendering` and `CustomSortFunc` callbacks
 
 ```javascript
 { Tag, FriendlyName, CustomSortFunc, CustomRendering }
@@ -87,6 +87,10 @@ When you want to sort something uniquely, just return an array of the rows to pr
 dable.columnData[1].CustomSortFunc = function (columnIndex, ascending, currentRowObjects) {
 	return currentRowObjects.reverse();
 }
+```
+The `CustomSortFunc` property also allows you to keep a column from sorting.  Just set it to `false`.
+```javascript
+dable.columnData[2].CustomSortFunc = false;
 ```
 What about printing?  If your table is paged, you need to be able to output all the rows to print!
 Here's a sample of how to do this extremely complex Dable procedure.
