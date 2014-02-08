@@ -764,7 +764,7 @@
 				tableDiv.setAttribute('class', 'panel panel-info');
 				tableDiv.setAttribute('style', 'margin-bottom: 0;');
 
-				var tableRows = table.querySelectorAll('.tbody tr');
+				var tableRows = table.querySelectorAll('tbody tr');
 				for (var i = 0; i < tableRows.length; ++i) {    //remove manual striping
 					tableRows[i].removeAttribute('style');
 				}
