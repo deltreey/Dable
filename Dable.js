@@ -1078,31 +1078,10 @@
 						pageFirstAnchor.innerHTML = 'First';
 						pageFirst.setAttribute('class', $export.pagerButtonsClass);
 						pageFirst.id = $export.id + '_page_first';
-						pageFirstAnchor.onclick = function () {
-								$export.pageNumber = 0;
-								if ($export.async &&
-								    ($export.asyncStart > $export.pageNumber * $export.pageSize
-								     || $export.pageNumber * $export.pageSize >
-							          $export.asyncStart + $export.asyncLength)) {
-										var ascending = true;
-										if ($export.sortOrder.length > 3
-										    && $export.sortOrder.substr(0, 4).toLowerCase() ==
-										       'desc') {
-												ascending = false;
-										}
-										$export.asyncRequest(
-											0,
-											$export.currentFilter,
-											$export.sortColumn,
-											ascending);
-								}
-								$export.UpdateDisplayedRows(document.getElementById($export.id +
-									'_body'));
-								$export.UpdateStyle();
-						};
+						pageFirst.onclick = $export.FirstPage;
 				if ($export.pageNumber <= 0) {
 					pageFirst.setAttribute('disabled', 'disabled');
-					pageFirstAnchor.onclick = function () {};	//disable onclick
+					pageFirst.onclick = function () {};	//disable onclick
 				}
 				pageFirst.appendChild(pageFirstAnchor);
 						right.appendChild(pageFirst);
@@ -1113,35 +1092,10 @@
 				pageLeftAnchor.innerHTML = 'Prev';
 				pageLeft.setAttribute('class', $export.pagerButtonsClass);
 				pageLeft.id = $export.id + '_page_prev';
-				pageLeftAnchor.onclick = function () {
-						$export.pageNumber -= 1;
-						if ($export.async &&
-						    ($export.asyncStart > $export.pageNumber * $export.pageSize
-						     || $export.pageNumber * $export.pageSize >
-						        $export.asyncStart + $export.asyncLength)) {
-							var newStart = $export.pageNumber * $export.pageSize;
-							var pages = 500 / $export.pageSize;
-							if ($export.pageNumber - pages > -1) {
-								newStart = ($export.pageNumber - pages) * $export.pageSize;
-							}
-							var ascending = true;
-							if ($export.sortOrder.length > 3
-							    && $export.sortOrder.substr(0, 4).toLowerCase() == 'desc') {
-								ascending = false;
-							}
-							$export.asyncRequest(
-								newStart,
-								$export.currentFilter,
-								$export.sortColumn,
-								ascending);
-						}
-						$export.UpdateDisplayedRows(document.getElementById($export.id +
-							'_body'));
-						$export.UpdateStyle();
-				};
+				pageLeft.onclick = $export.PreviousPage;
 				if ($export.pageNumber <= 0) {
 						pageLeft.setAttribute('disabled', 'disabled');
-				pageLeftAnchor.onclick = function () {};	//disable onclick
+				pageLeft.onclick = function () {};	//disable onclick
 				}
 				pageLeft.appendChild(pageLeftAnchor);
 				right.appendChild(pageLeft);
@@ -1169,35 +1123,15 @@
 						var liNodeAnchor = anchor.cloneNode(false);
 						liNodeAnchor.innerHTML = (i + 1).toString();
 						var page = i;
-						liNodeAnchor.onclick = function (j) {
+						liNode.onclick = function(j) {
 							return function() {
-								$export.pageNumber = j;
-								if ($export.async &&
-								($export.asyncStart > $export.pageNumber * $export.pageSize
-								|| $export.pageNumber * $export.pageSize >=
-							     $export.asyncStart + $export.asyncLength)) {
-									var newStart = $export.pageNumber * $export.pageSize;
-									var ascending = true;
-									if ($export.sortOrder.length > 3
-									    && $export.sortOrder.substr(0, 4).toLowerCase() ==
-									       'desc') {
-										ascending = false;
-									}
-									$export.asyncRequest(
-										newStart,
-										$export.currentFilter,
-										$export.sortColumn,
-										ascending);
-								}
-								$export.UpdateDisplayedRows(document.getElementById($export.id +
-									'_body'));
-								$export.UpdateStyle();
+								$export.GoToPage(j);
 							}
 						}(i);
 						liNode.setAttribute('class', $export.pagerButtonsClass);
 						if (i == $export.pageNumber) {
 							liNode.setAttribute('disabled', 'disabled');
-							liNodeAnchor.onclick = function () {};	//disable onclick
+							liNode.onclick = function () {};	//disable onclick
 						}
 						liNode.appendChild(liNodeAnchor);
 						right.appendChild(liNode);
@@ -1209,31 +1143,10 @@
 				pageRightAnchor.innerHTML = 'Next';
 				pageRight.setAttribute('class', $export.pagerButtonsClass);
 				pageRight.id = $export.id + '_page_next';
-				pageRightAnchor.onclick = function () {
-					$export.pageNumber += 1;
-					if ($export.async
-					    && ($export.asyncStart > $export.pageNumber * $export.pageSize
-					        || $export.pageNumber * $export.pageSize >
-					           $export.asyncStart + $export.asyncLength)) {
-						var newStart = $export.pageNumber * $export.pageSize;
-						var ascending = true;
-						if ($export.sortOrder.length > 3
-						    && $export.sortOrder.substr(0, 4).toLowerCase() == 'desc') {
-							ascending = false;
-						}
-						$export.asyncRequest(
-							newStart,
-							$export.currentFilter,
-							$export.sortColumn,
-							ascending);
-					}
-					$export.UpdateDisplayedRows(document.getElementById($export.id +
-						'_body'));
-					$export.UpdateStyle();
-				};
+				pageRight.onclick = $export.NextPage;
 				if ($export.NumberOfPages() - 1 == $export.pageNumber) {
 					pageRight.setAttribute('disabled', 'disabled');
-					pageRightAnchor.onclick = function () {};	//disable onclick
+					pageRight.onclick = function () {};	//disable onclick
 				}
 				pageRight.appendChild(pageRightAnchor);
 				right.appendChild(pageRight);
@@ -1244,43 +1157,84 @@
 					pageLastAnchor.innerHTML = 'Last';
 					pageLast.setAttribute('class', $export.pagerButtonsClass);
 					pageLast.id = $export.id + '_page_last';
-					pageLastAnchor.onclick = function () {
-						$export.pageNumber = $export.NumberOfPages() - 1;
-						//page number is 0 based
-						if ($export.async
-						    && ($export.asyncStart > $export.pageNumber * $export.pageSize
-						        || $export.pageNumber * $export.pageSize >
-						           $export.asyncStart + $export.asyncLength)) {
-							var newStart = 0;
-							var pages = (1000 / $export.pageSize) - 1;
-							//-1 for the page number and -1 to include current page
-							if ($export.pageNumber - pages > -1) {
-								newStart = ($export.pageNumber - pages) * $export.pageSize;
-							}
-							var ascending = true;
-							if ($export.sortOrder.length > 3
-							    && $export.sortOrder.substr(0, 4).toLowerCase() == 'desc') {
-								ascending = false;
-							}
-							$export.asyncRequest(
-								newStart,
-								$export.currentFilter,
-								$export.sortColumn,
-								ascending);
-						}
-						$export.UpdateDisplayedRows(document.getElementById($export.id +
-							'_body'));
-						$export.UpdateStyle();
-					};
+					pageLast.onclick = $export.LastPage;
 					if ($export.NumberOfPages() - 1 == $export.pageNumber) {
 						pageLast.setAttribute('disabled', 'disabled');
-						pageLastAnchor.onclick = function () {};	//disable onclick
+						pageLast.onclick = function () {};	//disable onclick
 					}
 					pageLast.appendChild(pageLastAnchor);
 					right.appendChild(pageLast);
 				}
 
 				return right;
+			};
+			
+			$export.FirstPage = function() {
+				$export.pageNumber = 0;
+				$export.GoToPage($export.pageNumber);
+			};
+			
+			$export.PreviousPage = function() {
+				$export.pageNumber -= 1;
+				$export.GoToPage($export.pageNumber);
+			};
+			
+			$export.GoToPage = function (page) {
+				$export.pageNumber = page;
+				if ($export.async &&
+				($export.asyncStart > $export.pageNumber * $export.pageSize
+				|| $export.pageNumber * $export.pageSize >=
+					 $export.asyncStart + $export.asyncLength)) {
+					var newStart = $export.pageNumber * $export.pageSize;
+					var ascending = true;
+					if ($export.sortOrder.length > 3
+							&& $export.sortOrder.substr(0, 4).toLowerCase() ==
+								 'desc') {
+						ascending = false;
+					}
+					$export.asyncRequest(
+						newStart,
+						$export.currentFilter,
+						$export.sortColumn,
+						ascending);
+				}
+				$export.UpdateDisplayedRows(document.getElementById($export.id +
+					'_body'));
+				$export.UpdateStyle();
+			};
+			
+			$export.NextPage = function() {
+				$export.pageNumber += 1;
+				$export.GoToPage($export.pageNumber);
+			};
+			
+			$export.LastPage = function() {
+				$export.pageNumber = $export.NumberOfPages() - 1;
+				//page number is 0 based
+				if ($export.async
+						&& ($export.asyncStart > $export.pageNumber * $export.pageSize
+								|| $export.pageNumber * $export.pageSize >
+									 $export.asyncStart + $export.asyncLength)) {
+					var newStart = 0;
+					var pages = (1000 / $export.pageSize) - 1;
+					//-1 for the page number and -1 to include current page
+					if ($export.pageNumber - pages > -1) {
+						newStart = ($export.pageNumber - pages) * $export.pageSize;
+					}
+					var ascending = true;
+					if ($export.sortOrder.length > 3
+							&& $export.sortOrder.substr(0, 4).toLowerCase() == 'desc') {
+						ascending = false;
+					}
+					$export.asyncRequest(
+						newStart,
+						$export.currentFilter,
+						$export.sortColumn,
+						ascending);
+				}
+				$export.UpdateDisplayedRows(document.getElementById($export.id +
+					'_body'));
+				$export.UpdateStyle();
 			};
 
 			//Utility functions
