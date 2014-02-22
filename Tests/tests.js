@@ -445,7 +445,7 @@ test( 'Dable with style="clear" has basic elements but no style', function() {
 	equal(footer.children[1].children[0].getAttribute("disabled"), "disabled");
 });
 
-test( 'Dable with style="bootstrap" has basic elements', function() {
+test( 'Dable with style="bootstrap" has basic elements and slightly different styling and classes', function() {
 	//Given: a table
 	document.body.appendChild(testDiv);
 	MakeSimpleTable(testDiv);
@@ -522,8 +522,10 @@ test( 'Dable with style="bootstrap" has basic elements', function() {
 	equal(header.children[0].children[1].children[1].innerHTML, "25");
 	equal(header.children[0].children[1].children[2].innerHTML, "50");
 	equal(header.children[0].children[1].children[3].innerHTML, "100");
-	equal(footer.children[1].children[0].children[0].innerHTML, "Prev");
-	equal(footer.children[1].children[1].children[0].innerHTML, "Next");
+			// different from default
+	equal(footer.children[1].children[0].children[0].innerHTML, "");
+	equal(footer.children[1].children[1].children[0].innerHTML, "");
+			// /different
 	equal(table.children[0].children[0].children[0].children[0].innerHTML, "Column 0 ");
 	equal(table.children[0].children[0].children[1].children[0].innerHTML, "Column 1 ");
 	equal(table.children[0].children[0].children[2].children[0].innerHTML, "Column 2 ");
@@ -548,10 +550,12 @@ test( 'Dable with style="bootstrap" has basic elements', function() {
 	equal(footer.children[1].style.float, "right");
 	equal(footer.children[1].style.listStyle, "none");
 	equal(footer.children[2].style.clear, "both");
-	equal(footer.children[1].children[0].style.display, "inline");
-	equal(footer.children[1].children[1].style.display, "inline");
-	equal(footer.children[1].children[0].style.marginRight, "5px");
-	equal(footer.children[1].children[1].style.marginRight, "5px");
+			// different from default
+	equal(footer.children[1].children[0].style.display, "");
+	equal(footer.children[1].children[1].style.display, "");
+	equal(footer.children[1].children[0].style.marginRight, "");
+	equal(footer.children[1].children[1].style.marginRight, "");
+			// /different
 	equal(table.children[0].children[0].children[0].style.padding, "5px");
 	equal(table.children[0].children[0].children[1].style.padding, "5px");
 	equal(table.children[0].children[0].children[2].style.padding, "5px");
@@ -572,27 +576,31 @@ test( 'Dable with style="bootstrap" has basic elements', function() {
 	equal(table.children[0].children[0].children[3].children[0].style.float, "left");
 	equal(table.children[0].children[0].children[3].children[1].style.float, "right");
 	equal(table.children[0].children[0].children[3].children[2].style.clear, "both");
-	equal(table.children[1].children[0].style.backgroundColor, "rgb(226, 228, 255)");
-	equal(table.children[1].children[1].style.backgroundColor, "white");
-	equal(table.children[1].children[2].style.backgroundColor, "rgb(226, 228, 255)");
-	equal(table.children[1].children[3].style.backgroundColor, "white");
-	equal(table.children[1].children[4].style.backgroundColor, "rgb(226, 228, 255)");
-	equal(table.children[1].children[5].style.backgroundColor, "white");
-	equal(table.children[1].children[6].style.backgroundColor, "rgb(226, 228, 255)");
-	equal(table.children[1].children[7].style.backgroundColor, "white");
-	equal(table.children[1].children[8].style.backgroundColor, "rgb(226, 228, 255)");
-	equal(table.children[1].children[9].style.backgroundColor, "white");
+			// different from default
+	equal(table.children[1].children[0].style.backgroundColor, "");
+	equal(table.children[1].children[1].style.backgroundColor, "");
+	equal(table.children[1].children[2].style.backgroundColor, "");
+	equal(table.children[1].children[3].style.backgroundColor, "");
+	equal(table.children[1].children[4].style.backgroundColor, "");
+	equal(table.children[1].children[5].style.backgroundColor, "");
+	equal(table.children[1].children[6].style.backgroundColor, "");
+	equal(table.children[1].children[7].style.backgroundColor, "");
+	equal(table.children[1].children[8].style.backgroundColor, "");
+	equal(table.children[1].children[9].style.backgroundColor, "");
+			// /different
 	equal(table.children[1].children[0].children[0].style.padding, "5px");
 	equal(table.children[1].children[0].children[1].style.padding, "5px");
 	equal(table.children[1].children[0].children[2].style.padding, "5px");
 	equal(table.children[1].children[0].children[3].style.padding, "5px");
 		//Classes
-	equal(footer.children[1].children[0].className, "table-page");
-	equal(footer.children[1].children[1].className, "table-page");
-	equal(table.children[0].children[0].children[0].children[1].className, "table-sort");
-	equal(table.children[0].children[0].children[1].children[1].className, "table-sort");
-	equal(table.children[0].children[0].children[2].children[1].className, "table-sort");
-	equal(table.children[0].children[0].children[3].children[1].className, "table-sort");
+			// different from default
+	equal(footer.children[1].children[0].className, "btn btn-default table-page");
+	equal(footer.children[1].children[1].className, "btn btn-default table-page");
+	equal(table.children[0].children[0].children[0].children[1].className, "table-sort glyphicon glyphicon-chevron-up");
+	equal(table.children[0].children[0].children[1].children[1].className, "table-sort glyphicon glyphicon-chevron-up");
+	equal(table.children[0].children[0].children[2].children[1].className, "table-sort glyphicon glyphicon-chevron-up");
+	equal(table.children[0].children[0].children[3].children[1].className, "table-sort glyphicon glyphicon-chevron-up");
+			// /different
 	equal(table.children[1].children[0].className, "table-row-even");
 	equal(table.children[1].children[1].className, "table-row-odd");
 	equal(table.children[1].children[2].className, "table-row-even");
@@ -606,6 +614,70 @@ test( 'Dable with style="bootstrap" has basic elements', function() {
 		//State
 	equal(footer.children[1].children[0].getAttribute("disabled"), "disabled");
 });
+
+module( "Function Counts" );
+test( 'Creating an Dable from Data', function() {
+	//Given: a spy on UpdateDisplayedRows, an empty dable, and some data for our Dable
+	var dable = new Dable();
+	sinon.spy(dable, "UpdateDisplayedRows");
+	sinon.spy(dable, "UpdateStyle");
+	var data = [ [ 1, 2 ], [ 3, 4 ] ];
+	var columns = [ 'Odd', 'Even' ]
+	dable.SetDataAsRows(data);
+	dable.SetColumnNames(columns);
+	
+	//When: we build the Dable
+	dable.BuildAll(testDiv.id);
+	
+	//Then: We get the mock only called once
+	equal(dable.UpdateDisplayedRows.callCount, 1);
+	equal(dable.UpdateStyle.callCount, 1);
+});
+
+test( 'Creating a Dable from a table', function() {
+	//Given: a spy on UpdateDisplayedRows, an empty dable, and a table full of data
+	var dable = new Dable();
+	sinon.spy(dable, "UpdateDisplayedRows");
+	sinon.spy(dable, "UpdateStyle");
+	MakeSimpleTable(testDiv);
+	
+	//When: we build the Dable
+	dable.BuildAll(testDiv.id);
+	
+	//Then: we get the mock only called once
+	equal(dable.UpdateDisplayedRows.callCount, 1);
+	equal(dable.UpdateStyle.callCount, 1);
+});
+
+test( "Calling UpdateStyle", function() {
+	//Given: a spy on UpdateDisplayedRows, and a dable built from a table
+	var dable = new Dable();
+	MakeSimpleTable(testDiv);
+	dable.BuildAll(testDiv.id);
+	sinon.spy(dable, "UpdateDisplayedRows");
+	
+	//When: we change the dable style and call UpdateStyle
+	dable.UpdateStyle();
+	
+	//Then: the mock is never called
+	equal(dable.UpdateDisplayedRows.callCount, 0);
+});
+
+test( "Calling UpdateDisplayedRows", function() {
+	//Given: a spy on UpdateStyle, and a dable built from a table
+	var dable = new Dable();
+	MakeSimpleTable(testDiv);
+	dable.BuildAll(testDiv.id);
+	sinon.spy(dable, "UpdateStyle");
+	
+	//When: we change the dable style and call UpdateDisplayedRows
+	dable.UpdateDisplayedRows();
+	
+	//Then: the mock is never called
+	equal(dable.UpdateStyle.callCount, 0);
+});
+
+
 
 function MakeSimpleTable(div) {
 	var table =  document.createElement("table");
