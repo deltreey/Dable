@@ -677,7 +677,22 @@ test( "Calling UpdateDisplayedRows", function() {
 	equal(dable.UpdateStyle.callCount, 0);
 });
 
-
+module("Header Tests");
+test( 'Preselected Page Size Populates in the UI', function() {
+	//Given: a dable with a specific selected page size
+	var dable = new Dable();
+	MakeSimpleTable(testDiv);
+	var selectedPageSize = 25;
+	dable.pageSize = selectedPageSize;
+	
+	//When: we build the dable
+	dable.BuildAll(testDiv.id);
+	
+	//Then: the dropdown value equals the selected page size
+	var header = document.getElementById(testDiv.id + '_header');
+	var pageSizeDropDown = header.querySelector('select');
+	equal(pageSizeDropDown.options[pageSizeDropDown.selectedIndex].value, selectedPageSize);
+});
 
 function MakeSimpleTable(div) {
 	var table =  document.createElement("table");

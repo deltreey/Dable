@@ -971,6 +971,13 @@
 						'_body'));
 					$export.UpdateStyle(tableDiv);
 				};
+				var options = entryCount.querySelectorAll('option');
+				for (var i = 0; i < options.length; ++i) {
+					if (options[i].value == $export.pageSize) {
+						options[i].selected = true;
+						break;
+					}
+				}
 				left.appendChild(entryCount);
 
 				var right = div.cloneNode(false);
