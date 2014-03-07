@@ -877,12 +877,18 @@
 			}
 			$export.GenerateTableFromHtml = function (tableNode) {
 				if (!tableNode) {
+					console.log("Dable Error: No HTML table to generate dable from");
 					return false;
 				}
 				if (tableNode.hasAttribute('class')) {
 					$export.tableClass = tableNode.getAttribute('class');
 				}
-				var headers = tableNode.querySelectorAll('thead tr th');
+				var thead = tableNode.querySelector('thead');
+				if (!thead) {
+					console.log("Dable Error: No thead element in table");
+					return false;
+				}
+				var headers = thead.querySelectorAll('tr th');
 				var tfoot = tableNode.querySelector('tfoot');
 				if (tfoot) {
 					$export.tfoothtml = tfoot.innerHTML;
@@ -914,6 +920,36 @@
 				parentDiv.innerHTML = '';
 				
 				return parentDiv.id;
+			};
+			
+			$export.Exists = function (tableDiv) {
+				var result = false;
+				
+				var checkId = '';
+				if (!tableDiv) {
+					checkId = $export.id;
+				}
+				else if (tableDiv
+					       && tableDiv.nodeType
+					       && tableDiv.nodeName.toLowerCase() == 'div') {
+					checkId = tableDiv.id;
+				}
+				else if (tableDiv
+					       && window.jQuery 
+					       && tableDiv instanceof jQuery
+					       && tableDiv[0].nodeType) {
+					checkId = tableDiv[0].id;
+				}
+				else if (tableDiv) {
+					checkId = tableDiv;
+				}
+				checkId += '_header';
+				var headerElement = document.getElementById(checkId);
+				if (headerElement) {
+					result = true;
+				}
+				
+				return result;
 			};
 			
 			$export.BuildAll = function (tableInput) {
@@ -1261,6 +1297,11 @@
 						RemoveStyle(childNodes[i]);
 					}
 				}
+			}
+			
+			//IE 8 Console.log fix
+			if (typeof console === "undefined" || typeof console.log === "undefined") {
+				console = {"log":function(){}};
 			}
 			
 			$export.BuildAll(tableOrId);

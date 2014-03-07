@@ -677,6 +677,30 @@ test( "Calling UpdateDisplayedRows", function() {
 	equal(dable.UpdateStyle.callCount, 0);
 });
 
+module("Public Function Tests");
+test( 'Dable Exists() returns true if Dable Exists', function() {
+	//Given: a dable
+	var dable = new Dable();
+	MakeSimpleTable(testDiv);
+	dable.BuildAll(testDiv.id);
+	
+	//When: we call dable.Exists()
+	var result = dable.Exists();
+	
+	//Then: we should get "true"
+	equal(result, true);
+});
+test( 'Dable Exists() returns false if Dable doesnt exist', function() {
+	//Given: an unbuilt dable
+	var dable = new Dable();
+	
+	//When: we call dable.Exists()
+	var result = dable.Exists();
+	
+	//Then: we should get "false"
+	equal(result, false);
+});
+
 module("Header Tests");
 test( 'Preselected Page Size Populates in the UI', function() {
 	//Given: a dable with a specific selected page size
@@ -692,6 +716,35 @@ test( 'Preselected Page Size Populates in the UI', function() {
 	var header = document.getElementById(testDiv.id + '_header');
 	var pageSizeDropDown = header.querySelector('select');
 	equal(pageSizeDropDown.options[pageSizeDropDown.selectedIndex].value, selectedPageSize);
+});
+
+module("Dable from HTML Tests");
+test( 'With no thead the dable is not created', function() {
+	//Given: a dable made from a table with no thead element
+	var dable = new Dable();
+	var table =  document.createElement("table");
+	var tbody = document.createElement("tbody");
+	var row = document.createElement("tr");
+	var cell = document.createElement("td");
+	
+	for (var i = 0; i < 20; ++i) {
+		var currentRow = row.cloneNode(false);
+		for (var j = 0; j < 4; ++j) {
+			var currentCell = cell.cloneNode(false);
+			currentCell.innerHTML = (i + j).toString();
+			currentRow.appendChild(currentCell);
+		}
+		tbody.appendChild(currentRow);
+	}
+	table.appendChild(tbody);
+	testDiv.appendChild(table);
+	
+	//When: we build the dable
+	dable.BuildAll(testDiv.id);
+	
+	//Then: the dable doesn't exist
+	var dableHeader = document.getElementById(testDiv.id + '_header');
+	equal(dable.Exists(), false);
 });
 
 function MakeSimpleTable(div) {
