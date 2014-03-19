@@ -1,0 +1,191 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Dable FAQ</title>
+		<script data-main="/js/main" src="/js/require.js" type="text/javascript"></script>
+		<script type="text/javascript">
+		require(['templateBuilder']);
+		</script>
+		<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+	</head>
+	<body data-spy="scroll" data-target="#affixed" data-offset="0">
+		{{{navbar}}}
+    <div class="container">
+			<div class="row">
+				<div class="col-md-9">
+					<div class="page-header">
+						<h1>Frequently Asked Questions</h1>
+					</div>
+					
+					<a class="anchor" id="faq1"></a>
+					<p class="lead">How do I use Dable?</p>
+					<p>Dable is really easy to use.  There are lots of examples all over this
+					site and the readme on GitHub.  The simplest Dable is done like this:
+<pre class="prettyprint lang-js">
+var dable = new Dable();
+var data = [ [ 1, 2 ], [ 3, 4 ] ];
+var columns = [ 'Odd', 'Even' ];
+dable.SetDataAsRows(data);
+dable.SetColumnNames(columns);
+dable.BuildAll("DefaultDable");
+</pre>
+					But there are lots of other ways to use it.  If you prefer HTML over
+					Javascript, you can build an HTML table and build dable in one line of
+					Javascript like this:
+<pre class="prettyprint lang-html">
+&lt;div id="TableDable"&gt;
+	&lt;table&gt;
+		&lt;thead&gt;
+			&lt;tr&gt;
+				&lt;th&gt;Odd&lt;/th&gt;
+				&lt;th&gt;Even&lt;/th&gt;
+			&lt;/tr&gt;
+		&lt;/thead&gt;
+		&lt;tbody&gt;
+			&lt;tr&gt;
+				&lt;td&gt;1&lt;/td&gt;
+				&lt;td&gt;2&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+				&lt;td&gt;3&lt;/td&gt;
+				&lt;td&gt;4&lt;/td&gt;
+			&lt;/tr&gt;
+		&lt;/tbody&gt;
+	&lt;/table&gt;
+&lt;/div&gt;
+&lt;script type="text/javascript"&gt;
+	var dable2 = new Dable("TableDable");
+&lt;/script&gt;
+</pre>
+					And of course this is just showing a little bit of what Dable can do.
+					Check out the <a href="http://deltreey.github.io/Dable/">Examples</a>
+					and the <a href="https://github.com/deltreey/Dable/wiki">Wiki</a> to
+					see more.
+					</p>
+					
+					<a class="anchor" id="faq2"></a>
+					<p class="lead">It's not working.</p>
+					<p>First, make sure you've included Dable as a script tag in your
+					&lt;head&gt;
+<pre class="prettyprint lang-html">
+&lt;script src="Dable.js" type="text/javascript"&gt;&lt;/script&gt;
+</pre>
+					If that doesn't fix it, then you should double check that you're trying to
+					build your Dable with a &lt;div&gt; element instead of the &lt;table&gt;
+					<br />
+					Finally, Dable doesn't use the # from JQuery on the id of the element.
+					Make sure you didn't add it by accident, or just wrap the id in a basic
+					Jquery selector.
+<pre class="prettyprint lang-js">
+var dable = new Dable("DivId");
+</pre>
+					OR, if you're using JQuery and would prefer it.
+<pre class="prettyprint lang-js">
+var dable = new Dable($("#DivId"));
+</pre>
+					Though, just a heads up, that's kind of redundant.</p>
+					
+					<a class="anchor" id="faq3"></a>
+					<p class="lead">Can I just get a template HTML page?  This is confusing</p>
+					<p><em>Sure!</em><br />
+					The example pages are all really simple HTML examples of Dable
+					in action.  If you want to use Javascript data, check out the source for
+					the
+					<a href="http://deltreey.github.io/Dable/Examples/Default">Default Example</a>.
+					If you prefer an HTML table, check out the source for the
+					<a href="http://deltreey.github.io/Dable/Examples/FromTable">From Table Example</a>.</p>
+					
+					<a class="anchor" id="faq4"></a>
+					<p class="lead">Do I need &lt;thead&gt; and &lt;tfoot&gt; tags?</p>
+					<p><em>thead Yes, tfoot No</em><br />
+					Dable finds out your column names and controls sorting based on the
+					cells in the first row of your thead tag, so this is a necessary element.
+					In fact, dable sends you a message in the console telling you there was
+					an error when you try to build a Dable on a table without a thead element.
+					The tfoot element is not necessary, but Dable does not remove it.  It is
+					sometimes useful to use the tfoot element to allow users to add rows to
+					the table.</p>
+					
+					<a class="anchor" id="faq5"></a>
+					<p class="lead">Can I use Dable with ASP.NET GridViews?</p>
+					<p><em>Absolutely!</em><br /> You only need to make sure that the gridview
+					has a thead element. <a href="http://stackoverflow.com/questions/309101/how-do-i-get-gridview-to-render-thead">See this stackoverflow question.</a></p>
+					
+					<a class="anchor" id="faq6"></a>
+					<p class="lead">Why do you build Dable on the &lt;div&gt; instead of the
+					&lt;table&gt;?</p>
+					<p>Dable doesn't just build an HTML table.  You can do that yourself.
+					Dable does page sizing and search in a &lt;div&gt; which it creates before
+					your table.  Then Dable adds a &lt;div&gt; after your table to handle
+					paging and to display the size of the data and if you've done any
+					filtering.</p>
+					
+					<a class="anchor" id="faq7"></a>
+					<p class="lead">Why IE 8?</p>
+					<p>Every organization I've worked at since 2011 (when IE 9 came out) has
+					been using IE 8.  While I think it is a very outdated browser, I wanted
+					to create a framework that would be able to be used anywhere I work, and
+					most of the places anyone else works.  Would I prefer to encourage the use
+					of more modern browsers?  Yes, of course.  Do I want to alienate users
+					(read: developers) because their company won't get with the program?
+					Absolutely not.</p>
+					<p>I considered the possibility of supporting browsers older than IE 8,
+					but IE 8 is the oldest browser to support the javascript feature
+					querySelector which works a lot like JQuery's selector and allows me to
+					keep Dable's code for traversing the DOM from being a massive mess.</p>
+					
+					<a class="anchor" id="faq8"></a>
+					<p class="lead">Why doesn't Dable use JQuery?</p>
+					<p>Dable is a tool, nothing more, nothing less.  The simpler the tool is,
+					the less time you have to spend reading the owner's manual.  JQuery was
+					not necessary to make it function, so I did not require it.  You can
+					certainly use Dable and JQuery together.  In fact, one of Dable's default
+					supported styles is based on JQueryUI.  But I didn't want to force you to
+					have to download extra files in order to get Dable to run.</p>
+					<p>Additionally, Dable actually runs faster because it doesn't use JQuery.
+					And there's <a href="http://youmightnotneedjquery.com/">this</a>.</p>
+					
+					<a class="anchor" id="faq9"></a>
+					<p class="lead">Why isn't Dable MVC (or some other pattern)?</p>
+					<p>MVC is a pattern.  A pattern is a way of organizing code so it is
+					easier for future developers to edit your code.  Dable is a tool, which
+					means it benefits from simplicity, rather than complexity.  I have plans
+					to make Dable's code easier to work with in the future, but it will always
+					compile down to a single javascript file which takes in data and spits out
+					html.  That means that it will always do some of the function of the
+					MVC controller, and some of the function of the MVC view.</p>
+					<p>I am a fan of single file plugins.  Smaller is better with tools.  You
+					can do a whole lot more with a hammer than you can with a
+					<a href="http://www.milwaukeetool.com/instruments/lighting-testers/2210-20">
+					Milwaukee Tools Fluorescent Light Tester</a>
+					(like maybe smashing the
+					flourescent lights above your cubicle that your co-worker keeps testing
+					with his new flourescent light tester that he bought because of
+					some project he found on GitHub).
+					Because Dable is so simple, you can plug it in anywhere and just use it.
+					I don't want to clutter that simplicity and force my users to host a whole
+					lot of files on their server and add more clutter to the &lt;head&gt;
+					element.  It's big enough already.</p>
+				</div>
+				<div class="col-md-3">
+					<div id="affixed">
+						<ul class="nav nav-pills nav-stacked" role="navigation">
+							<li><a href="#faq1">How do I use Dable?</a></li>
+							<li><a href="#faq2">It's not working.</a></li>
+							<li><a href="#faq3">Can I just get a template HTML page?</a></li>
+							<li><a href="#faq4">Do I need thead and tfoot?</a></li>
+							<li><a href="#faq5">Can I use Dable with GridViews?</a></li>
+							<li><a href="#faq6">Why do you build Dable on the div?</a></li>
+							<li><a href="#faq7">Why IE 8?</a></li>
+							<li><a href="#faq8">Why doesn't Dable use JQuery?</a></li>
+							<li><a href="#faq9">Why isn't Dable MVC?</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
