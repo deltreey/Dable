@@ -308,6 +308,8 @@
 
 					<a class="anchor" id="example8"></a>
 					<h3>Different Dable Sorting Features</h3>
+					<p>Dable automatically sorts text, numbers, and simple US Dates, but if you
+					need it to sort something else, you only need to add a custom sort function.</p>
 					<div id="dableSortingExample" class="bordered">
 						<div id="SortingDable"></div>
 						<script type="text/javascript">
@@ -342,6 +344,14 @@
 					</div>
 					<a href="Examples/Sorting.html">See it Alone</a>
 <pre class="prettyprint lang-html">
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;script src="../js/Dable.js"&gt;&lt;/script&gt;
+&lt;!--Include the Bootstrap CDN--&gt;
+&lt;link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet"&gt;
+&lt;/head&gt;
+&lt;body&gt;
 &lt;div id="SortingDable"&gt;&lt;/div&gt;
 &lt;script type="text/javascript"&gt;
 	var dable = new Dable();
@@ -370,6 +380,8 @@
 	dable.style = 'bootstrap';
 	dable.BuildAll("SortingDable");
 &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
 </pre>
 
 					<a class="anchor" id="example6"></a>
