@@ -99,20 +99,67 @@ var dable = new Dable($("#DivId"));
 					<a href="http://deltreey.github.io/Dable/Examples/FromTable">From Table Example</a>.</p>
 					
 					<a class="anchor" id="faq4"></a>
-					<p class="lead">Do I need &lt;thead&gt; and &lt;tfoot&gt; tags?</p>
-					<p><em>thead Yes, tfoot No</em><br />
+					<p class="lead">Do I need &lt;thead&gt; &lt;tbody&gt; and &lt;tfoot&gt; tags?</p>
+					<p><em>thead Yes, tbody Yes, tfoot No</em><br />
 					Dable finds out your column names and controls sorting based on the
 					cells in the first row of your thead tag, so this is a necessary element.
 					In fact, dable sends you a message in the console telling you there was
 					an error when you try to build a Dable on a table without a thead element.
+					Dable gathers your data as rows from your tbody tag.  So you need this also.
 					The tfoot element is not necessary, but Dable does not remove it.  It is
 					sometimes useful to use the tfoot element to allow users to add rows to
 					the table.</p>
+					<p>Of course, you don't even need a &lt;table&gt; tag if you build your
+					Dable as a javascript array.</p>
 					
 					<a class="anchor" id="faq5"></a>
 					<p class="lead">Can I use Dable with ASP.NET GridViews?</p>
 					<p><em>Absolutely!</em><br /> You only need to make sure that the gridview
 					has a thead element. <a href="http://stackoverflow.com/questions/309101/how-do-i-get-gridview-to-render-thead">See this stackoverflow question.</a></p>
+					
+					<a class="anchor" id="faq10"></a>
+					<p class="lead">Can I turn off sorting for certain columns?</p>
+					<p><em>Of Course!</em></p>
+					<p>Each column in your Dable has a corresponding columnData object.  This
+					is a javascript array, which is 0 based, so Column 3 is dable.columnData[2].
+					The columnData object has a CustomSortFunc property which allows you to set
+					custom sort functions for uniquely sorted columns.  If you want to turn off
+					sorting altogether, you need only set it to false.  It would look like this:
+<pre class="prettyprint lang-js">
+dable.columnData[2].CustomSortFunc = false;
+</pre></p>
+
+					<a class="anchor" id="faq12"></a>
+					<p class="lead">Can I display rows uniquely based on the data with Dable?</p>
+					<p><em>You sure can!</em></p>
+					<p>Each column in your Dable has a corresponding columnData object.  This
+					is a javascript array, which is 0 based, so Column 3 is dable.columnData[2].
+					The columnData object has a CustomRendering property which allows you to set
+					custom rendering functions for any of your columns.  You could display your
+					columns as links, or images, just by changing the rendering.  Additionally,
+					this feature allows you to display the data one way, but still sort and filter
+					the data based on the data in the dable.columns array.  The rendering is just that.
+					It does not in any way alter the data itself.  Here's an example:
+<pre class="prettyprint lang-js">
+dable.columnData[0].CustomRendering = function (cellValue) {
+	//display the cell with a link to details
+	return '&lt;a target="_blank" href="/?cell=' + cellValue + '"&gt;' + cellValue + '&lt;/a&gt;';
+};
+</pre></p>
+
+					<a class="anchor" id="faq11"></a>
+					<p class="lead">Dable's kind of slow with 100,000+ rows</p>
+					<p>Dable is a javascript library.  Therefore, it is only as fast as your computer,
+					or more specifically, your browser.  Some browsers, like IE8 do not handle lots of
+					javascript well, so Dable will run slower when you start to put a ginormous amount
+					of data in it.</p>
+					<p><em>Luckily, there are options!</em></p>
+					<p>Dable does allow you to work with remote data sets.  This is fairly complex
+					though, so I recommend you think long and hard before deciding that this is the
+					best option.  Additionally, printing the data in a Dable becomes flat out impossible
+					when you do this (it's not all on the screen at once).  There are a lot of features that are needed for this.  When I get
+					a good tutorial up that demonstrates Dable's async features, I will add a link to it
+					here.  For now, you're going to have to read the source code.  Sorry.</p>
 					
 					<a class="anchor" id="faq6"></a>
 					<p class="lead">Why do you build Dable on the &lt;div&gt; instead of the
@@ -160,15 +207,11 @@ var dable = new Dable($("#DivId"));
 					<p>I am a fan of single file plugins.  Smaller is better with tools.  You
 					can do a whole lot more with a hammer than you can with a
 					<a href="http://www.milwaukeetool.com/instruments/lighting-testers/2210-20">
-					Milwaukee Tools Fluorescent Light Tester</a>
-					(like maybe smashing the
-					flourescent lights above your cubicle that your co-worker keeps testing
-					with his new flourescent light tester that he bought because of
-					some project he found on GitHub).
+					Milwaukee Tools Fluorescent Light Tester</a>.
 					Because Dable is so simple, you can plug it in anywhere and just use it.
 					I don't want to clutter that simplicity and force my users to host a whole
 					lot of files on their server and add more clutter to the &lt;head&gt;
-					element.  It's big enough already.</p>
+					element.</p>
 				</div>
 				<div class="col-md-3">
 					<div id="affixed">
@@ -176,8 +219,11 @@ var dable = new Dable($("#DivId"));
 							<li><a href="#faq1">How do I use Dable?</a></li>
 							<li><a href="#faq2">It's not working.</a></li>
 							<li><a href="#faq3">Can I just get a template HTML page?</a></li>
-							<li><a href="#faq4">Do I need thead and tfoot?</a></li>
+							<li><a href="#faq4">Do I need thead tbody and tfoot?</a></li>
 							<li><a href="#faq5">Can I use Dable with GridViews?</a></li>
+							<li><a href="#faq10">Can I turn off sorting?</a></li>
+							<li><a href="#faq12">Can I display rows uniquely?</a></li>
+							<li><a href="#faq11">Dable's slow with 100,000+ rows</a></li>
 							<li><a href="#faq6">Why do you build Dable on the div?</a></li>
 							<li><a href="#faq7">Why IE 8?</a></li>
 							<li><a href="#faq8">Why doesn't Dable use JQuery?</a></li>
