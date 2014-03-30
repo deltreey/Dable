@@ -236,6 +236,7 @@
 					if (parseInt(currentRowObjects[i].Row[columnIndex]).toString()
 						.toLowerCase() == 'nan') {
 						isInt = false;
+						isDate = false;
 						break;
 					}
 					//check for dates
