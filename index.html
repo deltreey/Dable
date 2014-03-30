@@ -306,6 +306,72 @@
 &lt;/html&gt;
 </pre>
 
+					<a class="anchor" id="example8"></a>
+					<h3>Different Dable Sorting Features</h3>
+					<div id="dableSortingExample" class="bordered">
+						<div id="SortingDable"></div>
+						<script type="text/javascript">
+							require(['Dable'], function(Dable) {
+								var dable8 = new Dable();
+								var data = [
+									[ 1, '12/1/12', 'Armadillo', 'First' ],
+									[ 2, '12/2/2012', 'Cat', 'Fourth' ],
+									[ 3, '1/1/2001', 'Porcupine', 'Second' ],
+									[ 4, '2/22/02', 'Bat', 'Third' ] ];
+								var columns = [ 'Numbers', 'Dates', 'Text', 'Custom' ];
+								dable8.SetDataAsRows(data);
+								dable8.SetColumnNames(columns);
+								dable8.columnData[3].CustomSortFunc = function(columnIndex, ascending, currentRowObjects) {
+									var order = [ 'First', 'Second', 'Third', 'Fourth' ];
+									currentRowObjects.sort(function(a, b) {
+										var valueA = a.Row[columnIndex];
+										var valueB = b.Row[columnIndex];
+										return order.indexOf(valueA) - order.indexOf(valueB);
+									});
+									
+									if (!ascending) {
+										currentRowObjects.reverse();
+									}
+									
+									return currentRowObjects
+								};
+								dable8.style = 'bootstrap';
+								dable8.BuildAll("SortingDable");
+							});
+						</script>
+					</div>
+					<a href="Examples/Sorting.html">See it Alone</a>
+<pre class="prettyprint lang-html">
+&lt;div id="SortingDable"&gt;&lt;/div&gt;
+&lt;script type="text/javascript"&gt;
+	var dable = new Dable();
+	var data = [
+		[ 1, '12/1/12', 'Armadillo', 'First' ],
+		[ 2, '12/2/2012', 'Cat', 'Fourth' ],
+		[ 3, '1/1/2001', 'Porcupine', 'Second' ],
+		[ 4, '2/22/02', 'Bat', 'Third' ] ];
+	var columns = [ 'Numbers', 'Dates', 'Text', 'Custom' ];
+	dable.SetDataAsRows(data);
+	dable.SetColumnNames(columns);
+	dable.columnData[3].CustomSortFunc = function(columnIndex, ascending, currentRowObjects) {
+		var order = [ 'First', 'Second', 'Third', 'Fourth' ];
+		currentRowObjects.sort(function(a, b) {
+			var valueA = a.Row[columnIndex];
+			var valueB = b.Row[columnIndex];
+			return order.indexOf(valueA) - order.indexOf(valueB);
+		});
+		
+		if (!ascending) {
+			currentRowObjects.reverse();
+		}
+		
+		return currentRowObjects
+	};
+	dable.style = 'bootstrap';
+	dable.BuildAll("SortingDable");
+&lt;/script&gt;
+</pre>
+
 					<a class="anchor" id="example6"></a>
 					<h3>Dable with Paging Features:</h3>
 					<div id="PagingExample" class="bordered">
@@ -387,6 +453,7 @@
 							<li><a href="#example3">Bootstrap Style</a></li>
 							<li><a href="#example4">JQueryUI Style</a></li>
 							<li><a href="#example5">Alternating Style</a></li>
+							<li><a href="#example8">Sorting</a></li>
 							<li><a href="#example6">Paging</a></li>
 							<li><a href="#example7">Large Data</a></li>
 						</ul>

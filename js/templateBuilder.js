@@ -19,7 +19,7 @@ define(['text!../templates/navbar.html', 'mustache', 'jquery', 'bootstrap'],
 			{ name: 'JQueryUI Style', url: 'JQueryUIStyle' },
 			{ name: 'Large Data', url: 'LargeData' },
 			{ name: 'Paging', url: 'Paging' },
-			{ name: 'Paging Tester', url: 'PagingTester' }
+			{ name: 'Sorting', url: 'Sorting' }
 		];
 		var page = window.location.pathname.substr(1);
 		page = page.substr(0, page.indexOf('.'));
