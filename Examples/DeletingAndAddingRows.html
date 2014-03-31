@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="../Dable.js"></script>
+<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+</head>
+<body>
+<div id="DefaultDable"></div>
+<button type="button" id="addRow">Add Row</button>
+<script type="text/javascript">
+	$(document).ready(function() {
+		var dable = new Dable();
+		var data = [ [ 1, 2, "" ], [ 3, 4, "" ], [5, 6, ""], [7, 8, ""] ];
+		var columns = [ 'Odd', 'Even', 'Delete' ];
+		dable.SetDataAsRows(data);
+		dable.SetColumnNames(columns);
+		dable.columnData[2].CustomRendering = function(cellValue, rowNumber) {
+			return '<button type="button" class="deleteRow" data-rownumber="' + rowNumber + '">DELETE ROW</button>';
+		};
+		dable.BuildAll("DefaultDable");
+		$(document).on('click', '.deleteRow', function() {
+			var rowNumber = $(this).attr('data-rownumber');
+			dable.DeleteRow(rowNumber);
+		});
+		$(document).on('click', '#addRow', function() {
+			dable.AddRow([ 24, 36, "" ]);
+		});
+	});
+</script>
+</body>
+</html>

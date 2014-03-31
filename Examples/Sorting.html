@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="../Dable.js"></script>
+<!--Include the Bootstrap CDN-->
+<link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div id="SortingDable"></div>
+<script type="text/javascript">
+	var dable = new Dable();
+	var data = [
+		[ 1, '12/1/12', 'Armadillo', 'First' ],
+		[ 2, '12/2/2012', 'Cat', 'Fourth' ],
+		[ 3, '1/1/2001', 'Porcupine', 'Second' ],
+		[ 4, '2/22/02', 'Bat', 'Third' ] ];
+	var columns = [ 'Numbers', 'Dates', 'Text', 'Custom' ];
+	dable.SetDataAsRows(data);
+	dable.SetColumnNames(columns);
+	dable.columnData[3].CustomSortFunc = function(columnIndex, ascending, currentRowObjects) {
+		var order = [ 'First', 'Second', 'Third', 'Fourth' ];
+		currentRowObjects.sort(function(a, b) {
+			var valueA = a.Row[columnIndex];
+			var valueB = b.Row[columnIndex];
+			return order.indexOf(valueA) - order.indexOf(valueB);
+		});
+		
+		if (!ascending) {
+			currentRowObjects.reverse();
+		}
+		
+		return currentRowObjects
+	};
+	dable.style = 'bootstrap';
+	dable.BuildAll("SortingDable");
+</script>
+</body>
+</html>
