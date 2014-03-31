@@ -27,7 +27,12 @@ define(['text!../templates/navbar.html', 'mustache', 'jquery', 'bootstrap'],
 		];
 		var page = window.location.pathname.substr(1);
 		page = page.substr(0, page.indexOf('.'));
-		var navBarData = mustache.render(navbar, { examples: examples, faq: (page == 'faq'), dropdown: (page && page != '/') });
+		var navBarData = mustache.render(navbar, {
+			examples: examples,
+			faq: (page == 'faq'),
+			thanks: (page == 'thanks'),
+			dropdown: (page && page != '/')
+		});
 		var results = { navbar: navBarData };
 		
 		$(document).ready(function() {
