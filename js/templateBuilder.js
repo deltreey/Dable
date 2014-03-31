@@ -25,7 +25,9 @@ define(['text!../templates/navbar.html', 'mustache', 'jquery', 'bootstrap'],
 			{ name: 'Paging', url: 'Paging' },
 			{ name: 'Sorting', url: 'Sorting' }
 		];
-		var page = window.location.pathname.substr(1);
+		
+		var path = window.location.pathname;
+		var page = path.substr(path.lastIndexOf('/') + 1);
 		page = page.substr(0, page.indexOf('.'));
 		var navBarData = mustache.render(navbar, {
 			examples: examples,
