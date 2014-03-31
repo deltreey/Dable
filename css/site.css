@@ -42,3 +42,16 @@ body > .container {
 		padding: 4px 20px;
 		font-size: 13px;
 	}
+
+.gray a {
+	color: black;
+}
+	.gray a:hover {
+		background-color: #DCDCDC;
+	}
+	.gray .active {
+		background-color: #9A9A9A;
+	}
+	.gray .active a:hover {
+		background-color: #DCDCDC;
+	}
