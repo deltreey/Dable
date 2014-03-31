@@ -231,13 +231,11 @@
 				var isDate = true;
 				var newRowObjects = currentRowObjects.slice(0);
 				for (var i = 0; i < currentRowObjects.length; ++i) {
-					//simple 2/1/2010 style dates parse cleanly to int, so we can drop out
+					//simple 2/21/2010 style dates parse cleanly to int, so we can drop out
 					//if this won't parse
 					if (parseInt(currentRowObjects[i].Row[columnIndex]).toString()
 						.toLowerCase() == 'nan') {
 						isInt = false;
-						isDate = false;
-						break;
 					}
 					//check for dates
 					var dateString = currentRowObjects[i].Row[columnIndex].toString();
