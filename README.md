@@ -8,7 +8,7 @@ Dable is simple and elegant.  It has __zero__ dependencies and works in IE8+.
 Also Found On
 -----
 **NuGet**: https://www.nuget.org/packages/Dable/<br />
-**Chocolatey**: https://chocolatey.org/packages/Dable/1.1.0<br />
+**Chocolatey**: https://chocolatey.org/packages/Dable/1.1.1<br />
 **bower**: `bower install dable`
 
 How To
