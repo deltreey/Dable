@@ -1,0 +1,26 @@
+{
+  "name": "Dable",
+  "main": "Dable.js",
+  "version": "1.1.0",
+  "homepage": "https://github.com/deltreey/Dable",
+  "authors": [
+    "deltreey <suicidolt@gmail.com>"
+  ],
+  "description": "Dable (pronounced 'dabble') is a simple javascript table control with filtering, sorting, paging, styles, and more!",
+  "moduleType": [
+    "amd",
+    "globals",
+    "node"
+  ],
+  "keywords": [
+    "dable",
+    "datatable",
+    "table"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "node_modules",
+    "bower_components",
+    "*.nupkg"
+  ]
+}
