@@ -1,3 +1,4 @@
 require.config({
-	baseURL: 'js'
+	baseUrl: 'js',
+	deps: ['templateBuilder']
 });

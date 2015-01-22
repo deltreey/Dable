@@ -7,9 +7,6 @@
 		<meta name="viewport" content="width=device-width,initial-scale=1">
 		<link href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" rel="stylesheet">
 		<script data-main="js/main" src="js/require.js" type="text/javascript"></script>
-		<script type="text/javascript">
-			require(['templateBuilder']);
-		</script>
 		<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
 		<title>Dable</title>
 	</head>
@@ -88,6 +85,7 @@
 						</div>
 						<script type="text/javascript">
 							require(['Dable'], function(Dable) {
+								console.log('double call');
 								var dable2 = new Dable("TableDable");
 							});
 						</script>
