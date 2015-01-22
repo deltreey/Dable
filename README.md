@@ -9,6 +9,7 @@ Also Found On
 -----
 **NuGet**: https://www.nuget.org/packages/Dable/<br />
 **Chocolatey**: https://chocolatey.org/packages/Dable/1.1.0
+**bower**: `bower install dable`
 
 How To
 -----
