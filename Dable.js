@@ -605,11 +605,11 @@
 				}
 				var sorts = tableDiv.querySelectorAll('.' + $export.sortClass);
 				for (var i = 0; i < sorts.length; ++i) {
-					sorts[i].innerHTML = '^';
+					sorts[i].innerHTML = '&#9650;';
 					sorts[i].setAttribute('class', $export.sortClass);
 					if (i == $export.sortColumn) {
 						if ($export.sortOrder.toLowerCase().substr(0, 4) == 'desc') {
-							sorts[i].innerHTML = 'v';
+							sorts[i].innerHTML = '&#9660;';
 						}
 					}
 				}
