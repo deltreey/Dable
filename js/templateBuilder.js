@@ -33,6 +33,7 @@ define(['text!../templates/navbar.html', 'mustache', 'jquery', 'bootstrap'],
 			examples: examples,
 			faq: (page == 'faq'),
 			thanks: (page == 'thanks'),
+			serverSide: (page == 'server-side'),
 			dropdown: (page && page != '/')
 		});
 		var results = { navbar: navBarData };
