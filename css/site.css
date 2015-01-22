@@ -21,6 +21,7 @@ body > .container {
 
 .prettyprinted {
 	padding: 10px !important;
+	word-wrap: initial !important;
 }
 
 .anchor {
