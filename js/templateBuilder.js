@@ -52,5 +52,6 @@ define(['text!../templates/navbar.html', 'mustache', 'jquery', 'bootstrap'],
 			$('[data-spy="scroll"]').each(function () {
 				var $spy = $(this).scrollspy('refresh');
 			});
+			finishedLoading();
 		});
 });

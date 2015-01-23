@@ -28,16 +28,6 @@
 					<h3>A simple, no-styles, default Dable:</h3>
 					<div id="defaultExample" class="bordered">
 						<div id="DefaultDable"></div>
-						<script type="text/javascript">
-							require(['Dable'], function(Dable) {
-								var dable1 = new Dable();
-								var data = [ [ 1, 2 ], [ 3, 4 ] ];
-								var columns = [ 'Odd', 'Even' ];
-								dable1.SetDataAsRows(data);
-								dable1.SetColumnNames(columns);
-								dable1.BuildAll("DefaultDable");
-							});
-						</script>
 					</div>
 					<a href="Examples/Default.html">See it Alone</a>
 <pre class="prettyprint lang-html">
@@ -83,12 +73,6 @@
 								</tbody>
 							</table>
 						</div>
-						<script type="text/javascript">
-							require(['Dable'], function(Dable) {
-								console.log('double call');
-								var dable2 = new Dable("TableDable");
-							});
-						</script>
 					</div>
 					<a href="Examples/FromTable.html">See it Alone</a>
 <pre class="prettyprint lang-html">
@@ -129,17 +113,6 @@
 					<h3>Dable with Bootstrap styling:</h3>
 					<div id="bootstrapExample" class="bordered">
 						<div id="BootstrapDable"></div>
-						<script type="text/javascript">
-							require(['Dable'], function(Dable) {
-								var dable3 = new Dable();
-								var data = [ [ 1, 2 ], [ 3, 4 ] ];
-								var columns = [ 'Odd', 'Even' ];
-								dable3.SetDataAsRows(data);
-								dable3.SetColumnNames(columns);
-								dable3.style = 'bootstrap';	//set the style
-								dable3.BuildAll("BootstrapDable");
-							});
-						</script>
 					</div>
 					<a href="Examples/BootstrapStyle.html">See it Alone</a>
 <pre class="prettyprint lang-html">
@@ -169,17 +142,6 @@
 					<h3>Dable with JQueryUI styling:</h3>
 					<div id="jqueryuiExample" class="bordered">
 						<div id="JQueryUIDable"></div>
-						<script type="text/javascript">
-							require(['Dable'], function(Dable) {
-								var dable4 = new Dable();
-								var data = [ [ 1, 2 ], [ 3, 4 ] ];
-								var columns = [ 'Odd', 'Even' ];
-								dable4.SetDataAsRows(data);
-								dable4.SetColumnNames(columns);
-								dable4.style = 'jqueryui';	//set the style
-								dable4.BuildAll("JQueryUIDable");
-							});
-						</script>
 					</div>
 					<a href="Examples/JQueryUIStyle.html">See it Alone</a>
 <pre class="prettyprint lang-html">
@@ -229,26 +191,6 @@
 								</tbody>
 							</table>
 						</div>
-						<script type="text/javascript">
-							require(['Dable'], function(Dable) {
-								var dable5 = new Dable("AlternatingDable");
-								setInterval(function() {
-									if (dable5.style == "jqueryui") {
-										dable5.style = "bootstrap";
-									}
-									else if (dable5.style == "bootstrap") {
-										dable5.style = "clear";
-									}
-									else if (dable5.style == "clear") {
-										dable5.style = "";
-									}
-									else {
-										dable5.style = "jqueryui";
-									}
-									dable5.UpdateStyle(document.getElementById("AlternatingDable"));
-								}, 3000);
-							});
-						</script>
 					</div>
 					<a href="Examples/Alternating.html">See it Alone</a>
 <pre class="prettyprint lang-html">
@@ -310,35 +252,6 @@
 					need it to sort something else, you only need to add a custom sort function.</p>
 					<div id="dableSortingExample" class="bordered">
 						<div id="SortingDable"></div>
-						<script type="text/javascript">
-							require(['Dable'], function(Dable) {
-								var dable8 = new Dable();
-								var data = [
-									[ 1, '12/1/12', 'Armadillo', 'First' ],
-									[ 2, '12/2/2012', 'Cat', 'Fourth' ],
-									[ 3, '1/1/2001', 'Porcupine', 'Second' ],
-									[ 4, '2/22/02', 'Bat', 'Third' ] ];
-								var columns = [ 'Numbers', 'Dates', 'Text', 'Custom' ];
-								dable8.SetDataAsRows(data);
-								dable8.SetColumnNames(columns);
-								dable8.columnData[3].CustomSortFunc = function(columnIndex, ascending, currentRowObjects) {
-									var order = [ 'First', 'Second', 'Third', 'Fourth' ];
-									currentRowObjects.sort(function(a, b) {
-										var valueA = a.Row[columnIndex];
-										var valueB = b.Row[columnIndex];
-										return order.indexOf(valueA) - order.indexOf(valueB);
-									});
-									
-									if (!ascending) {
-										currentRowObjects.reverse();
-									}
-									
-									return currentRowObjects
-								};
-								dable8.style = 'bootstrap';
-								dable8.BuildAll("SortingDable");
-							});
-						</script>
 					</div>
 					<a href="Examples/Sorting.html">See it Alone</a>
 <pre class="prettyprint lang-html">
@@ -386,26 +299,6 @@
 					<h3>Dable with Paging Features:</h3>
 					<div id="PagingExample" class="bordered">
 						<div id="PagingDable"></div>
-						<script type="text/javascript">
-							require(['Dable'], function(Dable) {
-								var dable7 = new Dable();
-								var data = [
-											[1, 2], [3, 4], [5, 6], [7, 8], [9, 10],
-											[11, 12], [13, 14], [15, 16], [17, 18], [19, 20],
-											[1, 2], [3, 4], [5, 6], [7, 8], [9, 10],
-											[11, 12], [13, 14], [15, 16], [17, 18], [19, 20]
-								];
-								var columns = ['Odd', 'Even'];
-								dable7.SetDataAsRows(data);
-								dable7.SetColumnNames(columns);
-								dable7.style = 'jqueryui';
-								dable7.pageSizes = [1, 2, 5];		// replace the possible page sizes with our own
-								dable7.pageSize = 2;			// select a tiny page size for the example
-								dable7.pagerSize = 5;			// The pager is our previous/next buttons, we're adding a 5 page display to it
-								dable7.pagerIncludeFirstAndLast = true;	//we're going to include first and last buttons
-								dable7.BuildAll("PagingDable");
-							});
-						</script>
 					</div>
 					<a href="Examples/Paging.html">See it Alone</a>
 <pre class="prettyprint lang-html">
@@ -447,11 +340,6 @@
 					<br /><br />
 					<div id="largeDataExample">
 						<div id="LargeDataDable"></div>
-						<script type="text/javascript">
-							require(['largeData'], function(largeData) {
-								largeData.ShowLargeData();
-							});
-						</script>
 					</div>
 					<a href="Examples/LargeData.html">See it Alone</a>
 				</div>
@@ -471,5 +359,106 @@
 				</div>
 			</div>
 		</div>
+		<script type="text/javascript">
+			function finishedLoading() {	//wait until mustache rewrites the DOM
+				require(['largeData', 'Dable', 'jquery'], function(largeData, Dable, $) {
+					//DefaultDable
+					var dable1 = new Dable();
+					var data = [ [ 1, 2 ], [ 3, 4 ] ];
+					var columns = [ 'Odd', 'Even' ];
+					dable1.SetDataAsRows(data);
+					dable1.SetColumnNames(columns);
+					dable1.BuildAll("DefaultDable");
+
+					//TableDable
+					var dable2 = new Dable("TableDable");
+
+					//BootstrapDable
+					var dable3 = new Dable();
+					//data = [ [ 1, 2 ], [ 3, 4 ] ];
+					//columns = [ 'Odd', 'Even' ];
+					dable3.SetDataAsRows(data);
+					dable3.SetColumnNames(columns);
+					dable3.style = 'bootstrap';	//set the style
+					dable3.BuildAll("BootstrapDable");
+
+					//JqueryUIDable
+					var dable4 = new Dable();
+					//data = [ [ 1, 2 ], [ 3, 4 ] ];
+					//columns = [ 'Odd', 'Even' ];
+					dable4.SetDataAsRows(data);
+					dable4.SetColumnNames(columns);
+					dable4.style = 'jqueryui';	//set the style
+					dable4.BuildAll("JQueryUIDable");
+
+					//AlternatingDable
+					var dable5 = new Dable("AlternatingDable");
+					setInterval(function() {
+						if (dable5.style == "jqueryui") {
+							dable5.style = "bootstrap";
+						}
+						else if (dable5.style == "bootstrap") {
+							dable5.style = "clear";
+						}
+						else if (dable5.style == "clear") {
+							dable5.style = "";
+						}
+						else {
+							dable5.style = "jqueryui";
+						}
+						dable5.UpdateStyle(document.getElementById("AlternatingDable"));
+					}, 3000);
+
+					//SortingDable
+					var dable8 = new Dable();
+					data = [
+						[ 1, '12/1/12', 'Armadillo', 'First' ],
+						[ 2, '12/2/2012', 'Cat', 'Fourth' ],
+						[ 3, '1/1/2001', 'Porcupine', 'Second' ],
+						[ 4, '2/22/02', 'Bat', 'Third' ] ];
+					columns = [ 'Numbers', 'Dates', 'Text', 'Custom' ];
+					dable8.SetDataAsRows(data);
+					dable8.SetColumnNames(columns);
+					dable8.columnData[3].CustomSortFunc = function(columnIndex, ascending, currentRowObjects) {
+						var order = [ 'First', 'Second', 'Third', 'Fourth' ];
+						currentRowObjects.sort(function(a, b) {
+							var valueA = a.Row[columnIndex];
+							var valueB = b.Row[columnIndex];
+							return order.indexOf(valueA) - order.indexOf(valueB);
+						});
+						
+						if (!ascending) {
+							currentRowObjects.reverse();
+						}
+						
+						return currentRowObjects
+					};
+					dable8.style = 'bootstrap';
+					dable8.BuildAll("SortingDable");
+
+
+					//PagingDable
+					var dable7 = new Dable();
+					data = [
+						[1, 2], [3, 4], [5, 6], [7, 8], [9, 10],
+						[11, 12], [13, 14], [15, 16], [17, 18], [19, 20],
+						[1, 2], [3, 4], [5, 6], [7, 8], [9, 10],
+						[11, 12], [13, 14], [15, 16], [17, 18], [19, 20]
+					];
+					columns = ['Odd', 'Even'];
+					dable7.SetDataAsRows(data);
+					dable7.SetColumnNames(columns);
+					dable7.style = 'jqueryui';
+					dable7.pageSizes = [1, 2, 5];		// replace the possible page sizes with our own
+					dable7.pageSize = 2;			// select a tiny page size for the example
+					dable7.pagerSize = 5;			// The pager is our previous/next buttons, we're adding a 5 page display to it
+					dable7.pagerIncludeFirstAndLast = true;	//we're going to include first and last buttons
+					dable7.BuildAll("PagingDable");
+
+					//LargeData Dable
+					largeData.ShowLargeData();
+				});
+			}
+		</script>
 	</body>
 </html>
