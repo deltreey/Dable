@@ -65,7 +65,10 @@
 				dableRequest.onreadystatechange = function () {
 					if (dableRequest.readyState == 4 && dableRequest.status == 200) {
 						var data = JSON.parse(dableRequest.responseText);
-						var actualData = JSON.parse(data.d);    //stupid json
+						var actualData = data;
+						if (data.rows === undefined) {
+							actualData = JSON.parse(data.d);
+						}
 						var actualRows = actualData.rows;
 						//create empty rows for the rest of the set
 						actualRows.reverse();
