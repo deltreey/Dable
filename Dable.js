@@ -57,9 +57,9 @@
 			                                 filter,
 			                                 sortColumn,
 			                                 ascending,
-			                                 asynchronous) {
-			  if (typeof asynchronous == 'undefined') {
-			    asynchronous = false;
+			                                 callback) {	//callback if async
+			  if (typeof callback == 'undefined') {
+			    callback = false;
 			  }
 				var dableRequest = new XMLHttpRequest();
 				dableRequest.onreadystatechange = function () {
@@ -70,6 +70,27 @@
 							actualData = JSON.parse(data.d);
 						}
 						var actualRows = actualData.rows;
+						if (actualRows === undefined) {	//need rows in return data
+							console.error('Error, no rows in data from source');
+							if (callback) {
+								return callback('Error, no rows in data from source');
+							}
+							return;
+						}
+						else if (actualData.includedRowCount === undefined) {	//need filtered row count in data
+							console.error('Error, no includedRowCount in data from source');
+							if (callback) {
+								return callback('Error, no includedRowCount in data from source');
+							}
+							return;	
+						}
+						else if (actualData.rowCount === undefined) {	//need filtered row count in data
+							console.error('Error, no rowCount in data from source');
+							if (callback) {
+								return callback('Error, no rowCount in data from source');
+							}
+							return;	
+						}
 						//create empty rows for the rest of the set
 						actualRows.reverse();
 						for (var i = 0; i < start; ++i) {
@@ -87,11 +108,11 @@
 						$export.VisibleRowCount = function () {
 							return actualData.includedRowCount;
 						};
-						if (asynchronous != false
-						    && !!(asynchronous
-						          && asynchronous.call
-						          && asynchronous.apply)) {
-							asynchronous();
+						if (callback != false
+						    && !!(callback
+						          && callback.call
+						          && callback.apply)) {
+							callback();
 						}
 					}
 				}
@@ -125,17 +146,17 @@
 					    && $export.sortOrder.substr(0, 4).toLowerCase() == 'desc') {
 						ascending = false;
 					}
-					//search is wired up to be async so the user can keep typing,
-					//but it creates a race condition that is not conducive to
-					//fast typing, so I'll have to figure out a fix
 					$export.asyncRequest(
 						0,
 						$export.currentFilter,
 						$export.sortColumn,
-						ascending);
-					var body = document.getElementById($export.id + '_body');
-					$export.UpdateDisplayedRows(body);
-					$export.UpdateStyle(document.getElementById($export.id));
+						ascending,
+						function (error) {
+							if (error) { throw error; }
+							var body = document.getElementById($export.id + '_body');
+							$export.UpdateDisplayedRows(body);
+							$export.UpdateStyle(document.getElementById($export.id));
+						});
 				}
 				else {
 					var includedRows = [];
@@ -211,21 +232,34 @@
 					  $export.asyncRequest(
 							$export.asyncStart,
 							$export.currentFilter,
-							columnIndex, ascend);
+							columnIndex,
+							ascend,
+							function (error) {
+								if (error) { throw error; }
+								$export.visibleRows = $export.CreateRowsFromObjects($export.visibleRowObjects);
+								$export.UpdateDisplayedRows(
+									document.getElementById($export.id + '_body'));
+								$export.UpdateStyle();
+							});
 					}
 					else if ($export.columnData[columnIndex].CustomSortFunc) {
 						$export.visibleRowObjects = $export.columnData[columnIndex]
 							.CustomSortFunc(columnIndex, ascend, $export.visibleRowObjects);
+						$export.visibleRows = $export.CreateRowsFromObjects($export.visibleRowObjects);
+						$export.UpdateDisplayedRows(
+							document.getElementById($export.id + '_body'));
+						$export.UpdateStyle();
 					}
 					else {
 						$export.visibleRowObjects = $export
 							.baseSort(columnIndex, ascend, $export.visibleRowObjects);
+						$export.visibleRows = $export.CreateRowsFromObjects($export.visibleRowObjects);
+						$export.UpdateDisplayedRows(
+							document.getElementById($export.id + '_body'));
+						$export.UpdateStyle();
 					}
 					
-					$export.visibleRows = $export.CreateRowsFromObjects($export.visibleRowObjects);
-					$export.UpdateDisplayedRows(
-						document.getElementById($export.id + '_body'));
-					$export.UpdateStyle();
+					
 				}
 			};
 			
@@ -1013,20 +1047,39 @@
 				}
 
 				if ($export.async) {
-				    $export.asyncRequest(0, '', -1, true);
+				    $export.asyncRequest(
+				    	0,
+				    	'',
+				    	-1,
+				    	true,
+				    	function (error) {
+				    		if (error) { throw error; }
+				    		tableDiv.innerHTML = '';
+
+							var header = $export.BuildHeader(tableDiv);
+							var table = $export.BuildTable(tableDiv);
+							var footer = $export.BuildFooter(tableDiv);
+
+							tableDiv.appendChild(header);
+							tableDiv.appendChild(table);
+							tableDiv.appendChild(footer);
+
+							$export.UpdateStyle(tableDiv);
+				    	});
 				}
-				
-				tableDiv.innerHTML = '';
+				else {
+					tableDiv.innerHTML = '';
 
-				var header = $export.BuildHeader(tableDiv);
-				var table = $export.BuildTable(tableDiv);
-				var footer = $export.BuildFooter(tableDiv);
+					var header = $export.BuildHeader(tableDiv);
+					var table = $export.BuildTable(tableDiv);
+					var footer = $export.BuildFooter(tableDiv);
 
-				tableDiv.appendChild(header);
-				tableDiv.appendChild(table);
-				tableDiv.appendChild(footer);
+					tableDiv.appendChild(header);
+					tableDiv.appendChild(table);
+					tableDiv.appendChild(footer);
 
-				$export.UpdateStyle(tableDiv);
+					$export.UpdateStyle(tableDiv);
+				}
 			};
 			$export.BuildHeader = function (tableDiv) {
 				if (!tableDiv) {
@@ -1289,11 +1342,19 @@
 						newStart,
 						$export.currentFilter,
 						$export.sortColumn,
-						ascending);
+						ascending,
+						function (error) {
+							if (error) { throw error; }
+							$export.UpdateDisplayedRows(document.getElementById($export.id +
+								'_body'));
+							$export.UpdateStyle();
+						});
 				}
-				$export.UpdateDisplayedRows(document.getElementById($export.id +
-					'_body'));
-				$export.UpdateStyle();
+				else {
+					$export.UpdateDisplayedRows(document.getElementById($export.id +
+						'_body'));
+					$export.UpdateStyle();
+				}
 			};
 			
 			$export.NextPage = function() {
@@ -1323,11 +1384,19 @@
 						newStart,
 						$export.currentFilter,
 						$export.sortColumn,
-						ascending);
+						ascending,
+						function (error) {
+							if (error) { throw error; }
+							$export.UpdateDisplayedRows(document.getElementById($export.id +
+								'_body'));
+							$export.UpdateStyle();
+						});
 				}
-				$export.UpdateDisplayedRows(document.getElementById($export.id +
-					'_body'));
-				$export.UpdateStyle();
+				else {
+					$export.UpdateDisplayedRows(document.getElementById($export.id +
+						'_body'));
+					$export.UpdateStyle();
+				}
 			};
 
 			//Utility functions
