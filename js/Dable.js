@@ -116,7 +116,7 @@
 						}
 					}
 				}
-				dableRequest.open('POST', $export.async, asynchronous != false);
+				dableRequest.open('POST', $export.async, callback != false);
 				dableRequest.setRequestHeader('content-type', 'application/json');
 				var requestObject = JSON.parse(JSON.stringify($export.asyncData));
 				requestObject['start'] = start;
