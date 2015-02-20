@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="/js/Dable.js"></script>
+<!--Include the Bootstrap CDN-->
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div id="NodeDable"></div>
+<script type="text/javascript">
+	var dable = new Dable();
+	var columns = [ 'Stuff', 'Things', 'Bits', 'Bobs' ];
+	dable.async = 'http://localhost:8080/async';
+	dable.SetColumnNames(columns);
+	dable.pagerSize = 5;					// The pager is our previous/next buttons, we're adding a 5 page display to it
+	dable.pagerIncludeFirstAndLast = true;	//we're going to include first and last buttons
+	dable.BuildAll("NodeDable");
+</script>
+</body>
+</html>
