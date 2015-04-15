@@ -572,8 +572,14 @@
 				
 				var showing = footer.querySelector('#' + $export.id + '_showing');
 				if (showing) {
-					showing.innerHTML = "Showing " + start + " to " + end + " of " +
-						($export.VisibleRowCount()) + " entries";
+					if ($export.RowCount() == 0) {
+						showing.innerHTML = "There are no entries";
+					} else if ($export.VisibleRowCount() == 0) {
+						showing.innerHTML = "Showing 0 entries";
+					} else {
+						showing.innerHTML = "Showing " + start + " to " + end + " of " +
+							($export.VisibleRowCount()) + " entries";
+					}
 					if ($export.VisibleRowCount() != $export.RowCount()) {
 						showing.innerHTML += " (filtered from " + ($export.RowCount()) +
 							" total entries)";
