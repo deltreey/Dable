@@ -642,9 +642,10 @@
 				}
 				var sorts = tableDiv.querySelectorAll('.' + $export.sortClass);
 				for (var i = 0; i < sorts.length; ++i) {
-					sorts[i].innerHTML = '&#9650;';
+					sorts[i].innerHTML = '';
 					sorts[i].setAttribute('class', $export.sortClass);
 					if (i == $export.sortColumn) {
+						sorts[i].innerHTML = '&#9650;';
 						if ($export.sortOrder.toLowerCase().substr(0, 4) == 'desc') {
 							sorts[i].innerHTML = '&#9660;';
 						}
@@ -768,11 +769,11 @@
 					headCells[i].setAttribute('class', 'ui-state-default');
 					var sort = headCells[i].querySelector('.' + $export.sortClass);
 					if (sort) {
-						if (sort.innerHTML == 'v') {
+						if (sort.innerText.charCodeAt(0) == 9660) {
 							sort.setAttribute('class', $export.sortClass +
 								' ui-icon ui-icon-triangle-1-s');
 						}
-						else {
+						else if (sort.innerText.charCodeAt(0) == 9650) {
 							sort.setAttribute('class', $export.sortClass +
 								' ui-icon ui-icon-triangle-1-n');
 						}
@@ -857,11 +858,11 @@
 				for (var i = 0; i < headCells.length; ++i) {
 					var sort = headCells[i].querySelector('.' + $export.sortClass);
 					if (sort) {
-						if (sort.innerHTML == 'v') {
+						if (sort.innerText.charCodeAt(0) == 9660) {
 							sort.setAttribute('class', $export.sortClass +
 								' glyphicon glyphicon-chevron-down');
 						}
-						else {
+						else if (sort.innerText.charCodeAt(0) == 9650) {
 							sort.setAttribute('class', $export.sortClass +
 								' glyphicon glyphicon-chevron-up');
 						}
