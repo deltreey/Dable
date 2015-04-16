@@ -127,6 +127,28 @@
 				requestObject['ascending'] = ascending;
 				dableRequest.send(JSON.stringify(requestObject));
 			}
+			$export.asyncReload = function (callback) {
+				if (!callback) {
+					callback = function(error) {
+						if (error) {
+							throw error;
+						} else {
+							$export.UpdateDisplayedRows();
+							$export.UpdateStyle();
+						}
+					};
+				}
+
+				var ascending = true;
+				if ($export.sortOrder.length > 3
+					&& $export.sortOrder.substr(0, 4).toLowerCase() == 'desc') {
+					ascending = false;
+				}
+
+				$export.asyncRequest($export.asyncStart, $export.currentFilter, $export.sortColumn,
+					ascending, callback);
+			};
+			
 			$export.searchFunc = function (event) {
 				var searchBox = this;
 				if (searchBox.id != $export.id + '_search') {
@@ -572,8 +594,14 @@
 				
 				var showing = footer.querySelector('#' + $export.id + '_showing');
 				if (showing) {
-					showing.innerHTML = "Showing " + start + " to " + end + " of " +
-						($export.VisibleRowCount()) + " entries";
+					if ($export.RowCount() == 0) {
+						showing.innerHTML = "There are no entries";
+					} else if ($export.VisibleRowCount() == 0) {
+						showing.innerHTML = "Showing 0 entries";
+					} else {
+						showing.innerHTML = "Showing " + start + " to " + end + " of " +
+							($export.VisibleRowCount()) + " entries";
+					}
 					if ($export.VisibleRowCount() != $export.RowCount()) {
 						showing.innerHTML += " (filtered from " + ($export.RowCount()) +
 							" total entries)";
@@ -642,9 +670,10 @@
 				}
 				var sorts = tableDiv.querySelectorAll('.' + $export.sortClass);
 				for (var i = 0; i < sorts.length; ++i) {
-					sorts[i].innerHTML = '&#9650;';
+					sorts[i].innerHTML = '';
 					sorts[i].setAttribute('class', $export.sortClass);
 					if (i == $export.sortColumn) {
+						sorts[i].innerHTML = '&#9650;';
 						if ($export.sortOrder.toLowerCase().substr(0, 4) == 'desc') {
 							sorts[i].innerHTML = '&#9660;';
 						}
@@ -768,11 +797,11 @@
 					headCells[i].setAttribute('class', 'ui-state-default');
 					var sort = headCells[i].querySelector('.' + $export.sortClass);
 					if (sort) {
-						if (sort.innerHTML == 'v') {
+						if (sort.innerText.charCodeAt(0) == 9660) {
 							sort.setAttribute('class', $export.sortClass +
 								' ui-icon ui-icon-triangle-1-s');
 						}
-						else {
+						else if (sort.innerText.charCodeAt(0) == 9650) {
 							sort.setAttribute('class', $export.sortClass +
 								' ui-icon ui-icon-triangle-1-n');
 						}
@@ -857,11 +886,11 @@
 				for (var i = 0; i < headCells.length; ++i) {
 					var sort = headCells[i].querySelector('.' + $export.sortClass);
 					if (sort) {
-						if (sort.innerHTML == 'v') {
+						if (sort.innerText.charCodeAt(0) == 9660) {
 							sort.setAttribute('class', $export.sortClass +
 								' glyphicon glyphicon-chevron-down');
 						}
-						else {
+						else if (sort.innerText.charCodeAt(0) == 9650) {
 							sort.setAttribute('class', $export.sortClass +
 								' glyphicon glyphicon-chevron-up');
 						}
