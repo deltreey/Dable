@@ -5,6 +5,10 @@ Dable (pronounced 'dabble') is a simple javascript table control with filtering,
 
 Dable is simple and elegant.  It has __zero__ dependencies and works in IE8+.
 
+<a target="_blank" href="https://travis-ci.org/deltreey/Dable">
+	<img src="https://travis-ci.org/deltreey/Dable.svg?branch=master" />
+</a>
+
 Also Found On
 -----
 **NuGet**: https://www.nuget.org/packages/Dable/<br />
