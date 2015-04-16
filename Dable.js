@@ -127,6 +127,28 @@
 				requestObject['ascending'] = ascending;
 				dableRequest.send(JSON.stringify(requestObject));
 			}
+			$export.asyncReload = function (callback) {
+				if (!callback) {
+					callback = function(error) {
+						if (error) {
+							throw error;
+						} else {
+							$export.UpdateDisplayedRows();
+							$export.UpdateStyle();
+						}
+					};
+				}
+
+				var ascending = true;
+				if ($export.sortOrder.length > 3
+					&& $export.sortOrder.substr(0, 4).toLowerCase() == 'desc') {
+					ascending = false;
+				}
+
+				$export.asyncRequest($export.asyncStart, $export.currentFilter, $export.sortColumn,
+					ascending, callback);
+			};
+			
 			$export.searchFunc = function (event) {
 				var searchBox = this;
 				if (searchBox.id != $export.id + '_search') {
