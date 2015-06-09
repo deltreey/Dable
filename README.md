@@ -1,6 +1,8 @@
 Dable
 =====
 
+[![Join the chat at https://gitter.im/deltreey/Dable](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/deltreey/Dable?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Dable (pronounced 'dabble') is a simple javascript table control with filtering, sorting, paging, styles, and more!
 
 Dable is simple and elegant.  It has __zero__ dependencies and works in IE8+.
