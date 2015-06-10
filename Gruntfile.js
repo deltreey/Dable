@@ -1,13 +1,14 @@
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
 module.exports = function(grunt) {
+    var EXPORT_NAME = 'Dable';
     var path = require('path');
     
     var mainWrapperTemplate = [
     '(function (module) {', '<%= src %>', '})(function (root) {',
         'return Object.defineProperty({}, \'exports\', {',
-            'set: function (i) { root[\'<%= grunt.config(\'pkg.name\') %>\'] = i; },',
-            'get: function () { return root[\'<%= grunt.config(\'pkg.name\') %>\']; }',
+            'set: function (i) { root[\'' + EXPORT_NAME + '\'] = i; },',
+            'get: function () { return root[\'' + EXPORT_NAME + '\']; }',
         '});',
     '}(this));\n'].join('\n');
 
