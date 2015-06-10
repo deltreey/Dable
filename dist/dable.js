@@ -386,7 +386,7 @@
             for (var tableRows = table.querySelectorAll("tbody tr"), i = 0; i < tableRows.length; ++i) tableRows[i].removeAttribute("style");
             for (var headCells = table.querySelectorAll("th"), i = 0; i < headCells.length; ++i) {
                 var sort = headCells[i].querySelector("." + this.sortClass);
-                sort && (9660 == sort.innerText.charCodeAt(0) ? sort.setAttribute("class", this.sortClass + " glyphicon glyphicon-chevron-down") : 9650 == sort.innerText.charCodeAt(0) && sort.setAttribute("class", this.sortClass + " glyphicon glyphicon-chevron-up"), 
+                sort && (console.info(sort.innerText), 9660 == sort.innerText.charCodeAt(0) ? sort.setAttribute("class", this.sortClass + " glyphicon glyphicon-chevron-down") : 9650 == sort.innerText.charCodeAt(0) && sort.setAttribute("class", this.sortClass + " glyphicon glyphicon-chevron-up"), 
                 sort.innerHTML = "");
             }
             for (var pageClass = "btn btn-default " + this.pagerButtonsClass, pageLeft = footer.querySelector("#" + this.id + "_page_prev"), pageRight = footer.querySelector("#" + this.id + "_page_next"), pageParent = pageLeft.parentElement, pagerItems = footer.querySelectorAll("li"), i = 0; i < pagerItems.length; ++i) RemoveStyle(pagerItems[i]);
@@ -476,11 +476,11 @@
                 entryCount.appendChild(tempOption);
             }
             var dable = this;
-            entryCount.onchange = utils.bind(function() {
+            entryCount.onchange = function() {
                 var entCnt = this, value = entCnt.value;
                 dable.pageSize = parseInt(value), dable.UpdateDisplayedRows(document.getElementById(dable.id + "_body")), 
                 dable.UpdateStyle(tableDiv);
-            }, this);
+            };
             for (var options = entryCount.querySelectorAll("option"), i = 0; i < options.length; ++i) if (options[i].value == dable.pageSize) {
                 options[i].selected = !0;
                 break;
@@ -529,12 +529,12 @@
                 var pageFirst = li.cloneNode(!1), pageFirstAnchor = anchor.cloneNode(!1);
                 pageFirstAnchor.innerHTML = "First", pageFirst.setAttribute("class", this.pagerButtonsClass), 
                 pageFirst.id = this.id + "_page_first", pageFirst.onclick = this.FirstPage, this.pageNumber <= 0 && (pageFirst.setAttribute("disabled", "disabled"), 
-                pageFirst.onclick = function() {}), pageFirst.appendChild(pageFirstAnchor), right.appendChild(pageFirst);
+                pageFirst.onclick = utils.noop), pageFirst.appendChild(pageFirstAnchor), right.appendChild(pageFirst);
             }
             var pageLeft = li.cloneNode(!1), pageLeftAnchor = anchor.cloneNode(!1);
             if (pageLeftAnchor.innerHTML = "Prev", pageLeft.setAttribute("class", this.pagerButtonsClass), 
             pageLeft.id = this.id + "_page_prev", pageLeft.onclick = this.PreviousPage, this.pageNumber <= 0 && (pageLeft.setAttribute("disabled", "disabled"), 
-            pageLeft.onclick = function() {}), pageLeft.appendChild(pageLeftAnchor), right.appendChild(pageLeft), 
+            pageLeft.onclick = utils.noop), pageLeft.appendChild(pageLeftAnchor), right.appendChild(pageLeft), 
             this.pagerSize > 0) {
                 var start = this.pageNumber - parseInt(this.pagerSize / 2), length = start + this.pagerSize;
                 this.pageNumber <= this.pagerSize / 2 ? (length = this.pagerSize, start = 0, length > this.NumberOfPages() && (length = this.NumberOfPages())) : this.NumberOfPages() - this.pageNumber <= this.pagerSize / 2 && (length = this.NumberOfPages(), 
@@ -547,20 +547,20 @@
                             dable.GoToPage(j);
                         };
                     }(i), liNode.setAttribute("class", this.pagerButtonsClass), i == this.pageNumber && (liNode.setAttribute("disabled", "disabled"), 
-                    liNode.onclick = function() {}), liNode.appendChild(liNodeAnchor), right.appendChild(liNode);
+                    liNode.onclick = utils.noop), liNode.appendChild(liNodeAnchor), right.appendChild(liNode);
                 }
             }
             var pageRight = li.cloneNode(!1), pageRightAnchor = anchor.cloneNode(!1);
             if (pageRightAnchor.innerHTML = "Next", pageRight.setAttribute("class", this.pagerButtonsClass), 
             pageRight.id = this.id + "_page_next", pageRight.onclick = utils.bind(this.NextPage, this), 
             this.NumberOfPages() - 1 == this.pageNumber && (pageRight.setAttribute("disabled", "disabled"), 
-            pageRight.onclick = function() {}), pageRight.appendChild(pageRightAnchor), right.appendChild(pageRight), 
+            pageRight.onclick = utils.noop), pageRight.appendChild(pageRightAnchor), right.appendChild(pageRight), 
             this.pagerIncludeFirstAndLast) {
                 var pageLast = li.cloneNode(!1), pageLastAnchor = anchor.cloneNode(!1);
                 pageLastAnchor.innerHTML = "Last", pageLast.setAttribute("class", this.pagerButtonsClass), 
                 pageLast.id = this.id + "_page_last", pageLast.onclick = utils.bind(this.LastPage, this), 
                 this.NumberOfPages() - 1 == this.pageNumber && (pageLast.setAttribute("disabled", "disabled"), 
-                pageLast.onclick = function() {}), pageLast.appendChild(pageLastAnchor), right.appendChild(pageLast);
+                pageLast.onclick = utils.noop), pageLast.appendChild(pageLastAnchor), right.appendChild(pageLast);
             }
             return right;
         }, Dable.prototype.FirstPage = function() {
