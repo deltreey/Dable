@@ -1,0 +1,21 @@
+{
+  "name": "dable",
+  "version": "1.2.1",
+  "homepage": "https://github.com/deltreey/Dable",
+  "author": [
+    "deltreey <suicidolt@gmail.com>"
+  ],
+  "description": "Dable (pronounced 'dabble') is a simple javascript table control with filtering, sorting, paging, styles, and more!",
+  "main": "Dable.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/deltreey/Dable.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/danielkrainas/Dable/issues"
+  }
+}
