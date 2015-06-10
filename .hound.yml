@@ -1,0 +1,5 @@
+javascript:
+  ignore_file: .travis.yml
+  ignore_file: LICENSE
+  ignore_file: README.md
+  ignore_file: .gitignore
