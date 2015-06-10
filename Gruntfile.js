@@ -6,7 +6,7 @@ module.exports = function(grunt) {
         
         jshint: {
             all: {
-                src: ['Dable.js'],
+                src: ['index.js', 'lib/*.js'],
                 options: {
                     globalstrict: true,
                     globals: {
