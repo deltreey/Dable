@@ -85,7 +85,7 @@ module.exports = function(grunt) {
                     banner: requireStubs,
                     process: function (src, filePath) {
                         var name = path.basename(filePath, '.js');
-                        if (name === 'factory') {
+                        if (name === 'dable') {
                             return grunt.template.process(mainWrapperTemplate, { data: { src: src }});
                         }
 
@@ -95,8 +95,7 @@ module.exports = function(grunt) {
                 files: {
                     '.build/<%= pkg.name %>.js': [
                         'lib/utils.js',
-                        'lib/dable.js',
-                        'lib/factory.js'
+                        'lib/dable.js'
                     ]
                 }
             }

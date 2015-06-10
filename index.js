@@ -1,1 +1,1 @@
-module.exports = require('./lib/factory');
+module.exports = require('./lib/dable');
