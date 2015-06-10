@@ -35,7 +35,6 @@ module.exports = function(grunt) {
 
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
-        
         jshint: {
             all: {
                 src: ['index.js', 'lib/*.js'],
@@ -108,7 +107,10 @@ module.exports = function(grunt) {
         clean: [
             '.build',
             'dist'
-        ]
+        ],
+        qunit: {
+            all: ['test/test.html']
+        }
     });
 
     if (process.env.NODE_ENV === 'development') {
@@ -116,8 +118,9 @@ module.exports = function(grunt) {
         grunt.loadNpmTasks('grunt-contrib-uglify');
         grunt.loadNpmTasks('grunt-contrib-concat');
         grunt.loadNpmTasks('grunt-contrib-clean');
+        grunt.loadNpmTasks('grunt-contrib-qunit');
 
-        grunt.registerTask('test', ['jshint']);
+        grunt.registerTask('test', ['jshint', 'qunit']);
         grunt.registerTask('default', 'test');
         grunt.registerTask('build', ['test', 'clean', 'concat:build', 'concat:dist', 'uglify:beautify', 'uglify:dist']);
     }

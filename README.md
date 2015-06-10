@@ -2,14 +2,15 @@ Dable
 =====
 
 [![Join the chat at https://gitter.im/deltreey/Dable](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/deltreey/Dable?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Code Climate](https://codeclimate.com/github/deltreey/Dable/badges/gpa.svg)](https://codeclimate.com/github/deltreey/Dable)
+[![Test Coverage](https://codeclimate.com/github/deltreey/Dable/badges/coverage.svg)](https://codeclimate.com/github/deltreey/Dable/coverage)
+[![Travis CI](https://travis-ci.org/deltreey/Dable.svg?branch=master)](https://travis-ci.org/deltreey/Dable)
+[![bitHound Score](https://www.bithound.io/github/deltreey/Dable/badges/score.svg)](https://www.bithound.io/github/deltreey/Dable)
+
 
 Dable (pronounced 'dabble') is a simple javascript table control with filtering, sorting, paging, styles, and more!
 
 Dable is simple and elegant.  It has __zero__ dependencies and works in IE8+.
-
-<a target="_blank" href="https://travis-ci.org/deltreey/Dable">
-	<img src="https://travis-ci.org/deltreey/Dable.svg?branch=master" />
-</a>
 
 Also Found On
 -----
