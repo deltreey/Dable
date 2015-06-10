@@ -6,8 +6,13 @@ module.exports = function(grunt) {
     
     var mainWrapperTemplate = [
     '(function (module) {', '<%= src %>', '})(function (root) {',
+        'var defineAMD = function (m) {',
+            'if (typeof define === \'function\' && define.amd) {',
+                'define([], function () { return m; });',
+            '}',
+        '};',
         'return Object.defineProperty({}, \'exports\', {',
-            'set: function (i) { root[\'' + EXPORT_NAME + '\'] = i; },',
+            'set: function (i) { root[\'' + EXPORT_NAME + '\'] = i; defineAMD(i); },',
             'get: function () { return root[\'' + EXPORT_NAME + '\']; }',
         '});',
     '}(this));\n'].join('\n');
