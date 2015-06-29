@@ -2,6 +2,7 @@ Dable
 =====
 
 [![Join the chat at https://gitter.im/deltreey/Dable](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/deltreey/Dable?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Codacy Badge](https://www.codacy.com/project/badge/2106c1def8564436b6e6aef5980fd668)](https://www.codacy.com/app/suicidolt/Dable)
 [![Code Climate](https://codeclimate.com/github/deltreey/Dable/badges/gpa.svg)](https://codeclimate.com/github/deltreey/Dable)
 [![Test Coverage](https://codeclimate.com/github/deltreey/Dable/badges/coverage.svg)](https://codeclimate.com/github/deltreey/Dable/coverage)
 [![Travis CI](https://travis-ci.org/deltreey/Dable.svg?branch=master)](https://travis-ci.org/deltreey/Dable)
