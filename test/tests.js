@@ -596,10 +596,10 @@ test( 'Dable with style="bootstrap" has basic elements and slightly different st
 			// different from default
 	equal(footer.children[1].children[0].className, "btn btn-default table-page");
 	equal(footer.children[1].children[1].className, "btn btn-default table-page");
-	equal(table.children[0].children[0].children[0].children[1].className, "table-sort glyphicon glyphicon-chevron-up");
-	equal(table.children[0].children[0].children[1].children[1].className, "table-sort glyphicon glyphicon-chevron-up");
-	equal(table.children[0].children[0].children[2].children[1].className, "table-sort glyphicon glyphicon-chevron-up");
-	equal(table.children[0].children[0].children[3].children[1].className, "table-sort glyphicon glyphicon-chevron-up");
+	equal(table.children[0].children[0].children[0].children[1].className, "table-sort");
+	equal(table.children[0].children[0].children[1].children[1].className, "table-sort");
+	equal(table.children[0].children[0].children[2].children[1].className, "table-sort");
+	equal(table.children[0].children[0].children[3].children[1].className, "table-sort");
 			// /different
 	equal(table.children[1].children[0].className, "table-row-even");
 	equal(table.children[1].children[1].className, "table-row-odd");

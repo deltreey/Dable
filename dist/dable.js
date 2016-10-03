@@ -54,9 +54,11 @@
             asyncStart: 0,
             asyncLength: 1e3,
             tfoothtml: "",
+            //Basic Styling
             style: "none",
             evenRowColor: "#E2E4FF",
             oddRowColor: "white",
+            //Classes
             dableClass: "",
             headerClass: "",
             tableClass: "",
@@ -75,6 +77,7 @@
         }, Dable.prototype.GetPageForRow = function(row) {
             return Math.ceil(row / this.pageSize);
         }, Dable.prototype.asyncRequest = function(start, filter, sortColumn, ascending, callback) {
+            //callback if async
             var dable = this;
             "undefined" == typeof callback && (callback = !1);
             var dableRequest = new XMLHttpRequest();
@@ -84,21 +87,26 @@
                     void 0 === data.rows && (actualData = JSON.parse(data.d));
                     var actualRows = actualData.rows;
                     if (void 0 === actualRows) {
-                        if (console.error("Error, no rows in data from source"), callback) return callback("Error, no rows in data from source");
+                        if (//need rows in return data
+                        console.error("Error, no rows in data from source"), callback) return callback("Error, no rows in data from source");
                         return;
                     }
                     if (void 0 === actualData.includedRowCount) {
-                        if (console.error("Error, no includedRowCount in data from source"), callback) return callback("Error, no includedRowCount in data from source");
+                        if (//need filtered row count in data
+                        console.error("Error, no includedRowCount in data from source"), callback) return callback("Error, no includedRowCount in data from source");
                         return;
                     }
                     if (void 0 === actualData.rowCount) {
-                        if (console.error("Error, no rowCount in data from source"), callback) return callback("Error, no rowCount in data from source");
+                        if (//need filtered row count in data
+                        console.error("Error, no rowCount in data from source"), callback) return callback("Error, no rowCount in data from source");
                         return;
                     }
+                    //create empty rows for the rest of the set
                     actualRows.reverse();
-                    for (var i = 0; start > i; ++i) actualRows.push([]);
+                    for (var i = 0; i < start; ++i) actualRows.push([]);
                     actualRows.reverse();
                     for (var i = start + dable.asyncLength; i < actualData.includedRowCount; ++i) actualRows.push([]);
+                    //update
                     dable.SetDataAsRows(actualRows), this.RowCount = function() {
                         return actualData.rowCount;
                     }, this.VisibleRowCount = function() {
@@ -147,12 +155,13 @@
             }
         }, Dable.prototype.sortFunc = function(event) {
             var tag = this.tagName;
+            //prevent sorting from some form elements
             if ("INPUT" != tag && "BUTTON" != tag && "SELECT" != tag && "TEXTAREA" != tag) {
                 for (var columnCell = this, sortSpan = columnCell.querySelector("." + this.sortClass), columnTag = columnCell.getAttribute("data-tag"), columnIndex = -1, i = 0; i < this.columnData.length; ++i) if (this.columnData[i].Tag.toLowerCase() == columnTag.toLowerCase()) {
                     columnIndex = i;
                     break;
                 }
-                if (-1 == columnIndex) return !1;
+                if (columnIndex == -1) return !1;
                 this.sortColumn = columnIndex;
                 var ascend = !1;
                 this.sortOrder.length > 3 && "desc" == this.sortOrder.substr(0, 4).toLowerCase() && (ascend = !0), 
@@ -169,11 +178,15 @@
             }
         }, Dable.prototype.baseSort = function(columnIndex, ascending, currentRowObjects) {
             for (var isInt = !0, isDate = !0, newRowObjects = currentRowObjects.slice(0), i = 0; i < currentRowObjects.length; ++i) {
+                //simple 2/21/2010 style dates parse cleanly to int, so we can drop out
+                //if this won't parse
                 "nan" == parseInt(currentRowObjects[i].Row[columnIndex]).toString().toLowerCase() && (isInt = !1);
+                //check for dates
                 var dateString = currentRowObjects[i].Row[columnIndex].toString(), splitDate = dateString.split("/");
                 (3 != splitDate.length || splitDate[0].length < 1 || splitDate[0].length > 2 || splitDate[1].length < 1 || splitDate[1].length > 2 || 2 != splitDate[2].length && 4 != splitDate[2].length) && (isDate = !1);
             }
             return newRowObjects = isDate ? newRowObjects.sort(function(a, b) {
+                //default to US Date schema
                 var splitDateA = a.Row[columnIndex].split("/"), yearA = splitDateA[2].toString(), monthA = splitDateA[0].toString(), dayA = splitDateA[1].toString();
                 2 == yearA.length && (yearA = "20" + yearA), 1 == monthA.length && (monthA = "0" + monthA), 
                 1 == dayA.length && (dayA = "0" + dayA);
@@ -187,7 +200,8 @@
             }) : newRowObjects.sort(function(a, b) {
                 return a.Row[columnIndex] > b.Row[columnIndex] ? 1 : a.Row[columnIndex] < b.Row[columnIndex] ? -1 : 0;
             }), ascending || (newRowObjects = newRowObjects.reverse()), newRowObjects;
-        }, Dable.prototype.filters = [ function(searchText, value) {
+        }, Dable.prototype.filters = [ //PHRASES FILTER
+        function(searchText, value) {
             searchText = searchText.toString().toLowerCase(), value = value.toString().toLowerCase();
             for (var match, phrases = [], regex = /\s*".*?"\s*/g; match = regex.exec(searchText); ) {
                 var phrase = match[0].replace(/"/g, "").trim();
@@ -195,11 +209,12 @@
             }
             for (var i = 0; i < phrases.length; ++i) if (value.indexOf(phrases[i]) > -1) return !0;
             return !1;
-        }, function(searchText, value) {
+        }, //WORDS FILTER, IGNORING PHRASES
+        function(searchText, value) {
             searchText = searchText.toString().toLowerCase(), value = value.toString().toLowerCase();
             for (var match, regex = /\s*".*?"\s*/g; match = regex.exec(searchText); ) searchText = searchText.replace(match[0], " ");
-            for (var splitText = searchText.split(" "), i = 0; i < splitText.length; ++i) splitText[i] || (splitText.splice(i, 1), 
-            --i);
+            for (var splitText = searchText.split(" "), i = 0; i < splitText.length; ++i) splitText[i] || (//clear out empty strings
+            splitText.splice(i, 1), --i);
             for (var i = 0; i < splitText.length; ++i) if (value.indexOf(splitText[i]) > -1) return !0;
             return !1;
         } ], Dable.prototype.SetColumnNames = function(columnNames) {
@@ -242,7 +257,7 @@
                 for (var j = 0; j < columns[i].length; ++j) tableRows[j][i] = columns[i][j];
             }
             this.columns = columns, this.rows = tableRows, this.rowObjects = this.CreateObjectsFromRows(tableRows), 
-            this.visibleRows = rows.slice(0), this.visibleRowObjects = this.rowObjects.slice(0);
+            this.visibleRows = this.rows.slice(0), this.visibleRowObjects = this.rowObjects.slice(0);
         }, Dable.prototype.SetDataAsRows = function(rows) {
             if (!rows) return !1;
             for (var tableColumns = [], i = 0; i < rows.length; ++i) {
@@ -255,10 +270,13 @@
             if (!body && (body = document.getElementById(this.id + "_body"), !body)) return !1;
             for (var tempBody = body.cloneNode(!1); tempBody.firstChild; ) tempBody.removeChild(tempBody.firstChild);
             var row = document.createElement("tr"), cell = document.createElement("td"), pageDisplay = this.pageNumber * this.pageSize;
-            this.VisibleRowCount() <= pageDisplay && (this.pageNumber = 0, pageDisplay = 0);
+            this.VisibleRowCount() <= pageDisplay && (//if this is too big, go back to page 1
+            this.pageNumber = 0, pageDisplay = 0);
+            //get the display end id
             var length = pageDisplay + this.pageSize;
-            pageDisplay + this.pageSize >= this.VisibleRowCount() && (length = this.VisibleRowCount());
-            for (var i = pageDisplay; length > i; ++i) {
+            pageDisplay + this.pageSize >= this.VisibleRowCount() && (//if this is too big, only show remaining rows
+            length = this.VisibleRowCount());
+            for (var i = pageDisplay; i < length; ++i) {
                 var tempRow = row.cloneNode(!1);
                 i % 2 == 0 ? tempRow.setAttribute("class", this.evenRowClass) : tempRow.setAttribute("class", this.oddRowClass);
                 for (var j = 0; j < this.visibleRows[i].length; ++j) {
@@ -282,9 +300,13 @@
             return footer.replaceChild(this.BuildPager(), right), footer;
         }, Dable.prototype.UpdateStyle = function(tableDiv, style) {
             if (!tableDiv && (tableDiv = document.getElementById(this.id), !tableDiv)) return !1;
-            if (style || (style = this.style), this.style = style, this.RemoveStyles(tableDiv), 
-            "clear" != style.toLowerCase()) {
-                if (this.ApplyBaseStyles(tableDiv), "none" == style.toLowerCase()) return !0;
+            //clear is a style option to completely avoid any styling so you can
+            //roll your own
+            if (style || (style = this.style), this.style = style, //initial style cleanup
+            this.RemoveStyles(tableDiv), "clear" != style.toLowerCase()) {
+                if (//base styles for 'none', the other styles sometimes build on these
+                //so we apply them beforehand
+                this.ApplyBaseStyles(tableDiv), "none" == style.toLowerCase()) return !0;
                 "jqueryui" == style.toLowerCase() ? this.ApplyJqueryUIStyles(tableDiv) : "bootstrap" == style.toLowerCase() && this.ApplyBootstrapStyles(tableDiv);
             }
         }, Dable.prototype.RemoveStyles = function(tableDiv) {
@@ -301,9 +323,9 @@
             tbody.removeAttribute("class");
             for (var footer = children[2], footerChildren = footer.children, leftChildren = footerChildren[0].children, i = 0; i < leftChildren.length; ++i) leftChildren[i].removeAttribute("class");
             var right = footer.querySelector("#" + this.id + "_page_prev").parentElement;
-            footer.replaceChild(this.BuildPager(), right), tableDiv.removeAttribute("style"), 
-            RemoveStyle(children[0]), children[1].removeAttribute("style"), RemoveStyle(children[2]), 
-            RemoveStyle(thead), RemoveStyle(tbody);
+            footer.replaceChild(this.BuildPager(), right), //basically, don't remove style from tfoot, in case user added it
+            tableDiv.removeAttribute("style"), RemoveStyle(children[0]), children[1].removeAttribute("style"), 
+            RemoveStyle(children[2]), RemoveStyle(thead), RemoveStyle(tbody);
         }, Dable.prototype.ApplyBaseStyles = function(tableDiv) {
             this.dableClass && tableDiv.setAttribute("class", this.dableClass);
             var table = tableDiv.querySelector("table");
@@ -383,10 +405,11 @@
             table.setAttribute("class", "table table-bordered table-striped"), table.setAttribute("style", "width: 100%; margin-bottom: 0;"), 
             header.setAttribute("class", "panel-heading"), footer.setAttribute("class", "panel-footer"), 
             tableDiv.setAttribute("class", "panel panel-info"), tableDiv.setAttribute("style", "margin-bottom: 0;");
-            for (var tableRows = table.querySelectorAll("tbody tr"), i = 0; i < tableRows.length; ++i) tableRows[i].removeAttribute("style");
+            for (var tableRows = table.querySelectorAll("tbody tr"), i = 0; i < tableRows.length; ++i) //remove manual striping
+            tableRows[i].removeAttribute("style");
             for (var headCells = table.querySelectorAll("th"), i = 0; i < headCells.length; ++i) {
                 var sort = headCells[i].querySelector("." + this.sortClass);
-                sort && (console.info(sort.innerText), 9660 == sort.innerText.charCodeAt(0) ? sort.setAttribute("class", this.sortClass + " glyphicon glyphicon-chevron-down") : 9650 == sort.innerText.charCodeAt(0) && sort.setAttribute("class", this.sortClass + " glyphicon glyphicon-chevron-up"), 
+                sort && (9660 == sort.innerText.charCodeAt(0) ? sort.setAttribute("class", this.sortClass + " glyphicon glyphicon-chevron-down") : 9650 == sort.innerText.charCodeAt(0) && sort.setAttribute("class", this.sortClass + " glyphicon glyphicon-chevron-up"), 
                 sort.innerHTML = "");
             }
             for (var pageClass = "btn btn-default " + this.pagerButtonsClass, pageLeft = footer.querySelector("#" + this.id + "_page_prev"), pageRight = footer.querySelector("#" + this.id + "_page_next"), pageParent = pageLeft.parentElement, pagerItems = footer.querySelectorAll("li"), i = 0; i < pagerItems.length; ++i) RemoveStyle(pagerItems[i]);
@@ -407,9 +430,11 @@
             }
             for (var pageButtons = footer.querySelectorAll("." + this.pagerButtonsClass), i = 0; i < pageButtons.length; ++i) pageButtons[i].setAttribute("class", pageClass);
         }, Dable.prototype.CheckForTable = function(input) {
+            //Check for existing table
             if (input) {
                 input.nodeType && "div" == input.nodeName.toLowerCase() ? input.hasAttribute("id") ? this.id = input.getAttribute("id") : (this.id = "Dable1", 
-                input.setAttribute("id", "Dable1")) : window.jQuery && input instanceof jQuery && input[0].nodeType ? input[0].hasAttribute("id") ? this.id = input[0].getAttribute("id") : (this.id = "Dable1", 
+                input.setAttribute("id", "Dable1")) : window.jQuery && input instanceof jQuery && input[0].nodeType ? //jquery object
+                input[0].hasAttribute("id") ? this.id = input[0].getAttribute("id") : (this.id = "Dable1", 
                 input[0].setAttribute("id", "Dable1")) : this.id = input.toString();
                 var tableDiv = document.getElementById(this.id);
                 if (tableDiv && this.rows && this.rows.length < 1) {
@@ -417,6 +442,7 @@
                     if (table) {
                         tableDiv.hasAttribute("class") && (this.dableClass = tableDiv.getAttribute("class"));
                         var newTable = this.GenerateTableFromHtml(table);
+                        //Make it a Dable!
                         return newTable;
                     }
                 }
@@ -431,7 +457,8 @@
             if (!thead) return console.log("Dable Error: No thead element in table"), !1;
             var headers = thead.querySelectorAll("tr th"), tfoot = tableNode.querySelector("tfoot");
             tfoot && (this.tfoothtml = tfoot.innerHTML);
-            for (var colNames = [], i = 0; i < headers.length; ++i) colNames.push(headers[i].innerHTML);
+            for (var colNames = [], i = 0; i < headers.length; ++i) //add our column names
+            colNames.push(headers[i].innerHTML);
             this.SetColumnNames(colNames);
             var rowsHtml = tableNode.querySelectorAll("tbody tr"), allRows = [];
             rowsHtml.length > 1 && rowsHtml[0].hasAttribute("class") && rowsHtml[1].hasAttribute("class") && (this.evenRowClass = rowsHtml[0].getAttribute("class"), 
@@ -537,9 +564,10 @@
             pageLeft.onclick = utils.noop), pageLeft.appendChild(pageLeftAnchor), right.appendChild(pageLeft), 
             this.pagerSize > 0) {
                 var start = this.pageNumber - parseInt(this.pagerSize / 2), length = start + this.pagerSize;
-                this.pageNumber <= this.pagerSize / 2 ? (length = this.pagerSize, start = 0, length > this.NumberOfPages() && (length = this.NumberOfPages())) : this.NumberOfPages() - this.pageNumber <= this.pagerSize / 2 && (length = this.NumberOfPages(), 
-                start = this.NumberOfPages() - this.pagerSize);
-                for (var i = start; length > i; ++i) {
+                this.pageNumber <= this.pagerSize / 2 ? (// display from beginning
+                length = this.pagerSize, start = 0, length > this.NumberOfPages() && (length = this.NumberOfPages())) : this.NumberOfPages() - this.pageNumber <= this.pagerSize / 2 && (//display the last five pages
+                length = this.NumberOfPages(), start = this.NumberOfPages() - this.pagerSize);
+                for (var i = start; i < length; ++i) {
                     var liNode = li.cloneNode(!1), liNodeAnchor = anchor.cloneNode(!1);
                     liNodeAnchor.innerHTML = (i + 1).toString();
                     liNode.onclick = function(j) {
@@ -579,8 +607,10 @@
         }, Dable.prototype.NextPage = function() {
             this.pageNumber += 1, this.GoToPage(this.pageNumber);
         }, Dable.prototype.LastPage = function() {
+            //page number is 0 based
             if (this.pageNumber = this.NumberOfPages() - 1, this.async && (this.asyncStart > this.pageNumber * this.pageSize || this.pageNumber * this.pageSize > this.asyncStart + this.asyncLength)) {
                 var newStart = 0, pages = 1e3 / this.pageSize - 1;
+                //-1 for the page number and -1 to include current page
                 this.pageNumber - pages > -1 && (newStart = (this.pageNumber - pages) * this.pageSize);
                 var ascending = !0;
                 this.sortOrder.length > 3 && "desc" == this.sortOrder.substr(0, 4).toLowerCase() && (ascending = !1), 

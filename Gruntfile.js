@@ -39,7 +39,16 @@ module.exports = function(grunt) {
             all: {
                 src: ['index.js', 'lib/*.js'],
                 options: {
-                    globalstrict: true,
+                    strict: "implied",
+                    shadow: true,
+                    "-W041": false,
+                    laxbreak: true,
+                    sub: true,
+                    loopfunc: true,
+                    browser: true,
+                    boss: true,
+                    jquery: true,
+                    devel: true,
                     globals: {
                         require: false,
                         exports: false,
