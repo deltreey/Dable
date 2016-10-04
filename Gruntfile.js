@@ -41,7 +41,6 @@ module.exports = function(grunt) {
                 options: {
                     strict: "implied",
                     shadow: true,
-                    laxbreak: true,
                     sub: true,
                     loopfunc: true,
                     browser: true,
