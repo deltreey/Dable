@@ -747,6 +747,26 @@ test( 'With no thead the dable is not created', function() {
 	equal(dable.Exists(), false);
 });
 
+module("Dable from nested HTML Tests");
+test( 'basic Dable from nested HTML looks right', function() {
+	//Given: a table
+	var innerDiv = makeNestedTable(testDiv);
+
+	//When: we make it a dable
+	var dable = new Dable(innerDiv);
+
+	//Then: we see the elements we expect
+		//Element pattern
+	equal(innerDiv.children.length, 3);
+	var table = innerDiv.querySelector('table');
+	var footer = innerDiv.children[2];
+	equal(footer.children[0].children[0].innerHTML, "Showing 1 to 10 of 20 entries");
+	equal(table.children[1].children[0].children[0].innerHTML, 0);
+	equal(table.children[1].children[0].children[1].innerHTML, 1);
+	equal(table.children[1].children[0].children[2].innerHTML, 2);
+	equal(table.children[1].children[0].children[3].innerHTML, 3);
+});
+
 function MakeSimpleTable(div) {
 	var table =  document.createElement("table");
 	var tbody = document.createElement("tbody");
@@ -775,4 +795,19 @@ function MakeSimpleTable(div) {
 	}
 	table.appendChild(tbody);
 	div.appendChild(table);
+}
+
+function makeNestedTable(div) {
+	var table = document.createElement("table");
+	var tbody = document.createElement("tbody");
+	var row = document.createElement("tr");
+	var cell = document.createElement("td");
+	var innerDiv = document.createElement('DIV');
+	div.appendChild(table);
+	table.appendChild(tbody);
+	tbody.appendChild(row);
+	row.appendChild(cell);
+	cell.appendChild(innerDiv);
+	MakeSimpleTable(innerDiv);
+	return innerDiv;
 }
