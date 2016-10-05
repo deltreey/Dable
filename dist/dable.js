@@ -21,6 +21,10 @@
                 var args = Array.prototype.slice.call(arguments, 0);
                 return fn.apply(thisArg, args);
             };
+        }, exports.doSort = function(dable) {
+            return function() {
+                dable.sortFunc(this);
+            };
         }, exports.noop = function() {};
     }), function(module) {
         function RemoveStyle(node) {
@@ -111,12 +115,12 @@
                         return actualData.rowCount;
                     }, this.VisibleRowCount = function() {
                         return actualData.includedRowCount;
-                    }, 0 != callback && callback && callback.call && callback.apply && callback();
+                    }, callback !== !1 && callback && callback.call && callback.apply && callback();
                 }
-            }, dableRequest.open("POST", this.async, 0 != callback), dableRequest.setRequestHeader("content-type", "application/json");
+            }, dableRequest.open("POST", this.async, callback !== !1), dableRequest.setRequestHeader("content-type", "application/json");
             var requestObject = JSON.parse(JSON.stringify(this.asyncData));
             requestObject.start = start, this.asyncStart = start, requestObject.count = this.asyncLength, 
-            requestObject.filter = filter, requestObject.sortColumn = null == sortColumn ? -1 : sortColumn, 
+            requestObject.filter = filter, requestObject.sortColumn = null === sortColumn ? -1 : sortColumn, 
             requestObject.ascending = ascending, dableRequest.send(JSON.stringify(requestObject));
         }, Dable.prototype.asyncReload = function(callback) {
             callback || (callback = utils.bind(function(error) {
@@ -153,11 +157,11 @@
                 var body = document.getElementById(this.id + "_body");
                 this.UpdateDisplayedRows(body), this.UpdateStyle(document.getElementById(this.id));
             }
-        }, Dable.prototype.sortFunc = function(event) {
-            var tag = this.tagName;
+        }, Dable.prototype.sortFunc = function(columnCell) {
+            var tag = columnCell.tagName;
             //prevent sorting from some form elements
             if ("INPUT" != tag && "BUTTON" != tag && "SELECT" != tag && "TEXTAREA" != tag) {
-                for (var columnCell = this, sortSpan = columnCell.querySelector("." + this.sortClass), columnTag = columnCell.getAttribute("data-tag"), columnIndex = -1, i = 0; i < this.columnData.length; ++i) if (this.columnData[i].Tag.toLowerCase() == columnTag.toLowerCase()) {
+                for (var sortSpan = columnCell.querySelector("." + this.sortClass), columnTag = columnCell.getAttribute("data-tag"), columnIndex = -1, i = 0; i < this.columnData.length; ++i) if (this.columnData[i].Tag.toLowerCase() == columnTag.toLowerCase()) {
                     columnIndex = i;
                     break;
                 }
@@ -278,10 +282,10 @@
             length = this.VisibleRowCount());
             for (var i = pageDisplay; i < length; ++i) {
                 var tempRow = row.cloneNode(!1);
-                i % 2 == 0 ? tempRow.setAttribute("class", this.evenRowClass) : tempRow.setAttribute("class", this.oddRowClass);
+                i % 2 === 0 ? tempRow.setAttribute("class", this.evenRowClass) : tempRow.setAttribute("class", this.oddRowClass);
                 for (var j = 0; j < this.visibleRows[i].length; ++j) {
                     var tempCell = cell.cloneNode(!1), text = this.visibleRows[i][j];
-                    null != this.columnData[j].CustomRendering && (text = this.columnData[j].CustomRendering(text, this.visibleRowObjects[i].RowNumber)), 
+                    null !== this.columnData[j].CustomRendering && (text = this.columnData[j].CustomRendering(text, this.visibleRowObjects[i].RowNumber)), 
                     tempCell.innerHTML = text, tempRow.appendChild(tempCell);
                 }
                 tempBody.appendChild(tempRow);
@@ -294,7 +298,7 @@
             var start = this.pageNumber * this.pageSize + 1, end = start + this.pageSize - 1;
             end > this.VisibleRowCount() && (end = this.VisibleRowCount());
             var showing = footer.querySelector("#" + this.id + "_showing");
-            showing && (0 == this.RowCount() ? showing.innerHTML = "There are no entries" : 0 == this.VisibleRowCount() ? showing.innerHTML = "Showing 0 entries" : showing.innerHTML = "Showing " + start + " to " + end + " of " + this.VisibleRowCount() + " entries", 
+            showing && (0 === this.RowCount() ? showing.innerHTML = "There are no entries" : 0 === this.VisibleRowCount() ? showing.innerHTML = "Showing 0 entries" : showing.innerHTML = "Showing " + start + " to " + end + " of " + this.VisibleRowCount() + " entries", 
             this.VisibleRowCount() != this.RowCount() && (showing.innerHTML += " (filtered from " + this.RowCount() + " total entries)"));
             var right = footer.querySelector("#" + this.id + "_page_prev").parentElement;
             return footer.replaceChild(this.BuildPager(), right), footer;
@@ -460,7 +464,7 @@
             for (var colNames = [], i = 0; i < headers.length; ++i) //add our column names
             colNames.push(headers[i].innerHTML);
             this.SetColumnNames(colNames);
-            var rowsHtml = tableNode.querySelectorAll("tbody tr"), allRows = [];
+            var rowsHtml = tableNode.querySelector("tbody").rows, allRows = [];
             rowsHtml.length > 1 && rowsHtml[0].hasAttribute("class") && rowsHtml[1].hasAttribute("class") && (this.evenRowClass = rowsHtml[0].getAttribute("class"), 
             this.oddRowClass = rowsHtml[1].getAttribute("class"));
             for (var i = 0; i < rowsHtml.length; ++i) {
@@ -529,7 +533,7 @@
                 this.columnData[i].CustomSortFunc !== !1) {
                     var sortSpan = span.cloneNode(!1);
                     sortSpan.setAttribute("class", this.sortClass), sortSpan.innerHTML = "v", tempCell.appendChild(sortSpan), 
-                    tempCell.onclick = this.sortFunc;
+                    tempCell.onclick = utils.doSort(this);
                 }
                 var clear = span.cloneNode(!1);
                 tempCell.appendChild(clear), tempCell.setAttribute("data-tag", this.columnData[i].Tag), 

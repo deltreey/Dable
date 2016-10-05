@@ -1,3 +1,5 @@
+/* jshint -W041 */
+
 var testDiv = document.getElementById("qunit-fixture");
 
 module( "Baseline Tests" );
@@ -146,8 +148,8 @@ test( 'Dable with style="none" has basic elements', function() {
 	equal(header.children[0].children[1].children[2].children.length, 0);
 	equal(header.children[0].children[1].children[3].children.length, 0);
 	equal(header.children[1].children.length, 2);
-	equal(header.children[1].children[0].children.length, 0)
-	equal(header.children[1].children[1].children.length, 0)
+	equal(header.children[1].children[0].children.length, 0);
+	equal(header.children[1].children[1].children.length, 0);
 	equal(header.children[2].children.length, 0);
 	equal(footer.children.length, 3);
 	equal(footer.children[0].children.length, 1);
@@ -308,8 +310,8 @@ test( 'Dable with style="clear" has basic elements but no style', function() {
 	equal(header.children[0].children[1].children[2].children.length, 0);
 	equal(header.children[0].children[1].children[3].children.length, 0);
 	equal(header.children[1].children.length, 2);
-	equal(header.children[1].children[0].children.length, 0)
-	equal(header.children[1].children[1].children.length, 0)
+	equal(header.children[1].children[0].children.length, 0);
+	equal(header.children[1].children[1].children.length, 0);
 	equal(header.children[2].children.length, 0);
 	equal(footer.children.length, 3);
 	equal(footer.children[0].children.length, 1);
@@ -470,8 +472,8 @@ test( 'Dable with style="bootstrap" has basic elements and slightly different st
 	equal(header.children[0].children[1].children[2].children.length, 0);
 	equal(header.children[0].children[1].children[3].children.length, 0);
 	equal(header.children[1].children.length, 2);
-	equal(header.children[1].children[0].children.length, 0)
-	equal(header.children[1].children[1].children.length, 0)
+	equal(header.children[1].children[0].children.length, 0);
+	equal(header.children[1].children[1].children.length, 0);
 	equal(header.children[2].children.length, 0);
 	equal(footer.children.length, 3);
 	equal(footer.children[0].children.length, 1);
@@ -622,7 +624,7 @@ test( 'Creating an Dable from Data', function() {
 	sinon.spy(dable, "UpdateDisplayedRows");
 	sinon.spy(dable, "UpdateStyle");
 	var data = [ [ 1, 2 ], [ 3, 4 ] ];
-	var columns = [ 'Odd', 'Even' ]
+	var columns = [ 'Odd', 'Even' ];
 	dable.SetDataAsRows(data);
 	dable.SetColumnNames(columns);
 	
@@ -767,6 +769,25 @@ test( 'basic Dable from nested HTML looks right', function() {
 	equal(table.children[1].children[0].children[3].innerHTML, 3);
 });
 
+module("Event Tests");
+test( 'basic Dable ascending sort', function() {
+
+	//Given: a table
+	MakeSimpleTable(testDiv);
+
+	//When: we make it a dable and click on a header
+	var dable = new Dable(testDiv);
+	var table = testDiv.querySelector('table');
+	table.children[0].children[0].children[0].children[0].click();
+
+	//Then: we see the elements we expect
+	equal(table.children[0].children[0].children[0].children[0].innerHTML, "Column 0 ");
+	equal(table.children[0].children[0].children[0].children[1].innerText.charCodeAt(0), 9650);
+	// expect(0);
+
+
+});
+
 function MakeSimpleTable(div) {
 	var table =  document.createElement("table");
 	var tbody = document.createElement("tbody");
@@ -774,20 +795,21 @@ function MakeSimpleTable(div) {
 	var row = document.createElement("tr");
 	var cell = document.createElement("td");
 	var headCell = document.createElement("th");
-	
+
+	var currentCell;
 	var headRow = row.cloneNode(false);
 	for (var i = 0; i < 4; ++i) {
-		var currentCell = headCell.cloneNode(false);
+		currentCell = headCell.cloneNode(false);
 		currentCell.innerHTML = "Column " + i.toString();
 		headRow.appendChild(currentCell);
 	}
 	thead.appendChild(headRow);
 	table.appendChild(thead);
-	
-	for (var i = 0; i < 20; ++i) {
+
+	for (i = 0; i < 20; ++i) {
 		var currentRow = row.cloneNode(false);
 		for (var j = 0; j < 4; ++j) {
-			var currentCell = cell.cloneNode(false);
+			currentCell = cell.cloneNode(false);
 			currentCell.innerHTML = (i + j).toString();
 			currentRow.appendChild(currentCell);
 		}
