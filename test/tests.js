@@ -150,7 +150,6 @@ test( "Dable Pager goes forward", function() {
 	equal( dable.pageNumber, 1 );
 	equal( firstCell.innerHTML, "10" );
 });
-
 test( "Dable Pager goes backward", function() {
 	//Given: a table made into a Dable with more than 1 page and go to page 2
 	MakeSimpleTable(testDiv);
@@ -338,7 +337,6 @@ test( 'Dable with style="none" has basic elements', function() {
 		//State
 	equal(footer.children[1].children[0].getAttribute("disabled"), "disabled");
 });
-
 test( 'Dable with style="clear" has basic elements but no style', function() {
 	//Given: a table
 	document.body.appendChild(testDiv);
@@ -508,7 +506,6 @@ test( 'Dable with style="clear" has basic elements but no style', function() {
 		//State
 	equal(footer.children[1].children[0].getAttribute("disabled"), "disabled");
 });
-
 test( 'Dable with style="bootstrap" has basic elements and slightly different styling and classes', function() {
 	//Given: a table
 	document.body.appendChild(testDiv);
@@ -709,7 +706,6 @@ test( 'Creating an Dable from Data', function() {
 	equal(dable.UpdateDisplayedRows.callCount, 1);
 	equal(dable.UpdateStyle.callCount, 1);
 });
-
 test( 'Creating a Dable from a table', function() {
 	//Given: a spy on UpdateDisplayedRows, an empty dable, and a table full of data
 	var dable = new Dable();
@@ -724,7 +720,6 @@ test( 'Creating a Dable from a table', function() {
 	equal(dable.UpdateDisplayedRows.callCount, 1);
 	equal(dable.UpdateStyle.callCount, 1);
 });
-
 test( "Calling UpdateStyle", function() {
 	//Given: a spy on UpdateDisplayedRows, and a dable built from a table
 	var dable = new Dable();
@@ -738,7 +733,6 @@ test( "Calling UpdateStyle", function() {
 	//Then: the mock is never called
 	equal(dable.UpdateDisplayedRows.callCount, 0);
 });
-
 test( "Calling UpdateDisplayedRows", function() {
 	//Given: a spy on UpdateStyle, and a dable built from a table
 	var dable = new Dable();
@@ -855,10 +849,40 @@ test( 'basic Dable ascending sort', function() {
 	table.children[0].children[0].children[0].children[0].click();
 
 	//Then: we see the elements we expect
-	equal(table.children[0].children[0].children[0].children[0].innerHTML, "Column 0 ");
 	equal(table.children[0].children[0].children[0].children[1].innerText.charCodeAt(0), 9650);
-	// expect(0);
+	equal(table.children[1].children[0].children[0].innerText, '0');
 
+});
+test( 'basic Dable decending sort', function() {
+
+	//Given: a table
+	MakeSimpleTable(testDiv);
+
+	//When: we make it a dable and click on a header
+	var dable = new Dable(testDiv);
+	var table = testDiv.querySelector('table');
+	table.children[0].children[0].children[0].children[0].click();
+	table.children[0].children[0].children[0].children[0].click();
+
+	//Then: we see the elements we expect
+	equal(table.children[0].children[0].children[0].children[1].innerText.charCodeAt(0), 9660);
+	equal(table.children[1].children[0].children[0].innerText, '19');
+
+});
+test( 'basic Dable search filter', function() {
+
+	//Given: a table
+	MakeSimpleTable(testDiv);
+
+	//When: we make it a dable and click on a header
+	var dable = new Dable(testDiv);
+	var table = testDiv.querySelector('table');
+	var search = testDiv.children[0].children[1].children[1];
+	search.value = '11';
+	triggerEvent(search, 'keyup');
+
+	//Then: we see the elements we expect
+	equal(table.children[1].children[0].children[0].innerText, '8');
 
 });
 
@@ -917,3 +941,17 @@ function rgb2hex(rgb) {
 	return '#' + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]); 
 }
 
+function triggerEvent(el, type){
+	var e;
+	if ('createEvent' in document) {
+		// modern browsers, IE9+
+		e = document.createEvent('HTMLEvents');
+		e.initEvent(type, false, true);
+		el.dispatchEvent(e);
+	} else {
+		// IE 8
+		e = document.createEventObject();
+		e.eventType = type;
+		el.fireEvent('on' + e.eventType, e);
+	}
+}

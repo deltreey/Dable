@@ -25,6 +25,10 @@
             return function() {
                 dable.sortFunc(this);
             };
+        }, exports.doSearch = function(dable) {
+            return function() {
+                dable.searchFunc(this);
+            };
         }, exports.noop = function() {};
     }), function(module) {
         function RemoveStyle(node) {
@@ -130,8 +134,7 @@
             var ascending = !0;
             this.sortOrder.length > 3 && "desc" == this.sortOrder.substr(0, 4).toLowerCase() && (ascending = !1), 
             this.asyncRequest(this.asyncStart, this.currentFilter, this.sortColumn, ascending, callback);
-        }, Dable.prototype.searchFunc = function(event) {
-            var searchBox = this;
+        }, Dable.prototype.searchFunc = function(searchBox) {
             if (searchBox.id != this.id + "_search") return !1;
             if (!searchBox.value || searchBox.value.length < this.minimumSearchLength) this.currentFilter = ""; else {
                 var searchText = searchBox.value;
@@ -520,7 +523,7 @@
             var right = div.cloneNode(!1), search = span.cloneNode(!1);
             search.innerHTML = "Search ", right.appendChild(search);
             var inputSearch = input.cloneNode(!1);
-            inputSearch.setAttribute("id", this.id + "_search"), inputSearch.onkeyup = this.searchFunc, 
+            inputSearch.setAttribute("id", this.id + "_search"), inputSearch.onkeyup = utils.doSearch(this), 
             right.appendChild(inputSearch);
             var clear = div.cloneNode(!1), head = div.cloneNode(!1);
             return head.id = this.id + "_header", head.appendChild(left), head.appendChild(right), 
