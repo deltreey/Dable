@@ -1,5 +1,47 @@
 /* jshint -W041 */
 
+// From https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys
+if (!Object.keys) {
+  Object.keys = (function() {
+    'use strict';
+    var hasOwnProperty = Object.prototype.hasOwnProperty,
+        hasDontEnumBug = !({ toString: null }).propertyIsEnumerable('toString'),
+        dontEnums = [
+          'toString',
+          'toLocaleString',
+          'valueOf',
+          'hasOwnProperty',
+          'isPrototypeOf',
+          'propertyIsEnumerable',
+          'constructor'
+        ],
+        dontEnumsLength = dontEnums.length;
+
+    return function(obj) {
+      if (typeof obj !== 'object' && (typeof obj !== 'function' || obj === null)) {
+        throw new TypeError('Object.keys called on non-object');
+      }
+
+      var result = [], prop, i;
+
+      for (prop in obj) {
+        if (hasOwnProperty.call(obj, prop)) {
+          result.push(prop);
+        }
+      }
+
+      if (hasDontEnumBug) {
+        for (i = 0; i < dontEnumsLength; i++) {
+          if (hasOwnProperty.call(obj, dontEnums[i])) {
+            result.push(dontEnums[i]);
+          }
+        }
+      }
+      return result;
+    };
+  }());
+}
+
 var testDiv = document.getElementById("qunit-fixture");
 
 module( "Baseline Tests" );
@@ -219,12 +261,16 @@ test( 'Dable with style="none" has basic elements', function() {
 	equal(table.style.width, "100%");
 	equal(header.style.padding, "5px");
 	equal(footer.style.padding, "5px");
-	equal(header.children[0].style.float, "left");
-	equal(header.children[1].style.float, "right");
+	var myTest = header.children[0].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "left");
+	myTest = header.children[1].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "right");
 	equal(header.children[2].style.clear, "both");
-	equal(footer.children[0].style.float, "left");
-	equal(footer.children[1].style.float, "right");
-	equal(footer.children[1].style.listStyle, "none");
+	myTest = footer.children[0].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "left");
+	myTest = footer.children[1].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "right");
+	equal(footer.children[1].style.listStyleType, "none");
 	equal(footer.children[2].style.clear, "both");
 	equal(footer.children[1].children[0].style.display, "inline");
 	equal(footer.children[1].children[1].style.display, "inline");
@@ -238,27 +284,35 @@ test( 'Dable with style="none" has basic elements', function() {
 	//equal(table.children[0].children[0].children[1].style.cursor, "default");
 	//equal(table.children[0].children[0].children[2].style.cursor, "default");
 	//equal(table.children[0].children[0].children[3].style.cursor, "default");
-	equal(table.children[0].children[0].children[0].children[0].style.float, "left");
-	equal(table.children[0].children[0].children[0].children[1].style.float, "right");
+	myTest = table.children[0].children[0].children[0].children[0].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "left");
+	myTest = table.children[0].children[0].children[0].children[1].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "right");
 	equal(table.children[0].children[0].children[0].children[2].style.clear, "both");
-	equal(table.children[0].children[0].children[1].children[0].style.float, "left");
-	equal(table.children[0].children[0].children[1].children[1].style.float, "right");
+	myTest = table.children[0].children[0].children[1].children[0].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "left");
+	myTest = table.children[0].children[0].children[1].children[1].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "right");
 	equal(table.children[0].children[0].children[1].children[2].style.clear, "both");
-	equal(table.children[0].children[0].children[2].children[0].style.float, "left");
-	equal(table.children[0].children[0].children[2].children[1].style.float, "right");
+	myTest = table.children[0].children[0].children[2].children[0].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "left");
+	myTest = table.children[0].children[0].children[2].children[1].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "right");
 	equal(table.children[0].children[0].children[2].children[2].style.clear, "both");
-	equal(table.children[0].children[0].children[3].children[0].style.float, "left");
-	equal(table.children[0].children[0].children[3].children[1].style.float, "right");
+	myTest = table.children[0].children[0].children[3].children[0].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "left");
+	myTest = table.children[0].children[0].children[3].children[1].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "right");
 	equal(table.children[0].children[0].children[3].children[2].style.clear, "both");
-	equal(table.children[1].children[0].style.backgroundColor, "rgb(226, 228, 255)");
+	equal(rgb2hex(table.children[1].children[0].style.backgroundColor), "#e2e4ff");
 	equal(table.children[1].children[1].style.backgroundColor, "white");
-	equal(table.children[1].children[2].style.backgroundColor, "rgb(226, 228, 255)");
+	equal(rgb2hex(table.children[1].children[2].style.backgroundColor), "#e2e4ff");
 	equal(table.children[1].children[3].style.backgroundColor, "white");
-	equal(table.children[1].children[4].style.backgroundColor, "rgb(226, 228, 255)");
+	equal(rgb2hex(table.children[1].children[4].style.backgroundColor), "#e2e4ff");
 	equal(table.children[1].children[5].style.backgroundColor, "white");
-	equal(table.children[1].children[6].style.backgroundColor, "rgb(226, 228, 255)");
+	equal(rgb2hex(table.children[1].children[6].style.backgroundColor), "#e2e4ff");
 	equal(table.children[1].children[7].style.backgroundColor, "white");
-	equal(table.children[1].children[8].style.backgroundColor, "rgb(226, 228, 255)");
+	equal(rgb2hex(table.children[1].children[8].style.backgroundColor), "#e2e4ff");
 	equal(table.children[1].children[9].style.backgroundColor, "white");
 	equal(table.children[1].children[0].children[0].style.padding, "5px");
 	equal(table.children[1].children[0].children[1].style.padding, "5px");
@@ -400,17 +454,25 @@ test( 'Dable with style="clear" has basic elements but no style', function() {
 	//notEqual(table.children[0].children[0].children[1].style.cursor, "default");
 	//notEqual(table.children[0].children[0].children[2].style.cursor, "default");
 	//notEqual(table.children[0].children[0].children[3].style.cursor, "default");
-	notEqual(table.children[0].children[0].children[0].children[0].style.float, "left");
-	notEqual(table.children[0].children[0].children[0].children[1].style.float, "right");
+	myTest = table.children[0].children[0].children[0].children[0].style;
+	notEqual(myTest.styleFloat || myTest.cssFloat, "left");
+	myTest = table.children[0].children[0].children[0].children[1].style;
+	notEqual(myTest.styleFloat || myTest.cssFloat, "right");
 	notEqual(table.children[0].children[0].children[0].children[2].style.clear, "both");
-	notEqual(table.children[0].children[0].children[1].children[0].style.float, "left");
-	notEqual(table.children[0].children[0].children[1].children[1].style.float, "right");
+	myTest = table.children[0].children[0].children[1].children[0].style;
+	notEqual(myTest.styleFloat || myTest.cssFloat, "left");
+	myTest = table.children[0].children[0].children[1].children[1].style;
+	notEqual(myTest.styleFloat || myTest.cssFloat, "right");
 	notEqual(table.children[0].children[0].children[1].children[2].style.clear, "both");
-	notEqual(table.children[0].children[0].children[2].children[0].style.float, "left");
-	notEqual(table.children[0].children[0].children[2].children[1].style.float, "right");
+	myTest = table.children[0].children[0].children[2].children[0].style;
+	notEqual(myTest.styleFloat || myTest.cssFloat, "left");
+	myTest = table.children[0].children[0].children[2].children[1].style;
+	notEqual(myTest.styleFloat || myTest.cssFloat, "right");
 	notEqual(table.children[0].children[0].children[2].children[2].style.clear, "both");
-	notEqual(table.children[0].children[0].children[3].children[0].style.float, "left");
-	notEqual(table.children[0].children[0].children[3].children[1].style.float, "right");
+	myTest = table.children[0].children[0].children[3].children[0].style;
+	notEqual(myTest.styleFloat || myTest.cssFloat, "left");
+	myTest = table.children[0].children[0].children[3].children[1].style;
+	notEqual(myTest.styleFloat || myTest.cssFloat, "right");
 	notEqual(table.children[0].children[0].children[3].children[2].style.clear, "both");
 	notEqual(table.children[1].children[0].style.backgroundColor, "rgb(226, 228, 255)");
 	notEqual(table.children[1].children[1].style.backgroundColor, "white");
@@ -545,12 +607,16 @@ test( 'Dable with style="bootstrap" has basic elements and slightly different st
 	equal(table.style.width, "100%");
 	equal(header.style.padding, "5px");
 	equal(footer.style.padding, "5px");
-	equal(header.children[0].style.float, "left");
-	equal(header.children[1].style.float, "right");
+	myTest = header.children[0].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "left");
+	myTest = header.children[1].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "right");
 	equal(header.children[2].style.clear, "both");
-	equal(footer.children[0].style.float, "left");
-	equal(footer.children[1].style.float, "right");
-	equal(footer.children[1].style.listStyle, "none");
+	myTest = footer.children[0].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "left");
+	myTest = footer.children[1].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "right");
+	equal(footer.children[1].style.listStyleType, "none");
 	equal(footer.children[2].style.clear, "both");
 			// different from default
 	equal(footer.children[1].children[0].style.display, "");
@@ -566,17 +632,25 @@ test( 'Dable with style="bootstrap" has basic elements and slightly different st
 	//equal(table.children[0].children[0].children[1].style.cursor, "default");
 	//equal(table.children[0].children[0].children[2].style.cursor, "default");
 	//equal(table.children[0].children[0].children[3].style.cursor, "default");
-	equal(table.children[0].children[0].children[0].children[0].style.float, "left");
-	equal(table.children[0].children[0].children[0].children[1].style.float, "right");
+	myTest = table.children[0].children[0].children[0].children[0].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "left");
+	myTest = table.children[0].children[0].children[0].children[1].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "right");
 	equal(table.children[0].children[0].children[0].children[2].style.clear, "both");
-	equal(table.children[0].children[0].children[1].children[0].style.float, "left");
-	equal(table.children[0].children[0].children[1].children[1].style.float, "right");
+	myTest = table.children[0].children[0].children[1].children[0].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "left");
+	myTest = table.children[0].children[0].children[1].children[1].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "right");
 	equal(table.children[0].children[0].children[1].children[2].style.clear, "both");
-	equal(table.children[0].children[0].children[2].children[0].style.float, "left");
-	equal(table.children[0].children[0].children[2].children[1].style.float, "right");
+	myTest = table.children[0].children[0].children[2].children[0].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "left");
+	myTest = table.children[0].children[0].children[2].children[1].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "right");
 	equal(table.children[0].children[0].children[2].children[2].style.clear, "both");
-	equal(table.children[0].children[0].children[3].children[0].style.float, "left");
-	equal(table.children[0].children[0].children[3].children[1].style.float, "right");
+	myTest = table.children[0].children[0].children[3].children[0].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "left");
+	myTest = table.children[0].children[0].children[3].children[1].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "right");
 	equal(table.children[0].children[0].children[3].children[2].style.clear, "both");
 			// different from default
 	equal(table.children[1].children[0].style.backgroundColor, "");
@@ -833,3 +907,13 @@ function makeNestedTable(div) {
 	MakeSimpleTable(innerDiv);
 	return innerDiv;
 }
+
+function rgb2hex(rgb) {
+	if (rgb.search('rgb') == -1) {return rgb;}
+	rgb = rgb.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+))?\)$/);
+	function hex(x) {
+		return ('0' + parseInt(x).toString(16)).slice(-2);
+	}
+	return '#' + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]); 
+}
+
