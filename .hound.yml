@@ -3,3 +3,4 @@ javascript:
   ignore_file: LICENSE
   ignore_file: README.md
   ignore_file: .gitignore
+  ignore_file: dist/dable.min.js

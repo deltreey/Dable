@@ -1,3 +1,47 @@
+/* jshint -W041 */
+
+// From https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys
+if (!Object.keys) {
+  Object.keys = (function() {
+    'use strict';
+    var hasOwnProperty = Object.prototype.hasOwnProperty,
+        hasDontEnumBug = !({ toString: null }).propertyIsEnumerable('toString'),
+        dontEnums = [
+          'toString',
+          'toLocaleString',
+          'valueOf',
+          'hasOwnProperty',
+          'isPrototypeOf',
+          'propertyIsEnumerable',
+          'constructor'
+        ],
+        dontEnumsLength = dontEnums.length;
+
+    return function(obj) {
+      if (typeof obj !== 'object' && (typeof obj !== 'function' || obj === null)) {
+        throw new TypeError('Object.keys called on non-object');
+      }
+
+      var result = [], prop, i;
+
+      for (prop in obj) {
+        if (hasOwnProperty.call(obj, prop)) {
+          result.push(prop);
+        }
+      }
+
+      if (hasDontEnumBug) {
+        for (i = 0; i < dontEnumsLength; i++) {
+          if (hasOwnProperty.call(obj, dontEnums[i])) {
+            result.push(dontEnums[i]);
+          }
+        }
+      }
+      return result;
+    };
+  }());
+}
+
 var testDiv = document.getElementById("qunit-fixture");
 
 module( "Baseline Tests" );
@@ -106,7 +150,6 @@ test( "Dable Pager goes forward", function() {
 	equal( dable.pageNumber, 1 );
 	equal( firstCell.innerHTML, "10" );
 });
-
 test( "Dable Pager goes backward", function() {
 	//Given: a table made into a Dable with more than 1 page and go to page 2
 	MakeSimpleTable(testDiv);
@@ -146,8 +189,8 @@ test( 'Dable with style="none" has basic elements', function() {
 	equal(header.children[0].children[1].children[2].children.length, 0);
 	equal(header.children[0].children[1].children[3].children.length, 0);
 	equal(header.children[1].children.length, 2);
-	equal(header.children[1].children[0].children.length, 0)
-	equal(header.children[1].children[1].children.length, 0)
+	equal(header.children[1].children[0].children.length, 0);
+	equal(header.children[1].children[1].children.length, 0);
 	equal(header.children[2].children.length, 0);
 	equal(footer.children.length, 3);
 	equal(footer.children[0].children.length, 1);
@@ -217,12 +260,16 @@ test( 'Dable with style="none" has basic elements', function() {
 	equal(table.style.width, "100%");
 	equal(header.style.padding, "5px");
 	equal(footer.style.padding, "5px");
-	equal(header.children[0].style.float, "left");
-	equal(header.children[1].style.float, "right");
+	var myTest = header.children[0].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "left");
+	myTest = header.children[1].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "right");
 	equal(header.children[2].style.clear, "both");
-	equal(footer.children[0].style.float, "left");
-	equal(footer.children[1].style.float, "right");
-	equal(footer.children[1].style.listStyle, "none");
+	myTest = footer.children[0].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "left");
+	myTest = footer.children[1].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "right");
+	equal(footer.children[1].style.listStyleType, "none");
 	equal(footer.children[2].style.clear, "both");
 	equal(footer.children[1].children[0].style.display, "inline");
 	equal(footer.children[1].children[1].style.display, "inline");
@@ -236,27 +283,35 @@ test( 'Dable with style="none" has basic elements', function() {
 	//equal(table.children[0].children[0].children[1].style.cursor, "default");
 	//equal(table.children[0].children[0].children[2].style.cursor, "default");
 	//equal(table.children[0].children[0].children[3].style.cursor, "default");
-	equal(table.children[0].children[0].children[0].children[0].style.float, "left");
-	equal(table.children[0].children[0].children[0].children[1].style.float, "right");
+	myTest = table.children[0].children[0].children[0].children[0].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "left");
+	myTest = table.children[0].children[0].children[0].children[1].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "right");
 	equal(table.children[0].children[0].children[0].children[2].style.clear, "both");
-	equal(table.children[0].children[0].children[1].children[0].style.float, "left");
-	equal(table.children[0].children[0].children[1].children[1].style.float, "right");
+	myTest = table.children[0].children[0].children[1].children[0].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "left");
+	myTest = table.children[0].children[0].children[1].children[1].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "right");
 	equal(table.children[0].children[0].children[1].children[2].style.clear, "both");
-	equal(table.children[0].children[0].children[2].children[0].style.float, "left");
-	equal(table.children[0].children[0].children[2].children[1].style.float, "right");
+	myTest = table.children[0].children[0].children[2].children[0].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "left");
+	myTest = table.children[0].children[0].children[2].children[1].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "right");
 	equal(table.children[0].children[0].children[2].children[2].style.clear, "both");
-	equal(table.children[0].children[0].children[3].children[0].style.float, "left");
-	equal(table.children[0].children[0].children[3].children[1].style.float, "right");
+	myTest = table.children[0].children[0].children[3].children[0].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "left");
+	myTest = table.children[0].children[0].children[3].children[1].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "right");
 	equal(table.children[0].children[0].children[3].children[2].style.clear, "both");
-	equal(table.children[1].children[0].style.backgroundColor, "rgb(226, 228, 255)");
+	equal(rgb2hex(table.children[1].children[0].style.backgroundColor), "#e2e4ff");
 	equal(table.children[1].children[1].style.backgroundColor, "white");
-	equal(table.children[1].children[2].style.backgroundColor, "rgb(226, 228, 255)");
+	equal(rgb2hex(table.children[1].children[2].style.backgroundColor), "#e2e4ff");
 	equal(table.children[1].children[3].style.backgroundColor, "white");
-	equal(table.children[1].children[4].style.backgroundColor, "rgb(226, 228, 255)");
+	equal(rgb2hex(table.children[1].children[4].style.backgroundColor), "#e2e4ff");
 	equal(table.children[1].children[5].style.backgroundColor, "white");
-	equal(table.children[1].children[6].style.backgroundColor, "rgb(226, 228, 255)");
+	equal(rgb2hex(table.children[1].children[6].style.backgroundColor), "#e2e4ff");
 	equal(table.children[1].children[7].style.backgroundColor, "white");
-	equal(table.children[1].children[8].style.backgroundColor, "rgb(226, 228, 255)");
+	equal(rgb2hex(table.children[1].children[8].style.backgroundColor), "#e2e4ff");
 	equal(table.children[1].children[9].style.backgroundColor, "white");
 	equal(table.children[1].children[0].children[0].style.padding, "5px");
 	equal(table.children[1].children[0].children[1].style.padding, "5px");
@@ -282,7 +337,6 @@ test( 'Dable with style="none" has basic elements', function() {
 		//State
 	equal(footer.children[1].children[0].getAttribute("disabled"), "disabled");
 });
-
 test( 'Dable with style="clear" has basic elements but no style', function() {
 	//Given: a table
 	document.body.appendChild(testDiv);
@@ -308,8 +362,8 @@ test( 'Dable with style="clear" has basic elements but no style', function() {
 	equal(header.children[0].children[1].children[2].children.length, 0);
 	equal(header.children[0].children[1].children[3].children.length, 0);
 	equal(header.children[1].children.length, 2);
-	equal(header.children[1].children[0].children.length, 0)
-	equal(header.children[1].children[1].children.length, 0)
+	equal(header.children[1].children[0].children.length, 0);
+	equal(header.children[1].children[1].children.length, 0);
 	equal(header.children[2].children.length, 0);
 	equal(footer.children.length, 3);
 	equal(footer.children[0].children.length, 1);
@@ -398,17 +452,25 @@ test( 'Dable with style="clear" has basic elements but no style', function() {
 	//notEqual(table.children[0].children[0].children[1].style.cursor, "default");
 	//notEqual(table.children[0].children[0].children[2].style.cursor, "default");
 	//notEqual(table.children[0].children[0].children[3].style.cursor, "default");
-	notEqual(table.children[0].children[0].children[0].children[0].style.float, "left");
-	notEqual(table.children[0].children[0].children[0].children[1].style.float, "right");
+	myTest = table.children[0].children[0].children[0].children[0].style;
+	notEqual(myTest.styleFloat || myTest.cssFloat, "left");
+	myTest = table.children[0].children[0].children[0].children[1].style;
+	notEqual(myTest.styleFloat || myTest.cssFloat, "right");
 	notEqual(table.children[0].children[0].children[0].children[2].style.clear, "both");
-	notEqual(table.children[0].children[0].children[1].children[0].style.float, "left");
-	notEqual(table.children[0].children[0].children[1].children[1].style.float, "right");
+	myTest = table.children[0].children[0].children[1].children[0].style;
+	notEqual(myTest.styleFloat || myTest.cssFloat, "left");
+	myTest = table.children[0].children[0].children[1].children[1].style;
+	notEqual(myTest.styleFloat || myTest.cssFloat, "right");
 	notEqual(table.children[0].children[0].children[1].children[2].style.clear, "both");
-	notEqual(table.children[0].children[0].children[2].children[0].style.float, "left");
-	notEqual(table.children[0].children[0].children[2].children[1].style.float, "right");
+	myTest = table.children[0].children[0].children[2].children[0].style;
+	notEqual(myTest.styleFloat || myTest.cssFloat, "left");
+	myTest = table.children[0].children[0].children[2].children[1].style;
+	notEqual(myTest.styleFloat || myTest.cssFloat, "right");
 	notEqual(table.children[0].children[0].children[2].children[2].style.clear, "both");
-	notEqual(table.children[0].children[0].children[3].children[0].style.float, "left");
-	notEqual(table.children[0].children[0].children[3].children[1].style.float, "right");
+	myTest = table.children[0].children[0].children[3].children[0].style;
+	notEqual(myTest.styleFloat || myTest.cssFloat, "left");
+	myTest = table.children[0].children[0].children[3].children[1].style;
+	notEqual(myTest.styleFloat || myTest.cssFloat, "right");
 	notEqual(table.children[0].children[0].children[3].children[2].style.clear, "both");
 	notEqual(table.children[1].children[0].style.backgroundColor, "rgb(226, 228, 255)");
 	notEqual(table.children[1].children[1].style.backgroundColor, "white");
@@ -444,7 +506,6 @@ test( 'Dable with style="clear" has basic elements but no style', function() {
 		//State
 	equal(footer.children[1].children[0].getAttribute("disabled"), "disabled");
 });
-
 test( 'Dable with style="bootstrap" has basic elements and slightly different styling and classes', function() {
 	//Given: a table
 	document.body.appendChild(testDiv);
@@ -470,8 +531,8 @@ test( 'Dable with style="bootstrap" has basic elements and slightly different st
 	equal(header.children[0].children[1].children[2].children.length, 0);
 	equal(header.children[0].children[1].children[3].children.length, 0);
 	equal(header.children[1].children.length, 2);
-	equal(header.children[1].children[0].children.length, 0)
-	equal(header.children[1].children[1].children.length, 0)
+	equal(header.children[1].children[0].children.length, 0);
+	equal(header.children[1].children[1].children.length, 0);
 	equal(header.children[2].children.length, 0);
 	equal(footer.children.length, 3);
 	equal(footer.children[0].children.length, 1);
@@ -543,12 +604,16 @@ test( 'Dable with style="bootstrap" has basic elements and slightly different st
 	equal(table.style.width, "100%");
 	equal(header.style.padding, "5px");
 	equal(footer.style.padding, "5px");
-	equal(header.children[0].style.float, "left");
-	equal(header.children[1].style.float, "right");
+	myTest = header.children[0].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "left");
+	myTest = header.children[1].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "right");
 	equal(header.children[2].style.clear, "both");
-	equal(footer.children[0].style.float, "left");
-	equal(footer.children[1].style.float, "right");
-	equal(footer.children[1].style.listStyle, "none");
+	myTest = footer.children[0].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "left");
+	myTest = footer.children[1].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "right");
+	equal(footer.children[1].style.listStyleType, "none");
 	equal(footer.children[2].style.clear, "both");
 			// different from default
 	equal(footer.children[1].children[0].style.display, "");
@@ -564,17 +629,25 @@ test( 'Dable with style="bootstrap" has basic elements and slightly different st
 	//equal(table.children[0].children[0].children[1].style.cursor, "default");
 	//equal(table.children[0].children[0].children[2].style.cursor, "default");
 	//equal(table.children[0].children[0].children[3].style.cursor, "default");
-	equal(table.children[0].children[0].children[0].children[0].style.float, "left");
-	equal(table.children[0].children[0].children[0].children[1].style.float, "right");
+	myTest = table.children[0].children[0].children[0].children[0].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "left");
+	myTest = table.children[0].children[0].children[0].children[1].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "right");
 	equal(table.children[0].children[0].children[0].children[2].style.clear, "both");
-	equal(table.children[0].children[0].children[1].children[0].style.float, "left");
-	equal(table.children[0].children[0].children[1].children[1].style.float, "right");
+	myTest = table.children[0].children[0].children[1].children[0].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "left");
+	myTest = table.children[0].children[0].children[1].children[1].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "right");
 	equal(table.children[0].children[0].children[1].children[2].style.clear, "both");
-	equal(table.children[0].children[0].children[2].children[0].style.float, "left");
-	equal(table.children[0].children[0].children[2].children[1].style.float, "right");
+	myTest = table.children[0].children[0].children[2].children[0].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "left");
+	myTest = table.children[0].children[0].children[2].children[1].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "right");
 	equal(table.children[0].children[0].children[2].children[2].style.clear, "both");
-	equal(table.children[0].children[0].children[3].children[0].style.float, "left");
-	equal(table.children[0].children[0].children[3].children[1].style.float, "right");
+	myTest = table.children[0].children[0].children[3].children[0].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "left");
+	myTest = table.children[0].children[0].children[3].children[1].style;
+	equal(myTest.styleFloat || myTest.cssFloat, "right");
 	equal(table.children[0].children[0].children[3].children[2].style.clear, "both");
 			// different from default
 	equal(table.children[1].children[0].style.backgroundColor, "");
@@ -596,10 +669,10 @@ test( 'Dable with style="bootstrap" has basic elements and slightly different st
 			// different from default
 	equal(footer.children[1].children[0].className, "btn btn-default table-page");
 	equal(footer.children[1].children[1].className, "btn btn-default table-page");
-	equal(table.children[0].children[0].children[0].children[1].className, "table-sort glyphicon glyphicon-chevron-up");
-	equal(table.children[0].children[0].children[1].children[1].className, "table-sort glyphicon glyphicon-chevron-up");
-	equal(table.children[0].children[0].children[2].children[1].className, "table-sort glyphicon glyphicon-chevron-up");
-	equal(table.children[0].children[0].children[3].children[1].className, "table-sort glyphicon glyphicon-chevron-up");
+	equal(table.children[0].children[0].children[0].children[1].className, "table-sort");
+	equal(table.children[0].children[0].children[1].children[1].className, "table-sort");
+	equal(table.children[0].children[0].children[2].children[1].className, "table-sort");
+	equal(table.children[0].children[0].children[3].children[1].className, "table-sort");
 			// /different
 	equal(table.children[1].children[0].className, "table-row-even");
 	equal(table.children[1].children[1].className, "table-row-odd");
@@ -622,7 +695,7 @@ test( 'Creating an Dable from Data', function() {
 	sinon.spy(dable, "UpdateDisplayedRows");
 	sinon.spy(dable, "UpdateStyle");
 	var data = [ [ 1, 2 ], [ 3, 4 ] ];
-	var columns = [ 'Odd', 'Even' ]
+	var columns = [ 'Odd', 'Even' ];
 	dable.SetDataAsRows(data);
 	dable.SetColumnNames(columns);
 	
@@ -633,7 +706,6 @@ test( 'Creating an Dable from Data', function() {
 	equal(dable.UpdateDisplayedRows.callCount, 1);
 	equal(dable.UpdateStyle.callCount, 1);
 });
-
 test( 'Creating a Dable from a table', function() {
 	//Given: a spy on UpdateDisplayedRows, an empty dable, and a table full of data
 	var dable = new Dable();
@@ -648,7 +720,6 @@ test( 'Creating a Dable from a table', function() {
 	equal(dable.UpdateDisplayedRows.callCount, 1);
 	equal(dable.UpdateStyle.callCount, 1);
 });
-
 test( "Calling UpdateStyle", function() {
 	//Given: a spy on UpdateDisplayedRows, and a dable built from a table
 	var dable = new Dable();
@@ -662,7 +733,6 @@ test( "Calling UpdateStyle", function() {
 	//Then: the mock is never called
 	equal(dable.UpdateDisplayedRows.callCount, 0);
 });
-
 test( "Calling UpdateDisplayedRows", function() {
 	//Given: a spy on UpdateStyle, and a dable built from a table
 	var dable = new Dable();
@@ -747,6 +817,75 @@ test( 'With no thead the dable is not created', function() {
 	equal(dable.Exists(), false);
 });
 
+module("Dable from nested HTML Tests");
+test( 'basic Dable from nested HTML looks right', function() {
+	//Given: a table
+	var innerDiv = makeNestedTable(testDiv);
+
+	//When: we make it a dable
+	var dable = new Dable(innerDiv);
+
+	//Then: we see the elements we expect
+		//Element pattern
+	equal(innerDiv.children.length, 3);
+	var table = innerDiv.querySelector('table');
+	var footer = innerDiv.children[2];
+	equal(footer.children[0].children[0].innerHTML, "Showing 1 to 10 of 20 entries");
+	equal(table.children[1].children[0].children[0].innerHTML, 0);
+	equal(table.children[1].children[0].children[1].innerHTML, 1);
+	equal(table.children[1].children[0].children[2].innerHTML, 2);
+	equal(table.children[1].children[0].children[3].innerHTML, 3);
+});
+
+module("Event Tests");
+test( 'basic Dable ascending sort', function() {
+
+	//Given: a table
+	MakeSimpleTable(testDiv);
+
+	//When: we make it a dable and click on a header
+	var dable = new Dable(testDiv);
+	var table = testDiv.querySelector('table');
+	table.children[0].children[0].children[0].children[0].click();
+
+	//Then: we see the elements we expect
+	equal(table.children[0].children[0].children[0].children[1].innerText.charCodeAt(0), 9650);
+	equal(table.children[1].children[0].children[0].innerText, '0');
+
+});
+test( 'basic Dable decending sort', function() {
+
+	//Given: a table
+	MakeSimpleTable(testDiv);
+
+	//When: we make it a dable and click on a header
+	var dable = new Dable(testDiv);
+	var table = testDiv.querySelector('table');
+	table.children[0].children[0].children[0].children[0].click();
+	table.children[0].children[0].children[0].children[0].click();
+
+	//Then: we see the elements we expect
+	equal(table.children[0].children[0].children[0].children[1].innerText.charCodeAt(0), 9660);
+	equal(table.children[1].children[0].children[0].innerText, '19');
+
+});
+test( 'basic Dable search filter', function() {
+
+	//Given: a table
+	MakeSimpleTable(testDiv);
+
+	//When: we make it a dable and click on a header
+	var dable = new Dable(testDiv);
+	var table = testDiv.querySelector('table');
+	var search = testDiv.children[0].children[1].children[1];
+	search.value = '11';
+	triggerEvent(search, 'keyup');
+
+	//Then: we see the elements we expect
+	equal(table.children[1].children[0].children[0].innerText, '8');
+
+});
+
 function MakeSimpleTable(div) {
 	var table =  document.createElement("table");
 	var tbody = document.createElement("tbody");
@@ -754,20 +893,21 @@ function MakeSimpleTable(div) {
 	var row = document.createElement("tr");
 	var cell = document.createElement("td");
 	var headCell = document.createElement("th");
-	
+
+	var currentCell;
 	var headRow = row.cloneNode(false);
 	for (var i = 0; i < 4; ++i) {
-		var currentCell = headCell.cloneNode(false);
+		currentCell = headCell.cloneNode(false);
 		currentCell.innerHTML = "Column " + i.toString();
 		headRow.appendChild(currentCell);
 	}
 	thead.appendChild(headRow);
 	table.appendChild(thead);
-	
-	for (var i = 0; i < 20; ++i) {
+
+	for (i = 0; i < 20; ++i) {
 		var currentRow = row.cloneNode(false);
 		for (var j = 0; j < 4; ++j) {
-			var currentCell = cell.cloneNode(false);
+			currentCell = cell.cloneNode(false);
 			currentCell.innerHTML = (i + j).toString();
 			currentRow.appendChild(currentCell);
 		}
@@ -775,4 +915,43 @@ function MakeSimpleTable(div) {
 	}
 	table.appendChild(tbody);
 	div.appendChild(table);
+}
+
+function makeNestedTable(div) {
+	var table = document.createElement("table");
+	var tbody = document.createElement("tbody");
+	var row = document.createElement("tr");
+	var cell = document.createElement("td");
+	var innerDiv = document.createElement('DIV');
+	div.appendChild(table);
+	table.appendChild(tbody);
+	tbody.appendChild(row);
+	row.appendChild(cell);
+	cell.appendChild(innerDiv);
+	MakeSimpleTable(innerDiv);
+	return innerDiv;
+}
+
+function rgb2hex(rgb) {
+	if (rgb.search('rgb') == -1) {return rgb;}
+	rgb = rgb.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+))?\)$/);
+	function hex(x) {
+		return ('0' + parseInt(x).toString(16)).slice(-2);
+	}
+	return '#' + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]); 
+}
+
+function triggerEvent(el, type){
+	var e;
+	if ('createEvent' in document) {
+		// modern browsers, IE9+
+		e = document.createEvent('HTMLEvents');
+		e.initEvent(type, false, true);
+		el.dispatchEvent(e);
+	} else {
+		// IE 8
+		e = document.createEventObject();
+		e.eventType = type;
+		el.fireEvent('on' + e.eventType, e);
+	}
 }
