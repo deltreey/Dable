@@ -1,6 +1,26 @@
-javascript:
-  ignore_file: .travis.yml
-  ignore_file: LICENSE
-  ignore_file: README.md
-  ignore_file: .gitignore
-  ignore_file: dist/dable.min.js
+ruby:
+  enabled: false
+
+coffeescript:
+  enabled: false
+
+jshint:
+  config_file: .jshintrc
+  ignore_file: .jshintignore
+
+scss:
+  enabled: false
+
+haml:
+  enabled: false
+
+go:
+  enabled: false
+
+swift:
+  enabled: false
+
+eslint:
+  enabled: true
+  config_file: .eslintrc.js
+  ignore_file: .eslintignore

@@ -2,13 +2,20 @@
   "name": "dable",
   "version": "1.2.1",
   "homepage": "https://github.com/deltreey/Dable",
-  "author": [
-    "deltreey <suicidolt@gmail.com>"
-  ],
+  "author": "deltreey <suicidolt@gmail.com>",
   "description": "Dable (pronounced 'dabble') is a simple javascript table control with filtering, sorting, paging, styles, and more!",
   "main": "Dable.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "clean": "rimraf lib/*",
+    "prebuild": "npm run eslint && npm run clean",
+    "build": "npm run rollup",
+    "postbuild": "npm run uglify && npm run qunit",
+    "eslint": "eslint .",
+    "qunit": "node-qunit-phantomjs test/test.html",
+    "rollup": "rollup -c",
+    "test": "npm run build",
+    "uglify": "npm run uglify:umd",
+    "uglify:umd": "uglifyjs ./lib/dable.js -c -m -b -o ./lib/dable.min.js --comments /^!/ --ie8 --toplevel"
   },
   "repository": {
     "type": "git",
@@ -16,16 +23,15 @@
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/danielkrainas/Dable/issues"
+    "url": "https://github.com/deltreey/Dable/issues"
   },
   "devDependencies": {
-    "bower": "^1.7.9",
-    "grunt": "^1.0.1",
-    "grunt-cli": "^1.2.0",
-    "grunt-contrib-clean": "^1.0.0",
-    "grunt-contrib-concat": "^1.0.1",
-    "grunt-contrib-jshint": "^1.0.0",
-    "grunt-contrib-qunit": "^1.2.0",
-    "grunt-contrib-uglify": "^2.0.0"
+    "bower": "^1.8.0",
+    "eslint": "^3.19.0",
+    "node-qunit-phantomjs": "^1.5.0",
+    "qunitjs": "^1.23.1",
+    "rimraf": "^2.6.1",
+    "rollup": "^0.41.6",
+    "uglify-js": "^3.0.7"
   }
 }
