@@ -6,8 +6,6 @@ coffeescript:
 
 jshint:
   config_file: .jshintrc
-
-jshint:
   ignore_file: .jshintignore
 
 scss:
@@ -24,9 +22,5 @@ swift:
 
 eslint:
   enabled: true
-
-eslint:
   config_file: .eslintrc.js
-
-eslint:
   ignore_file: .eslintignore
